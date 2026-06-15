@@ -110,7 +110,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
             Måltidsväljare 🎲
           </span>
           <h2 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tight mt-1.5 flex items-center gap-2">
-            <span>Find Me A Meal</span>
+            <span>Hitta en måltid</span>
           </h2>
           <p className="text-xs text-muted-foreground font-semibold">
             {step === 'select-type' 

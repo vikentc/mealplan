@@ -207,7 +207,7 @@ export default function HomeClient({
             className="px-6 py-3 bg-amber-400 hover:bg-amber-500 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-2"
           >
             <Sparkles className="h-4.5 w-4.5 text-foreground shrink-0 animate-pulse" />
-            <span>Find me a meal 🎲</span>
+            <span>Hitta en måltid 🎲</span>
           </button>
         </motion.div>
       </motion.section>

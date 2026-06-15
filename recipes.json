@@ -4142,9 +4142,9 @@
   },
   {
     "name": "Jennies special ribs",
-    "url": "https://www.koket.se/nyhetsmorgon/jennie-wallden/jennies-special-ribs",
+    "url": "https://www.tasteline.com/recept/jennie-walldens-special-ribs/",
     "description": "I vänskapskretsen gillar man dessa revben. Jag blir tillfrågad att göra dem gång på gång och det blir sällan några över, trots jag alltid gör i överkant. Länge fanns det inget nerskrivet recept på dessa revben, som blivit något av min specialitet  - varav namnet &quot;special ribs&quot;. /Jennie   Jens Dolks dryckestips2261 Leth Rosé Zweigelt 2013, ÖsterrikeRosé mitt i vintern? Ja om det passar till maten så spelar vädret ingen roll tycker jag. Dessutom brukar jag ju tipsa om rosé när Jennie står för maten med sina asieninspirerade smaker.",
-    "image": "/static/img/placeholder.png",
+    "image": "https://eu-central-1.linodeobjects.com/tasteline/2014/09/jennies-special-ribs-foto-daniel-ohlsson-fyrkantig-800x800.jpg",
     "preparationTime": 15,
     "cookingTime": 20,
     "totalTime": 35,
@@ -4348,7 +4348,8 @@
       "vitaminD": 0.2,
       "vitaminB12": 1.2
     },
-    "id": "recipe_32"
+    "id": "recipe_32",
+    "updatedAt": "2026-06-15T14:27:49.149Z"
   },
   {
     "name": "Tunn kotlett med gräddsås",

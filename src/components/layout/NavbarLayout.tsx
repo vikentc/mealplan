@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   ChefHat,
   Menu, 
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logout } from '@/app/actions/auth';
 
 interface NavItem {
   label: string;
@@ -29,12 +30,31 @@ const ITEM_COLORS: Record<string, { bg: string; text: string }> = {
 
 export default function NavbarLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
 
   // Force light mode only to ensure strict compliance
   useEffect(() => {
     document.documentElement.classList.remove('dark');
   }, []);
+
+  const getSessionUserFromCookie = () => {
+    if (typeof document === 'undefined') return null;
+    const match = document.cookie.match(/(?:^|; )user_session=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+
+  useEffect(() => {
+    setCurrentUser(getSessionUserFromCookie());
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    await logout();
+    setCurrentUser(null);
+    router.push('/login');
+    router.refresh();
+  };
 
   const checkIsActive = (href: string) => {
     if (href === '/') {
@@ -101,6 +121,30 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
             ))}
           </nav>
 
+          {/* Desktop Auth State */}
+          <div className="hidden md:flex items-center gap-3 shrink-0">
+            {currentUser ? (
+              <>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-950 border-2 border-foreground px-3 py-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  👤 {currentUser}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="text-[10px] font-black uppercase tracking-wider bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground px-3.5 py-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                >
+                  Logga ut
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="text-[10px] font-black uppercase tracking-wider bg-cyan-100 hover:bg-cyan-200 text-cyan-950 border-2 border-foreground px-3.5 py-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer text-center font-bold"
+              >
+                Logga in
+              </Link>
+            )}
+          </div>
+
           {/* Mobile Hamburger menu */}
           <div className="flex items-center gap-4 md:hidden shrink-0">
             <button
@@ -131,10 +175,31 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
             ))}
           </nav>
           
-          <div className="border-t-2 border-foreground/20 pt-4 text-center">
-            <span className="inline-block bg-amber-100 text-amber-950 border-2 border-foreground px-3.5 py-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-[10px] font-black uppercase tracking-wider">
-              Inloggad: Kent & Maja
-            </span>
+          <div className="border-t-2 border-foreground/20 pt-4 flex flex-col items-center gap-3">
+            {currentUser ? (
+              <>
+                <span className="inline-block bg-emerald-100 text-emerald-950 border-2 border-foreground px-4 py-2 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs font-black uppercase tracking-wider">
+                  👤 Inloggad: {currentUser}
+                </span>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-center py-3 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-black uppercase text-xs tracking-wider rounded-xl transition-all active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+                >
+                  Logga ut
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full text-center py-3 bg-cyan-100 hover:bg-cyan-200 text-cyan-950 border-2 border-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-black uppercase text-xs tracking-wider rounded-xl transition-all active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+              >
+                Logga in
+              </Link>
+            )}
           </div>
         </div>
       )}

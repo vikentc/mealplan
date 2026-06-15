@@ -60,12 +60,16 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
   const router = useRouter();
   const [servings, setServings] = useState(recipe.servings || 4);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [checkedIngredients, setCheckedIngredients] = useState<Record<number, boolean>>({});
   const [checkedInstructions, setCheckedInstructions] = useState<Record<number, boolean>>({});
 
   // Load checklist state on mount
   useEffect(() => {
+    if (typeof document !== 'undefined') {
+      setIsLoggedIn(document.cookie.includes('user_session='));
+    }
     const savedIngs = localStorage.getItem(`recipe-checked-ings-${recipe.id}`);
     const savedInsts = localStorage.getItem(`recipe-checked-insts-${recipe.id}`);
     if (savedIngs) {
@@ -132,24 +136,25 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
           <span>Tillbaka till recept</span>
         </Link>
 
-        <div className="flex items-center gap-3">
-
-          <Link
-            href={`/recipes/${recipe.id}/edit`}
-            className="px-5 py-3 bg-cyan-100 hover:bg-cyan-200 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer"
-          >
-            <Edit3 className="h-4.5 w-4.5" />
-            <span>Redigera</span>
-          </Link>
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="px-5 py-3 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer"
-          >
-            <Trash2 className="h-4.5 w-4.5" />
-            <span>{isDeleting ? 'Tar bort...' : 'Ta bort'}</span>
-          </button>
-        </div>
+        {isLoggedIn && (
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/recipes/${recipe.id}/edit`}
+              className="px-5 py-3 bg-cyan-100 hover:bg-cyan-200 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Edit3 className="h-4.5 w-4.5" />
+              <span>Redigera</span>
+            </Link>
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="px-5 py-3 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Trash2 className="h-4.5 w-4.5" />
+              <span>{isDeleting ? 'Tar bort...' : 'Ta bort'}</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 1. Main Recipe Info Hero Card (spans full width) */}

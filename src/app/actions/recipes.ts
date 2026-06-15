@@ -3,6 +3,16 @@
 import { db } from '@/lib/db';
 import fs from 'fs';
 import path from 'path';
+import { cookies } from 'next/headers';
+
+async function checkAuth() {
+  const cookieStore = await cookies();
+  const sessionUser = cookieStore.get('user_session')?.value;
+  if (!sessionUser) {
+    throw new Error('Ej behörig. Vänligen logga in.');
+  }
+  return sessionUser;
+}
 
 // Local paths for fallback files
 const RECIPES_FILE = path.join(process.cwd(), 'recipes.json');
@@ -370,6 +380,7 @@ export async function getRecipeById(id: string) {
 }
 
 export async function createRecipe(data: any) {
+  await checkAuth();
   return runWithFallback(
     async () => {
       const recipe = await db.recipe.create({
@@ -433,6 +444,7 @@ export async function createRecipe(data: any) {
 }
 
 export async function updateRecipe(id: string, data: any) {
+  await checkAuth();
   return runWithFallback(
     async () => {
       const recipe = await db.recipe.update({
@@ -499,6 +511,7 @@ export async function updateRecipe(id: string, data: any) {
 }
 
 export async function deleteRecipe(id: string) {
+  await checkAuth();
   return runWithFallback(
     async () => {
       await db.recipe.delete({
@@ -546,6 +559,7 @@ export async function saveWeeklyPlan(plans: Array<{
   mealSlot: string;
   recipeId: string;
 }>) {
+  await checkAuth();
   return runWithFallback(
     async () => {
       // Use a transaction to update plan records in database

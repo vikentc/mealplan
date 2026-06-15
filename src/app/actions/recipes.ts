@@ -14,6 +14,50 @@ async function checkAuth() {
   return sessionUser;
 }
 
+// Caching layer variables & helper functions
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache TTL in production
+
+let allRecipesCache: any[] | null = null;
+let allRecipesCacheTime = 0;
+
+let recipeCache: Record<string, { data: any; timestamp: number }> = {};
+let weeklyPlanCache: Record<number, { data: any[]; timestamp: number }> = {};
+
+function invalidateRecipesCache() {
+  allRecipesCache = null;
+  allRecipesCacheTime = 0;
+  recipeCache = {};
+}
+
+function invalidateWeeklyPlanCache(weekOffset?: number) {
+  if (weekOffset !== undefined) {
+    delete weeklyPlanCache[weekOffset];
+  } else {
+    weeklyPlanCache = {};
+  }
+}
+
+async function getAllRecipesInternal(): Promise<any[]> {
+  const now = Date.now();
+  if (allRecipesCache && (now - allRecipesCacheTime < CACHE_TTL_MS)) {
+    return allRecipesCache;
+  }
+
+  const recipes = await runWithFallback(
+    async () => {
+      const results = await db.recipe.findMany({
+        orderBy: { name: 'asc' },
+      });
+      return JSON.parse(JSON.stringify(results));
+    },
+    () => getFallbackRecipes()
+  );
+
+  allRecipesCache = recipes;
+  allRecipesCacheTime = now;
+  return recipes;
+}
+
 // Local paths for fallback files
 const RECIPES_FILE = path.join(process.cwd(), 'recipes.json');
 const PLANS_FILE = path.join(process.cwd(), 'plans.json');
@@ -282,15 +326,8 @@ export async function getRecipes(filters?: {
   craving?: string;
 }) {
   // Fetch all recipes from DB / Fallback
-  const allRecipes = await runWithFallback(
-    async () => {
-      const results = await db.recipe.findMany({
-        orderBy: { name: 'asc' },
-      });
-      return JSON.parse(JSON.stringify(results));
-    },
-    () => getFallbackRecipes()
-  );
+  // Fetch all recipes from cache / DB / Fallback
+  const allRecipes = await getAllRecipesInternal();
 
   let originalQuery = filters?.query || '';
   let correctedQuery = originalQuery;
@@ -365,22 +402,32 @@ export async function getRecipes(filters?: {
 }
 
 export async function getRecipeById(id: string) {
-  return runWithFallback(
+  const now = Date.now();
+  const cached = recipeCache[id];
+  if (cached && (now - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.data;
+  }
+
+  const recipe = await runWithFallback(
     async () => {
-      const recipe = await db.recipe.findUnique({
+      const result = await db.recipe.findUnique({
         where: { id }
       });
-      return recipe ? JSON.parse(JSON.stringify(recipe)) : null;
+      return result ? JSON.parse(JSON.stringify(result)) : null;
     },
     () => {
       const recipes = getFallbackRecipes();
       return recipes.find((r) => r.id === id) || null;
     }
   );
+
+  recipeCache[id] = { data: recipe, timestamp: now };
+  return recipe;
 }
 
 export async function createRecipe(data: any) {
   await checkAuth();
+  invalidateRecipesCache();
   return runWithFallback(
     async () => {
       const recipe = await db.recipe.create({
@@ -445,6 +492,7 @@ export async function createRecipe(data: any) {
 
 export async function updateRecipe(id: string, data: any) {
   await checkAuth();
+  invalidateRecipesCache();
   return runWithFallback(
     async () => {
       const recipe = await db.recipe.update({
@@ -512,6 +560,7 @@ export async function updateRecipe(id: string, data: any) {
 
 export async function deleteRecipe(id: string) {
   await checkAuth();
+  invalidateRecipesCache();
   return runWithFallback(
     async () => {
       await db.recipe.delete({
@@ -529,7 +578,13 @@ export async function deleteRecipe(id: string) {
 }
 
 export async function getWeeklyPlan(weekOffset: number = 0) {
-  return runWithFallback(
+  const now = Date.now();
+  const cached = weeklyPlanCache[weekOffset];
+  if (cached && (now - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.data;
+  }
+
+  const data = await runWithFallback(
     async () => {
       const plans = await db.weeklyPlan.findMany({
         where: { weekOffset },
@@ -551,6 +606,9 @@ export async function getWeeklyPlan(weekOffset: number = 0) {
         .filter((p) => p.recipe !== null); // Filter out orphans
     }
   );
+
+  weeklyPlanCache[weekOffset] = { data, timestamp: now };
+  return data;
 }
 
 export async function saveWeeklyPlan(plans: Array<{
@@ -560,6 +618,8 @@ export async function saveWeeklyPlan(plans: Array<{
   recipeId: string;
 }>) {
   await checkAuth();
+  const weekOffset = plans.length > 0 ? plans[0].weekOffset : 0;
+  invalidateWeeklyPlanCache(weekOffset);
   return runWithFallback(
     async () => {
       // Use a transaction to update plan records in database

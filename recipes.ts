@@ -26,17 +26,17 @@ export interface Nutrition {
 export interface Recipe {
   id: string;
   name: string;
-  url: string;
-  description: string;
-  image: string;
+  url: string | null;
+  description: string | null;
+  image: string | null;
   preparationTime: number;
   cookingTime: number;
   totalTime: number;
   servings: number;
   difficulty: string;
   cuisine: string;
-  countryOfOrigin: string;
-  region: string;
+  countryOfOrigin: string | null;
+  region: string | null;
   mealType: string;
   occasions: string[];
   flavorProfile: string[];
@@ -45,6 +45,8 @@ export interface Recipe {
   ingredients: Ingredient[];
   instructions: string[];
   nutrition: Nutrition;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const recipes: Recipe[] = [
@@ -2053,9 +2055,9 @@ export const recipes: Recipe[] = [
     "id": "recipe_15"
   },
   {
-    "name": "Roasted Red Pepper Skillet Chicken",
+    "name": "Kyckling i krämig paprika- och parmesansås",
     "url": "https://www.jocooks.com/recipes/roasted-red-pepper-skillet-chicken/",
-    "description": "This Roasted Red Pepper Skillet Chicken is the answer to your boring dinner blues. We sear juicy chicken breasts until golden and then simmer them in a vibrant smoky sauce made with roasted peppers and parmesan cheese. It is a one pan wonder that looks sophisticated but is simple enough for a busy weeknight. Serve it over pasta or rice to soak up every single drop of that incredible sauce.",
+    "description": "Kyckling i krämig paprika- och parmesansås är lösningen på alla tråkiga middagar. Vi bryner saftiga kycklingfiléer tills de är gyllene och sjuder dem sedan i en fyllig, smakrik sås gjord på grillad paprika och parmesanost. En underbar allt-i-ett-rätt som känns lyxig men är enkel nog för en hektisk vardagskväll. Servera med pasta eller ris för att suga upp varenda droppe av den fantastiska såsen.",
     "image": "https://www.jocooks.com/wp-content/uploads/2024/04/roasted-red-pepper-skillet-chicken-1-19.jpg",
     "preparationTime": 10,
     "cookingTime": 20,
@@ -2083,80 +2085,80 @@ export const recipes: Recipe[] = [
     "spiceLevel": 0,
     "ingredients": [
       {
-        "name": "chicken breasts (boneless and skinless, pounded to an even thickness)",
+        "name": "kycklingfiléer (benfria och skinnfria, utbankade till jämn tjocklek)",
         "quantity": 4,
         "unit": "st",
         "optional": false
       },
       {
-        "name": "salt and pepper ( to taste)",
+        "name": "salt och peppar",
         "quantity": null,
         "unit": null,
         "optional": true
       },
       {
-        "name": "tablespoons olive oil",
+        "name": "olivolja",
         "quantity": 2,
-        "unit": "st",
+        "unit": "msk",
         "optional": false
       },
       {
-        "name": "garlic (minced)",
+        "name": "vitlöksklyftor (pressade eller finhackade)",
         "quantity": 4,
-        "unit": "cloves",
-        "optional": false
-      },
-      {
-        "name": "roasted red peppers (chopped)",
-        "quantity": 1,
-        "unit": "cup",
-        "optional": false
-      },
-      {
-        "name": "heavy cream",
-        "quantity": 1,
-        "unit": "cup",
-        "optional": false
-      },
-      {
-        "name": "chicken broth (low sodium)",
-        "quantity": 0.5,
-        "unit": "cup",
-        "optional": false
-      },
-      {
-        "name": "Parmesan cheese (grated)",
-        "quantity": 0.75,
-        "unit": "cup",
-        "optional": false
-      },
-      {
-        "name": "teaspoon Italian seasoning",
-        "quantity": 1,
         "unit": "st",
         "optional": false
       },
       {
-        "name": "teaspoon smoked paprika",
-        "quantity": 1,
-        "unit": "st",
+        "name": "grillad röd paprika (hackad)",
+        "quantity": 2.4,
+        "unit": "dl",
         "optional": false
       },
       {
-        "name": "fresh parsley (chopped, for garnish)",
+        "name": "vispgrädde",
+        "quantity": 2.4,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "kycklingbuljong (gärna med låg salthalt)",
+        "quantity": 1.2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "parmesanost (riven)",
+        "quantity": 1.8,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "italiensk kryddmix",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "rökt paprikapulver",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "färsk persilja (hackad, för garnering)",
         "quantity": null,
         "unit": null,
         "optional": false
       }
     ],
     "instructions": [
-      "Season the chicken breasts with salt, pepper, and smoked paprika.",
-      "Heat the olive oil in a large skillet over medium-high heat. Add the chicken breasts and cook until each side is golden brown and the chicken is cooked through, about 6-7 minutes per side. Transfer the chicken to a plate and cover to keep warm.",
-      "In a blender, combine the roasted red peppers, heavy cream, and chicken broth. Blend until smooth.",
-      "In the same skillet used for the chicken, cook the minced garlic over medium heat until fragrant, about 1 minute. Be careful not to burn the garlic.",
-      "Pour the blended roasted pepper sauce into the skillet and bring to a simmer. Stir in the grated Parmesan cheese and Italian seasoning. If the sauce is too thick, you can thin it with a little more chicken broth. Simmer until the sauce has thickened to your liking, about 3-4 minutes.",
-      "Return the chicken breasts to the skillet, spooning the sauce over them. Allow the chicken to simmer in the sauce for a few minutes to reheat and absorb the flavors. If desired, sprinkle with red pepper flakes for a bit of spice.",
-      "Garnish with chopped parsley and serve over rice."
+      "Krydda kycklingfiléerna med salt, peppar och rökt paprikapulver.",
+      "Hetta upp olivoljan i en stor stekpanna på medelhög värme. Lägg i kycklingfiléerna och stek tills de är gyllenbruna på båda sidor och helt genomstekta, ca 6–7 minuter per sida. Lägg över kycklingen på en tallrik och täck över för att hålla den varm.",
+      "Mixa grillad paprika, vispgrädde och kycklingbuljong i en blender tills det är helt slätt.",
+      "Fräs den finhackade vitlöken i samma stekpanna på medelvärme i ca 1 minut tills den doftar gott. Var försiktig så att vitlöken inte bränns.",
+      "Häll den mixade paprikasåsen i stekpannan och låt den sjuda upp. Rör ner den rivna parmesanosten och den italienska kryddmixen. Om såsen är för tjock kan du späda den med lite mer kycklingbuljong. Låt sjuda tills såsen tjocknat efter smak, ca 3–4 minuter.",
+      "Lägg tillbaka kycklingfiléerna i pannan och skeda såsen över dem. Låt kycklingen sjuda i såsen i några minuter så att den blir varm och tar åt sig smakerna. Strö eventuellt över lite chiliflakes om du vill ha lite hetta.",
+      "Garnera med hackad persilja och servera med kokt ris eller pasta."
     ],
     "nutrition": {
       "calories": 111,
@@ -4191,9 +4193,9 @@ export const recipes: Recipe[] = [
   },
   {
     "name": "Jennies special ribs",
-    "url": "https://www.koket.se/nyhetsmorgon/jennie-wallden/jennies-special-ribs",
+    "url": "https://www.tasteline.com/recept/jennie-walldens-special-ribs/",
     "description": "I vänskapskretsen gillar man dessa revben. Jag blir tillfrågad att göra dem gång på gång och det blir sällan några över, trots jag alltid gör i överkant. Länge fanns det inget nerskrivet recept på dessa revben, som blivit något av min specialitet  - varav namnet &quot;special ribs&quot;. /Jennie   Jens Dolks dryckestips2261 Leth Rosé Zweigelt 2013, ÖsterrikeRosé mitt i vintern? Ja om det passar till maten så spelar vädret ingen roll tycker jag. Dessutom brukar jag ju tipsa om rosé när Jennie står för maten med sina asieninspirerade smaker.",
-    "image": "/static/img/placeholder.png",
+    "image": "https://eu-central-1.linodeobjects.com/tasteline/2014/09/jennies-special-ribs-foto-daniel-ohlsson-fyrkantig-800x800.jpg",
     "preparationTime": 15,
     "cookingTime": 20,
     "totalTime": 35,
@@ -4397,7 +4399,8 @@ export const recipes: Recipe[] = [
       "vitaminD": 0.2,
       "vitaminB12": 1.2
     },
-    "id": "recipe_32"
+    "id": "recipe_32",
+    "updatedAt": "2026-06-15T14:27:49.149Z"
   },
   {
     "name": "Tunn kotlett med gräddsås",
@@ -7184,9 +7187,9 @@ export const recipes: Recipe[] = [
     "id": "recipe_56"
   },
   {
-    "name": "Chocolate-Orange Tart",
+    "name": "Choklad- och apelsinpaj",
     "url": "https://www.themissinglokness.com/2021/12/09/chocolate-orange-tart/",
-    "description": "Makes one 9-inch tart",
+    "description": "Räcker till en 23 cm paj",
     "image": "https://www.themissinglokness.com/wp-content/uploads/2021/12/BJG_9209-sf.jpg",
     "preparationTime": 30,
     "cookingTime": 30,
@@ -7213,108 +7216,108 @@ export const recipes: Recipe[] = [
     "spiceLevel": 0,
     "ingredients": [
       {
-        "name": "Flaky sea salt",
+        "name": "Flingsalt",
         "quantity": null,
         "unit": null,
         "optional": false
       },
       {
-        "name": "Chocolate shaving ((optional for garnish))",
+        "name": "Riven choklad (valfritt för garnering)",
         "quantity": null,
         "unit": null,
         "optional": true
       },
       {
-        "name": "Dehydrated or fresh orange slices ((optional for garnish))",
+        "name": "Torkade eller färska apelsinskivor (valfritt för garnering)",
         "quantity": null,
         "unit": null,
         "optional": true
       },
       {
-        "name": "grams all-purpose flour",
+        "name": "vetemjöl",
         "quantity": 150,
-        "unit": "st",
+        "unit": "g",
         "optional": false
       },
       {
-        "name": "grams sugar",
+        "name": "strösocker",
         "quantity": 50,
-        "unit": "st",
+        "unit": "g",
         "optional": false
       },
       {
-        "name": "teaspoon kosher salt",
+        "name": "kosher salt",
         "quantity": 0.25,
-        "unit": "st",
+        "unit": "tsk",
         "optional": false
       },
       {
-        "name": "grams unsalted butter ((8 tablespoons) (cold and cut into ½-inch cubes))",
+        "name": "osaltat smör (kallt och tärnat)",
         "quantity": 113,
-        "unit": "st",
+        "unit": "g",
         "optional": false
       },
       {
-        "name": "large egg yolk",
+        "name": "stor äggula",
         "quantity": 1,
         "unit": "st",
         "optional": false
       },
       {
-        "name": "teaspoon vanilla extract",
+        "name": "vaniljextrakt",
         "quantity": 1,
-        "unit": "st",
+        "unit": "tsk",
         "optional": false
       },
       {
-        "name": "tablespoon whole milk",
+        "name": "standardmjölk",
         "quantity": 1,
-        "unit": "st",
+        "unit": "msk",
         "optional": false
       },
       {
-        "name": "grams semi-sweet chocolate ((10 ounces) (chopped into small pieces))",
+        "name": "mörk eller halvbitter choklad (hackad)",
         "quantity": 283,
-        "unit": "st",
+        "unit": "g",
         "optional": false
       },
       {
-        "name": "heavy cream",
-        "quantity": 1,
-        "unit": "cups",
+        "name": "vispgrädde",
+        "quantity": 2.4,
+        "unit": "dl",
         "optional": false
       },
       {
-        "name": "teaspoons sugar",
+        "name": "strösocker",
         "quantity": 2,
-        "unit": "st",
+        "unit": "tsk",
         "optional": false
       },
       {
-        "name": "tablespoon orange zest ((about 1 orange) (finely grated))",
+        "name": "apelsinskal (finriven)",
         "quantity": 1,
-        "unit": "st",
+        "unit": "msk",
         "optional": false
       },
       {
-        "name": "grams unsalted butter ((5 tablespoons) (at room temperature and cut into ½-inch cubes))",
+        "name": "osaltat smör (rumstempererat och tärnat)",
         "quantity": 70,
-        "unit": "st",
+        "unit": "g",
         "optional": false
       }
     ],
     "instructions": [
-      "In a large mixing bowl, whisk together flour, sugar and salt. Add cold butter cubes. Toss with flour mixture. Using your finger tips or a pastry cutter, break the butter into small pieces, no larger than the size of pea. The mixture should look like coarse breadcrumbs. Transfer the bowl in the fridge to chill.",
-      "In the meantime, in a small bowl, whisk together egg yolk, vanilla extract and milk.",
-      "Add the wet mixture into the flour mixture. The mixture will be crumbly. Using your hand, squeeze the dough together and knead gently for a couple times. Shape into a round disk. Wrap in plastic wrap and chill in the fridge for 15 minutes.",
-      "Lightly grease the bottom and sides of a 9-inch round tart pan (with a removable bottom) with butter.",
-      "In a lightly floured surface, roll the dough into about 1/8-inch thick. While working, dust with more flour to prevent sticking. Carefully roll the dough onto a rolling pin and transfer to the prepared tart pan. Press and fit the dough into the pan. Trim off any excess dough. If there is any crack or hole, patch with a thin layer of extra dough. Prick the dough all over with a fork (just the bottom, not the sides). Chill the dough in the fridge for at least 30 minutes.",
-      "Preheat the oven to 375˚F (190˚C). Prepare a 12 x 12 parchment paper, crunch it up roughly and open it back up, so it can be easily shaped into the tart.",
-      "Place and fit the parchment paper on the tart. Fill with pie weights or dry beans. Bake in the oven for 12 – 14 minutes, until the crust feels dry and set. Carefully remove the pie weights and parchment paper. Bake in the oven for 8 – 10 more minutes, until golden brown.",
-      "Remove the crust from oven and cool completely on a cooling rack (keep the tart in the pan).",
-      "For the ganache, in a large mixing bowl, place chopped chocolate.",
-      "In a small saucepan over medium heat, combine heavy cream and sugar. Cook until it just starts to simmer. Pour over the chocolate immediately. Set aside for 5 minutes. Add orange zest and softened butter cubes. Stir with a spatula until smooth and glossy. Pour the ganache into the cooled tart crust (still in tart pan). Remove the air bubbles with a toothpick. Carefully transfer the tart to the fridge to set for at least 1 hour.",
-      "When ready to serve, carefully remove tart from pan. Sprinkle the top with flaky sea salt. Garnish with chocolate shaving and orange slices if using. Cut the tart with a hot knife. Serve cold."
+      "Blanda vetemjöl, socker och salt i en stor bunke. Tillsätt det kalla, tärnade smöret och fördela det i mjölblandningen. Nyp ihop med fingertopparna eller använd en degblandare tills smöret är finfördelat i ärtstora bitar och blandningen liknar grova brödsmulor. Ställ bunken i kylskåpet för att svalna.",
+      "Vispa under tiden ihop äggula, vaniljextrakt och mjölk i en liten skål.",
+      "Tillsätt äggblandningen till mjölblandningen. Degen kommer att vara smulig. Pressa ihop degen med händerna och knåda försiktigt några gånger tills den går ihop. Forma till en platt rund skiva, slå in i plastfolie och låt vila i kylen i 15 minuter.",
+      "Smörj botten och sidorna av en pajform (ca 23 cm i diameter, gärna med löstagbar botten) med lite smör.",
+      "Kavla ut degen på en lätt mjölad arbetsbänk tills den är ca 3 mm tjock. Mjöla efter hand så att degen inte fastnar. Rulla försiktigt upp degen på kaveln och för över den till pajformen. Tryck ut degen jämnt i formen och skär bort överflödiga kanter. Laga eventuella sprickor med överbliven deg. Nagga pajbotten med en gaffel (endast botten, inte kanterna) och ställ formen i kylen i minst 30 minuter.",
+      "Värm ugnen till 190˚C. Knyckla ihop ett bakplåtspapper och släta ut det igen (så att det blir lättare att forma efter pajen).",
+      "Lägg bakplåtspapperet i pajformen och fyll med bakbönor eller torra bönor som tyngd. Grädda mitt i ugnen i 12–14 minuter tills pajskalet känns torrt och fast. Ta försiktigt bort bönorna och papperet och grädda i ytterligare 8–10 minuter tills pajskalet är gyllenbrunt.",
+      "Ta ut pajskalet från ugnen och låt det svalna helt på ett galler (låt pajen ligga kvar i formen).",
+      "Lägg den hackade chokladen till chokladkrämen (ganachen) i en stor bunke.",
+      "Värm vispgrädde och socker i en liten kastrull på medelvärme tills det precis börjar sjuda. Häll grädden omedelbart över chokladen och låt stå i 5 minuter. Tillsätt finrivet apelsinskal och det mjuka, tärnade smöret. Rör om med en slickepott tills smeten är helt slät och glansig. Häll chokladkrämen i det avsvalnade pajskalet. Stick hål på eventuella luftbubblor med en tandpetare och ställ pajen i kylen i minst 1 timme så att krämen stelnar.",
+      "Lossa försiktigt pajen ur formen vid servering. Strö över lite flingsalt och garnera med riven choklad och apelsinskivor om så önskas. Skär pajen i bitar med en varm kniv. Serveras kall."
     ],
     "nutrition": {
       "calories": 1685,

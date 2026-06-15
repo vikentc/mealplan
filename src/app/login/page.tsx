@@ -88,7 +88,7 @@ function LoginFormContent() {
             required
             disabled={isPending}
             autoComplete="username"
-            placeholder="maja eller kent"
+            placeholder="Användarnamn"
             className="w-full p-3.5 bg-white border-2 border-foreground rounded-xl text-sm font-semibold focus:outline-none focus:bg-amber-50/20 focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all placeholder:text-foreground/30"
           />
         </div>

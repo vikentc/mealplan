@@ -322,16 +322,14 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => {}} // toggling handled by parent click
-                      className="h-4.5 w-4.5 mt-0.5 rounded border-2 border-foreground text-amber-500 focus:ring-amber-500 cursor-pointer accent-foreground shrink-0 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] checked:shadow-none checked:translate-y-[1.5px] transition-all"
+                      className="h-5 w-5 mt-0.5 rounded-full border-2 border-foreground bg-white checked:bg-[#f5ecd8] focus:ring-0 focus:ring-offset-0 cursor-pointer appearance-none shrink-0 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] checked:shadow-none checked:translate-y-[1.5px] transition-all relative after:content-[''] after:hidden checked:after:block after:absolute after:left-[5.5px] after:top-[1.5px] after:w-[5px] after:h-[10px] after:border-r-2 after:border-b-2 after:border-foreground after:rotate-45"
                     />
-                    <div className="flex gap-3 items-start">
-                      <span className="h-6 w-6 rounded-full bg-amber-100 text-foreground border-2 border-foreground font-black text-xs flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                        {idx + 1}
-                      </span>
+                    <div className="flex-1">
                       <p className={cn(
                         "text-xs md:text-sm leading-relaxed text-foreground font-medium",
                         isChecked && "line-through text-foreground/50"
                       )}>
+                        <span className="font-black mr-2 text-foreground/75">{idx + 1}.</span>
                         {step}
                       </p>
                     </div>

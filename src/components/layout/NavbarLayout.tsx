@@ -57,10 +57,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
   };
 
   const visibleNavItems = navItems.filter((item) => {
-    if (item.href === '/planner' || item.href === '/recipes/add') {
-      return !!currentUser;
-    }
-    return true;
+    return !!currentUser;
   });
 
   const checkIsActive = (href: string) => {

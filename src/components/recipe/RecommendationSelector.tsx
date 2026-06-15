@@ -86,6 +86,16 @@ export default function RecommendationSelector() {
   const searchParams = useSearchParams();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // Collapsible state for desktop card: defaults to expanded if any filter is active
+  const [isExpanded, setIsExpanded] = useState(!!(
+    searchParams.get('mealType') || 
+    searchParams.get('craving') || 
+    searchParams.get('cuisine') || 
+    searchParams.get('flavor') || 
+    searchParams.get('mood') || 
+    searchParams.get('nutritionGoal')
+  ));
 
   // Read URL search params
   const activeQuery = searchParams.get('query') || '';
@@ -409,9 +419,13 @@ export default function RecommendationSelector() {
   return (
     <>
       {/* 1. Desktop View (Unified Card-based Mealfinder) */}
-      <div className="hidden md:block bg-card border-3 border-foreground rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-[radial-gradient(rgba(0,0,0,0.025)_1.5px,transparent_1.5px)] [background-size:16px_16px]">
-        {/* Header Panel */}
-        <div className="p-6 md:p-8 border-b-3 border-foreground bg-secondary/15 flex items-center justify-between">
+      <div className="hidden md:block bg-card border-3 border-foreground rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+        {/* Header Panel Toggle */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          type="button"
+          className="w-full p-6 md:p-8 bg-secondary/15 flex items-center justify-between hover:bg-secondary/25 transition-colors cursor-pointer select-none text-left focus:outline-none"
+        >
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-amber-400 border-2 border-foreground flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <SlidersHorizontal className="h-5 w-5 text-foreground" />
@@ -421,25 +435,31 @@ export default function RecommendationSelector() {
               <p className="text-[10px] text-muted-foreground font-semibold">Vad i hela friden ska vi äta idag? 🧭</p>
             </div>
           </div>
-        </div>
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-foreground/75 shrink-0 pl-4">
+            <span>{isExpanded ? 'Dölj kompassen' : 'Visa kompassen'}</span>
+            {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+          </div>
+        </button>
 
         {/* Selectors body */}
-        <div className="p-6 md:p-8 space-y-6">
-          {renderSelectors(false)}
+        {isExpanded && (
+          <div className="p-6 md:p-8 space-y-6 border-t-3 border-foreground bg-[radial-gradient(rgba(0,0,0,0.025)_1.5px,transparent_1.5px)] [background-size:16px_16px] animate-in slide-in-from-top-4 duration-200">
+            {renderSelectors(false)}
 
-          {hasActiveFilters && (
-            <div className="flex justify-end pt-4 border-t-2 border-dashed border-foreground/25">
-              <button
-                onClick={handleReset}
-                type="button"
-                className="px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <RotateCcw className="h-4 w-4" />
-                <span>Rensa filter / Börja om</span>
-              </button>
-            </div>
-          )}
-        </div>
+            {hasActiveFilters && (
+              <div className="flex justify-end pt-4 border-t-2 border-dashed border-foreground/25">
+                <button
+                  onClick={handleReset}
+                  type="button"
+                  className="px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  <span>Rensa filter / Börja om</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 2. Mobile View (Trigger Button & Dialog Overlay) */}

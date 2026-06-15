@@ -14,6 +14,8 @@ interface IngredientListProps {
   originalServings: number;
   spiceLevel: number;
   originalSpiceLevel: number;
+  checkedIngredients?: Record<number, boolean>;
+  onToggleIngredient?: (idx: number) => void;
 }
 
 // Check if ingredient is spicy
@@ -32,7 +34,9 @@ export default function IngredientList({
   servings,
   originalServings,
   spiceLevel,
-  originalSpiceLevel
+  originalSpiceLevel,
+  checkedIngredients = {},
+  onToggleIngredient
 }: IngredientListProps) {
   const portionFactor = servings / originalServings;
   
@@ -90,33 +94,50 @@ export default function IngredientList({
           const spiceChanged = isSpicy && spiceLevel !== originalSpiceLevel;
           const hasChanged = (portionChanged && ing.quantity !== null) || spiceChanged;
 
+          const isChecked = !!checkedIngredients[idx];
+
           return (
             <li 
               key={idx} 
               className={`py-3.5 flex items-center justify-between gap-4 transition-all duration-200 ${
                 isRemoved ? "opacity-45 line-through decoration-red-500/50 bg-red-100/20 rounded-xl px-2" : ""
-              }`}
+              } ${isChecked ? "opacity-60 bg-emerald-50/10" : ""}`}
             >
-              {/* Ingredient Name */}
-              <div className="flex items-center gap-2.5">
-                <div className={`h-5 w-5 rounded-full flex items-center justify-center border-2 border-foreground text-[10px] shrink-0 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ${
-                  isRemoved 
-                    ? "text-red-800 bg-red-100" 
-                    : isSpicy 
-                      ? "text-red-850 bg-red-100 animate-pulse" 
-                      : "text-foreground bg-amber-100"
-                }`}>
-                  {isRemoved ? <AlertCircle className="h-3 w-3" /> : isSpicy ? <Flame className="h-3 w-3 fill-current" /> : <Check className="h-3.5 w-3.5" />}
-                </div>
-                <div>
-                  <span className={`text-xs font-black uppercase tracking-tight ${isSpicy ? "text-red-850" : "text-foreground"}`}>
-                    {ing.name}
-                  </span>
-                  {ing.optional && (
-                    <span className="text-[9px] text-foreground ml-1.5 font-black uppercase tracking-wider bg-amber-100 px-1.5 py-0.5 rounded-md border-2 border-foreground shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                      Valfri
+              {/* Ingredient Name with Checkbox click-handler */}
+              <div 
+                className="flex items-center gap-3 select-none cursor-pointer"
+                onClick={() => onToggleIngredient && onToggleIngredient(idx)}
+              >
+                {onToggleIngredient && (
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {}} // toggling handled by parent div click
+                    className="h-4.5 w-4.5 rounded border-2 border-foreground text-amber-500 focus:ring-amber-500 cursor-pointer accent-foreground shrink-0 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] checked:shadow-none checked:translate-y-[1.5px] transition-all"
+                  />
+                )}
+                <div className="flex items-center gap-2.5">
+                  <div className={`h-5 w-5 rounded-full flex items-center justify-center border-2 border-foreground text-[10px] shrink-0 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ${
+                    isRemoved 
+                      ? "text-red-800 bg-red-100" 
+                      : isSpicy 
+                        ? "text-red-850 bg-red-100 animate-pulse" 
+                        : "text-foreground bg-amber-100"
+                  }`}>
+                    {isRemoved ? <AlertCircle className="h-3 w-3" /> : isSpicy ? <Flame className="h-3 w-3 fill-current" /> : <Check className="h-3.5 w-3.5" />}
+                  </div>
+                  <div>
+                    <span className={`text-xs font-black uppercase tracking-tight ${
+                      isChecked ? "line-through text-foreground/50" : isSpicy ? "text-red-850" : "text-foreground"
+                    }`}>
+                      {ing.name}
                     </span>
-                  )}
+                    {ing.optional && (
+                      <span className="text-[9px] text-foreground ml-1.5 font-black uppercase tracking-wider bg-amber-100 px-1.5 py-0.5 rounded-md border-2 border-foreground shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                        Valfri
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

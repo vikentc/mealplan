@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { 
   PlusCircle, 
@@ -58,6 +59,25 @@ export default function HomeClient({
 }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showRules, setShowRules] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeQuery = searchParams.get('query') || '';
+  const [queryText, setQueryText] = useState(activeQuery);
+
+  useEffect(() => {
+    setQueryText(activeQuery);
+  }, [activeQuery]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams.toString());
+    if (queryText) {
+      params.set('query', queryText);
+    } else {
+      params.delete('query');
+    }
+    router.push(`/?${params.toString()}`);
+  };
   
   // Parallax Scroll Hooks
   const { scrollY } = useScroll();
@@ -144,6 +164,26 @@ export default function HomeClient({
           <p className="text-sm md:text-base text-foreground font-medium leading-relaxed max-w-lg mx-auto">
             Planera dina måltider, sök recept med avancerade filter och hitta förslag utifrån dina cravings!
           </p>
+
+          {/* Search focus */}
+          <div className="w-full max-w-4xl mx-auto pt-3 text-left">
+            <form onSubmit={handleSearchSubmit} className="relative w-full">
+              <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground z-10" />
+              <input
+                type="text"
+                placeholder="Sök på receptnamn eller ingrediens..."
+                value={queryText}
+                onChange={(e) => setQueryText(e.target.value)}
+                className="w-full pl-12 pr-28 py-4 bg-card border-3 border-foreground rounded-2xl text-foreground text-xs font-black uppercase tracking-wide focus:outline-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] placeholder:text-foreground/50 transition-all"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-foreground hover:bg-foreground/90 text-background text-xs font-black rounded-xl transition-all cursor-pointer uppercase tracking-wider z-10"
+              >
+                Sök
+              </button>
+            </form>
+          </div>
         </div>
       </motion.section>
 

@@ -191,14 +191,25 @@ export default function RecommendationSelector() {
   };
 
   const handleApplyMobile = () => {
-    const params = new URLSearchParams();
-    if (tempQuery) params.set('query', tempQuery);
+    const params = new URLSearchParams(searchParams.toString());
+    
     if (tempMealType) params.set('mealType', tempMealType);
+    else params.delete('mealType');
+
     if (tempCraving) params.set('craving', tempCraving);
+    else params.delete('craving');
+
     if (tempCuisine) params.set('cuisine', tempCuisine);
+    else params.delete('cuisine');
+
     if (tempFlavor) params.set('flavor', tempFlavor);
+    else params.delete('flavor');
+
     if (tempMood) params.set('mood', tempMood);
+    else params.delete('mood');
+
     if (tempNutritionGoal) params.set('nutritionGoal', tempNutritionGoal);
+    else params.delete('nutritionGoal');
 
     router.push(`/?${params.toString()}`);
     setIsDialogOpen(false);
@@ -217,7 +228,6 @@ export default function RecommendationSelector() {
   };
 
   const hasActiveFilters = !!(
-    activeQuery || 
     activeMealType || 
     activeCraving || 
     activeCuisine || 
@@ -229,37 +239,13 @@ export default function RecommendationSelector() {
   const activeMealLabel = MEAL_TYPES.find(t => t.id === activeMealType)?.label || '';
   const activeCravingLabel = CRAVINGS.find(c => c.id === activeCraving)?.label || '';
 
-  let triggerText = '🔍 Sök maträtt, måltid & cravings';
-  if (activeQuery || activeMealLabel || activeCravingLabel) {
+  let triggerText = '🔍 Anpassa måltid & cravings';
+  if (activeMealLabel || activeCravingLabel) {
     const parts = [];
-    if (activeQuery) parts.push(`"${activeQuery}"`);
     if (activeMealLabel) parts.push(activeMealLabel);
     if (activeCravingLabel) parts.push(activeCravingLabel.split(' ').slice(1).join(' ') || activeCravingLabel);
     triggerText = `🥑 ${parts.join(' + ')}`;
   }
-
-  const renderSearchField = (isMobile: boolean) => (
-    <div className="w-full">
-      <form onSubmit={isMobile ? (e) => e.preventDefault() : handleTextSubmit} className="relative w-full">
-        <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground z-10" />
-        <input
-          type="text"
-          placeholder="Sök på receptnamn eller ingrediens..."
-          value={isMobile ? tempQuery : tempQuery}
-          onChange={(e) => setTempQuery(e.target.value)}
-          className="w-full pl-12 pr-28 py-4 bg-card border-3 border-foreground rounded-2xl text-foreground text-xs font-black uppercase tracking-wide focus:outline-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] placeholder:text-foreground/50 transition-all"
-        />
-        {!isMobile && (
-          <button
-            type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-foreground hover:bg-foreground/90 text-background text-xs font-black rounded-xl transition-all cursor-pointer uppercase tracking-wider z-10"
-          >
-            Sök
-          </button>
-        )}
-      </form>
-    </div>
-  );
 
   const renderSelectors = (isMobile: boolean) => {
     const currentMeal = isMobile ? tempMealType : activeMealType;
@@ -448,9 +434,8 @@ export default function RecommendationSelector() {
           )}
         </div>
 
-        {/* Search input & selectors body */}
+        {/* Selectors body */}
         <div className="p-6 md:p-8 space-y-6">
-          {renderSearchField(false)}
           {renderSelectors(false)}
         </div>
       </div>
@@ -492,11 +477,6 @@ export default function RecommendationSelector() {
 
               {/* Scrollable Selector Panel */}
               <div className="flex-1 overflow-y-auto space-y-5 py-2 pr-1 select-none">
-                {/* Mobile Search input */}
-                <div className="space-y-1.5 text-left">
-                  <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Sökord</label>
-                  {renderSearchField(true)}
-                </div>
                 {renderSelectors(true)}
               </div>
 

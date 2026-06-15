@@ -56,6 +56,13 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
     router.refresh();
   };
 
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.href === '/planner' || item.href === '/recipes/add') {
+      return !!currentUser;
+    }
+    return true;
+  });
+
   const checkIsActive = (href: string) => {
     if (href === '/') {
       return pathname === '/';
@@ -110,7 +117,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
 
           {/* Desktop Links (Dynamic centred pills) */}
           <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-3">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -163,7 +170,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
       {isMobileMenuOpen && (
         <div className="md:hidden fixed top-24 left-4 right-4 z-40 bg-white border-3 border-foreground rounded-[2rem] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-6 overflow-hidden">
           <nav className="flex flex-col gap-4">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

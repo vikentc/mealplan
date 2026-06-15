@@ -82,8 +82,13 @@ export default function HomeClient({
   const activeQuery = searchParams.get('query') || '';
   const [queryText, setQueryText] = useState(activeQuery);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
     setQueryText(activeQuery);
+    if (typeof document !== 'undefined') {
+      setIsLoggedIn(document.cookie.includes('user_session='));
+    }
   }, [activeQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -253,12 +258,14 @@ export default function HomeClient({
               Vi hittade inga recept som matchar just den valda kombinationen av filter för tillfället. Skapa ett nytt recept eller rensa filtren!
             </p>
           </div>
-          <Link
-            href="/recipes/add"
-            className="inline-block px-5 py-2.5 bg-card border-2 border-foreground hover:bg-secondary text-xs font-black uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
-          >
-            Skapa ett recept
-          </Link>
+          {isLoggedIn && (
+            <Link
+              href="/recipes/add"
+              className="inline-block px-5 py-2.5 bg-card border-2 border-foreground hover:bg-secondary text-xs font-black uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+            >
+              Skapa ett recept
+            </Link>
+          )}
         </div>
       )}
 

@@ -264,7 +264,7 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
       {/* Header bar */}
       <div className="flex items-center justify-between">
         <Link
-          href={isEdit ? `/recipes/${recipe?.id}` : '/recipes'}
+          href={isEdit ? `/recipes/${recipe?.id}` : '/'}
           className="px-4 py-2.5 bg-secondary text-foreground hover:bg-secondary/80 font-bold rounded-xl flex items-center gap-2 text-xs transition-colors shrink-0"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -734,7 +734,7 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
         {/* Submit Actions */}
         <div className="flex justify-end gap-3">
           <Link
-            href={isEdit ? `/recipes/${recipe?.id}` : '/recipes'}
+            href={isEdit ? `/recipes/${recipe?.id}` : '/'}
             className="px-6 py-3.5 bg-secondary text-foreground hover:bg-secondary/80 font-bold rounded-2xl transition-colors text-sm"
           >
             Avbryt

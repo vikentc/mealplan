@@ -17,14 +17,12 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Översikt', href: '/' },
-  { label: 'Sök recept', href: '/recipes' },
   { label: 'Veckoplanering', href: '/planner' },
   { label: 'Skapa recept', href: '/recipes/add' },
 ];
 
 const ITEM_COLORS: Record<string, { bg: string; text: string }> = {
   '/': { bg: 'bg-cyan-100', text: 'text-cyan-950' },
-  '/recipes': { bg: 'bg-amber-100', text: 'text-amber-950' },
   '/planner': { bg: 'bg-emerald-100', text: 'text-emerald-950' },
   '/recipes/add': { bg: 'bg-red-100', text: 'text-red-950' },
 };
@@ -44,9 +42,6 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
     }
     if (href === '/recipes/add') {
       return pathname === '/recipes/add';
-    }
-    if (href === '/recipes') {
-      return pathname.startsWith('/recipes') && pathname !== '/recipes/add';
     }
     return pathname.startsWith(href);
   };

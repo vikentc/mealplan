@@ -108,7 +108,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
       setIsDeleting(true);
       try {
         await deleteRecipe(recipe.id);
-        router.push('/recipes');
+        router.push('/');
         router.refresh();
       } catch (error) {
         console.error('Failed to delete recipe:', error);
@@ -126,7 +126,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
       {/* Back navigation & Edit/Delete actions */}
       <div className="flex justify-between items-center flex-wrap gap-4">
         <Link
-          href="/recipes"
+          href="/"
           className="px-5 py-3 bg-amber-100 hover:bg-amber-200 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer shrink-0"
         >
           <ChevronLeft className="h-4.5 w-4.5 text-foreground" />

@@ -18,7 +18,6 @@ import {
 import { deleteRecipe } from '@/app/actions/recipes';
 import { cn, getDifficultyColor, formatTime } from '@/lib/utils';
 import PortionScaler from './PortionScaler';
-import SpiceScaler from './SpiceScaler';
 import IngredientList from './IngredientList';
 import NutritionBadge from './NutritionBadge';
 
@@ -60,7 +59,6 @@ interface RecipeDetailsContainerProps {
 export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContainerProps) {
   const router = useRouter();
   const [servings, setServings] = useState(recipe.servings || 4);
-  const [spiceLevel, setSpiceLevel] = useState(recipe.spiceLevel || 0);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -245,19 +243,12 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
             onChange={setServings}
           />
 
-          {/* Spice Adjuster */}
-          <SpiceScaler
-            spiceLevel={spiceLevel}
-            originalSpiceLevel={recipe.spiceLevel}
-            onChange={setSpiceLevel}
-          />
-
           {/* Ingredients list */}
           <IngredientList
             ingredients={recipe.ingredients}
             servings={servings}
             originalServings={recipe.servings}
-            spiceLevel={spiceLevel}
+            spiceLevel={recipe.spiceLevel}
             originalSpiceLevel={recipe.spiceLevel}
           />
 

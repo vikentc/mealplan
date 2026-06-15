@@ -110,103 +110,124 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
         </div>
       </div>
 
-      {/* Main Recipe Info Hero Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Large Image & Main Details (Left 2 columns on desktop) */}
-        <div className="lg:col-span-2 space-y-8">
-          
-          {/* Main Recipe Card Header */}
-          <div className="bg-card border-3 border-foreground rounded-[2rem] overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-            {/* Image banner */}
-            <div className="relative h-64 md:h-80 bg-secondary border-b-3 border-foreground">
-              {recipe.image ? (
-                <Image
-                  src={recipe.image}
-                  alt={recipe.name}
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 750px"
-                />
-              ) : (
-                <div className="h-full w-full flex items-center justify-center bg-secondary/50 text-foreground font-black uppercase text-xs tracking-wider">
-                  Bild saknas
-                </div>
-              )}
+      {/* 1. Main Recipe Info Hero Card (spans full width) */}
+      <div className="bg-card border-3 border-foreground rounded-[2rem] overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+        {/* Image banner */}
+        <div className="relative h-64 md:h-96 w-full bg-secondary border-b-3 border-foreground">
+          {recipe.image ? (
+            <Image
+              src={recipe.image}
+              alt={recipe.name}
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center bg-secondary/50 text-foreground font-black uppercase text-xs tracking-wider">
+              Bild saknas
+            </div>
+          )}
+        </div>
+
+        {/* Title & Stats */}
+        <div className="p-6 md:p-8 space-y-5">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-100 text-amber-850 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              {recipe.cuisine}
+            </span>
+            
+            {recipe.nutrition?.protein >= 30 && (
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                💪 Högprotein
+              </span>
+            )}
+
+            <span className={cn(
+              "text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-blue-100 text-blue-900"
+            )}>
+              {recipe.difficulty?.toLowerCase() === 'easy' ? 'Enkel' : recipe.difficulty?.toLowerCase() === 'medium' ? 'Medelsvår' : 'Svår'}
+            </span>
+            
+            {recipe.url && (
+              <a
+                href={recipe.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-black uppercase tracking-wider bg-secondary hover:bg-amber-100/50 text-foreground px-2.5 py-1 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1.5 transition-all"
+              >
+                <LinkIcon className="h-3.5 w-3.5" /> Originalkälla
+              </a>
+            )}
+          </div>
+
+          <div>
+            <h1 className="text-2xl md:text-4xl font-black text-foreground tracking-tight leading-none uppercase">
+              {recipe.name}
+            </h1>
+            {recipe.description && (
+              <p className="text-xs md:text-sm text-foreground/80 font-medium leading-relaxed mt-3 max-w-2xl">
+                {recipe.description}
+              </p>
+            )}
+          </div>
+
+          {/* Time Indicators */}
+          <div className="border-t-3 border-foreground pt-5 flex gap-6 text-xs text-foreground/80">
+            <div className="flex items-center gap-2.5">
+              <Clock className="h-5 w-5 text-foreground" />
+              <div>
+                <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.preparationTime)}</span>
+                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Förberedelse</span>
+              </div>
             </div>
 
-            {/* Title & Stats */}
-            <div className="p-6 md:p-8 space-y-5">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-100 text-amber-850 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                  {recipe.cuisine}
-                </span>
-                
-                {recipe.nutrition?.protein >= 30 && (
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                    💪 Högprotein
-                  </span>
-                )}
-
-                <span className={cn(
-                  "text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-blue-100 text-blue-900"
-                )}>
-                  {recipe.difficulty?.toLowerCase() === 'easy' ? 'Enkel' : recipe.difficulty?.toLowerCase() === 'medium' ? 'Medelsvår' : 'Svår'}
-                </span>
-                
-                {recipe.url && (
-                  <a
-                    href={recipe.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] font-black uppercase tracking-wider bg-secondary hover:bg-amber-100/50 text-foreground px-2.5 py-1 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1.5 transition-all"
-                  >
-                    <LinkIcon className="h-3.5 w-3.5" /> Originalkälla
-                  </a>
-                )}
-              </div>
-
+            <div className="border-l-3 border-foreground pl-6 flex items-center gap-2.5">
+              <Clock className="h-5 w-5 text-foreground" />
               <div>
-                <h1 className="text-2xl md:text-4xl font-black text-foreground tracking-tight leading-none uppercase">
-                  {recipe.name}
-                </h1>
-                {recipe.description && (
-                  <p className="text-xs md:text-sm text-foreground/80 font-medium leading-relaxed mt-3 max-w-2xl">
-                    {recipe.description}
-                  </p>
-                )}
+                <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.cookingTime)}</span>
+                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Tillagning</span>
               </div>
+            </div>
 
-              {/* Time Indicators */}
-              <div className="border-t-3 border-foreground pt-5 flex gap-6 text-xs text-foreground/80">
-                <div className="flex items-center gap-2.5">
-                  <Clock className="h-5 w-5 text-foreground" />
-                  <div>
-                    <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.preparationTime)}</span>
-                    <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Förberedelse</span>
-                  </div>
-                </div>
-
-                <div className="border-l-3 border-foreground pl-6 flex items-center gap-2.5">
-                  <Clock className="h-5 w-5 text-foreground" />
-                  <div>
-                    <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.cookingTime)}</span>
-                    <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Tillagning</span>
-                  </div>
-                </div>
-
-                <div className="border-l-3 border-foreground pl-6 flex items-center gap-2.5">
-                  <Clock className="h-5 w-5 text-foreground animate-pulse" />
-                  <div>
-                    <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.totalTime)}</span>
-                    <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Total tid</span>
-                  </div>
-                </div>
+            <div className="border-l-3 border-foreground pl-6 flex items-center gap-2.5">
+              <Clock className="h-5 w-5 text-foreground animate-pulse" />
+              <div>
+                <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.totalTime)}</span>
+                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Total tid</span>
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
+      {/* 2. Content Layout: Desktop = Left (Nutrition, Instructions), Right (Portions, Ingredients). Mobile order = Right block, then Left block. */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Right column in desktop layout: Portion Scaler & Ingredients (order-1: rendered first on mobile) */}
+        <div className="lg:col-span-1 space-y-8 order-1 lg:order-2">
+          
+          {/* Portion Scaler */}
+          <PortionScaler
+            servings={servings}
+            originalServings={recipe.servings}
+            onChange={setServings}
+          />
+
+          {/* Ingredients list */}
+          <IngredientList
+            ingredients={recipe.ingredients}
+            servings={servings}
+            originalServings={recipe.servings}
+            spiceLevel={recipe.spiceLevel}
+            originalSpiceLevel={recipe.spiceLevel}
+          />
+
+        </div>
+
+        {/* Left column in desktop layout: Nutrition & Instructions (order-2: rendered second on mobile) */}
+        <div className="lg:col-span-2 space-y-8 order-2 lg:order-1">
+          
           {/* Scaled Nutrition Data */}
           <section className="space-y-4">
             <h3 className="font-black text-lg text-foreground uppercase tracking-tight flex items-center gap-2">
@@ -230,27 +251,6 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
               ))}
             </ol>
           </section>
-
-        </div>
-
-        {/* Scalers & Ingredients (Right 1 column on desktop) */}
-        <div className="space-y-8">
-          
-          {/* Portion Scaler */}
-          <PortionScaler
-            servings={servings}
-            originalServings={recipe.servings}
-            onChange={setServings}
-          />
-
-          {/* Ingredients list */}
-          <IngredientList
-            ingredients={recipe.ingredients}
-            servings={servings}
-            originalServings={recipe.servings}
-            spiceLevel={recipe.spiceLevel}
-            originalSpiceLevel={recipe.spiceLevel}
-          />
 
         </div>
 

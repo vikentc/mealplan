@@ -121,9 +121,9 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
         </div>
 
         {/* Modal Content */}
-        <div className="flex-1 overflow-y-auto min-h-[300px] flex flex-col justify-center">
+        <div className="flex-1 overflow-y-auto min-h-[300px] flex flex-col md:justify-center">
           {step === 'select-type' ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 py-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 py-4">
               {MEAL_TYPES.map((type) => {
                 const Icon = type.icon;
                 return (
@@ -131,7 +131,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                     key={type.id}
                     onClick={() => handleSelectType(type.id)}
                     className={cn(
-                      "p-6 border-3 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all duration-200 cursor-pointer active:translate-y-[2px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
+                      "p-4 md:p-6 border-3 rounded-2xl flex flex-col items-center justify-center gap-2 md:gap-3 transition-all duration-200 cursor-pointer active:translate-y-[2px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
                       "bg-white border-foreground text-foreground/80 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
                       type.hoverBg
                     )}

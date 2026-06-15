@@ -330,7 +330,7 @@ export default function RecommendationSelector() {
             className="px-5 py-2.5 bg-card border-2 border-foreground hover:bg-secondary text-foreground text-xs font-black uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] flex items-center gap-2 cursor-pointer transition-all"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            <span>Avancerade filter</span>
+            <span>Kluriga följdfrågor</span>
             {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
 
@@ -338,14 +338,14 @@ export default function RecommendationSelector() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-5 bg-card border-3 border-foreground rounded-2xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] animate-in slide-in-from-top-2 duration-150">
               {/* Cuisine Dropdown */}
               <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Kök</label>
+                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Från vilket hörn av världen? (Kök)</label>
                 <div className="relative">
                   <select
                     value={currentCuisine}
                     onChange={(e) => isMobile ? setTempCuisine(e.target.value) : handleDropdownChange('cuisine', e.target.value)}
                     className="w-full py-2.5 pl-4 pr-9 bg-white border-2 border-foreground rounded-xl text-foreground text-[11px] font-black uppercase tracking-wide focus:outline-none appearance-none cursor-pointer"
                   >
-                    <option value="">Alla kök</option>
+                    <option value="">Alla hörn</option>
                     {CUISINES.map(c => <option key={c} value={c}>{cuisineLabels[c] || c}</option>)}
                   </select>
                   <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground pointer-events-none" />
@@ -354,7 +354,7 @@ export default function RecommendationSelector() {
 
               {/* Flavor Dropdown */}
               <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Smak</label>
+                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Hur ska smaklökarna kittlas? (Smak)</label>
                 <div className="relative">
                   <select
                     value={currentFlavor}
@@ -370,14 +370,14 @@ export default function RecommendationSelector() {
 
               {/* Category Dropdown */}
               <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Kategori</label>
+                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Vilken mat-vibe letar vi efter? (Kategori)</label>
                 <div className="relative">
                   <select
                     value={currentMood}
                     onChange={(e) => isMobile ? setTempMood(e.target.value) : handleDropdownChange('mood', e.target.value)}
                     className="w-full py-2.5 pl-4 pr-9 bg-white border-2 border-foreground rounded-xl text-foreground text-[11px] font-black uppercase tracking-wide focus:outline-none appearance-none cursor-pointer"
                   >
-                    <option value="">Alla kategorier</option>
+                    <option value="">Alla vibes</option>
                     {MOODS.map(m => <option key={m} value={m}>{moodLabels[m] || m}</option>)}
                   </select>
                   <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground pointer-events-none" />
@@ -386,14 +386,14 @@ export default function RecommendationSelector() {
 
               {/* Nutrition Dropdown */}
               <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Näringsmål</label>
+                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Har vi något hälsomål i sikte? (Näring)</label>
                 <div className="relative">
                   <select
                     value={currentGoal}
                     onChange={(e) => isMobile ? setTempNutritionGoal(e.target.value) : handleDropdownChange('nutritionGoal', e.target.value)}
                     className="w-full py-2.5 pl-4 pr-9 bg-white border-2 border-foreground rounded-xl text-foreground text-[11px] font-black uppercase tracking-wide focus:outline-none appearance-none cursor-pointer"
                   >
-                    <option value="">Alla mål</option>
+                    <option value="">Inget särskilt</option>
                     {NUTRITION_GOALS.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
                   </select>
                   <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground pointer-events-none" />
@@ -417,26 +417,28 @@ export default function RecommendationSelector() {
               <SlidersHorizontal className="h-5 w-5 text-foreground" />
             </div>
             <div>
-              <h2 className="text-xl font-black uppercase tracking-tight text-foreground">Maja & Kents Mealfinder</h2>
-              <p className="text-[10px] text-muted-foreground font-semibold">Skräddarsy ditt sök i realtid</p>
+              <h2 className="text-xl font-black uppercase tracking-tight text-foreground">Maja & Kents Käk-Kompass</h2>
+              <p className="text-[10px] text-muted-foreground font-semibold">Vad i hela friden ska vi äta idag? 🧭</p>
             </div>
           </div>
-          
-          {hasActiveFilters && (
-            <button
-              onClick={handleReset}
-              type="button"
-              className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              <span>Rensa filter</span>
-            </button>
-          )}
         </div>
 
         {/* Selectors body */}
         <div className="p-6 md:p-8 space-y-6">
           {renderSelectors(false)}
+
+          {hasActiveFilters && (
+            <div className="flex justify-end pt-4 border-t-2 border-dashed border-foreground/25">
+              <button
+                onClick={handleReset}
+                type="button"
+                className="px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <RotateCcw className="h-4 w-4" />
+                <span>Rensa filter / Börja om</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -458,10 +460,10 @@ export default function RecommendationSelector() {
               {/* Header */}
               <div className="mb-4 pr-8">
                 <span className="text-[9px] font-black uppercase tracking-widest text-cyan-800 bg-cyan-100 border border-foreground px-2 py-0.5 rounded inline-block">
-                  Mealfinder
+                  Käk-Kompassen 🧭
                 </span>
                 <h3 className="text-lg font-black text-foreground uppercase tracking-tight mt-1">
-                  Maja & Kents Mealfinder
+                  Maja & Kents Käk-Kompass
                 </h3>
               </div>
 

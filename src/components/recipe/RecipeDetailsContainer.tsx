@@ -93,10 +93,13 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
     });
   };
 
-  const clearAllChecks = () => {
+  const clearIngredients = () => {
     setCheckedIngredients({});
-    setCheckedInstructions({});
     localStorage.removeItem(`recipe-checked-ings-${recipe.id}`);
+  };
+
+  const clearInstructions = () => {
+    setCheckedInstructions({});
     localStorage.removeItem(`recipe-checked-insts-${recipe.id}`);
   };
 
@@ -131,17 +134,6 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
         </Link>
 
         <div className="flex items-center gap-3">
-          {/* Nollställ bockar button */}
-          {(Object.values(checkedIngredients).some(Boolean) || Object.values(checkedInstructions).some(Boolean)) && (
-            <button
-              onClick={clearAllChecks}
-              type="button"
-              className="px-5 py-3 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <RotateCcw className="h-4.5 w-4.5" />
-              <span>Nollställ bockar</span>
-            </button>
-          )}
 
           <Link
             href={`/recipes/${recipe.id}/edit`}
@@ -274,6 +266,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
             originalSpiceLevel={recipe.spiceLevel}
             checkedIngredients={checkedIngredients}
             onToggleIngredient={toggleIngredient}
+            onClearIngredients={clearIngredients}
           />
 
         </div>
@@ -292,16 +285,16 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
 
           {/* Step-by-step Instructions */}
           <section className="bg-card border-3 border-foreground p-6 md:p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-2">
               <h3 className="font-black text-lg text-foreground uppercase tracking-tight">Instruktioner</h3>
-              {(Object.values(checkedIngredients).some(Boolean) || Object.values(checkedInstructions).some(Boolean)) && (
+              {Object.values(checkedInstructions).some(Boolean) && (
                 <button
-                  onClick={clearAllChecks}
+                  onClick={clearInstructions}
                   type="button"
                   className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-[9px] uppercase tracking-wider rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0"
                 >
                   <RotateCcw className="h-3 w-3" />
-                  <span>Rensa checklistan</span>
+                  <span>Rensa</span>
                 </button>
               )}
             </div>

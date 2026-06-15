@@ -1,4 +1,5 @@
 import React from 'react';
+import { RotateCcw } from 'lucide-react';
 
 interface Ingredient {
   name: string;
@@ -15,6 +16,7 @@ interface IngredientListProps {
   originalSpiceLevel: number;
   checkedIngredients?: Record<number, boolean>;
   onToggleIngredient?: (idx: number) => void;
+  onClearIngredients?: () => void;
 }
 
 // Check if ingredient is spicy
@@ -35,7 +37,8 @@ export default function IngredientList({
   spiceLevel,
   originalSpiceLevel,
   checkedIngredients = {},
-  onToggleIngredient
+  onToggleIngredient,
+  onClearIngredients
 }: IngredientListProps) {
   const portionFactor = servings / originalServings;
   
@@ -59,7 +62,19 @@ export default function IngredientList({
 
   return (
     <div className="bg-card border-3 border-foreground p-6 rounded-[2rem] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <h3 className="font-black text-lg text-foreground mb-4 uppercase tracking-tight">Ingredienser</h3>
+      <div className="flex justify-between items-center gap-2 mb-4 flex-wrap">
+        <h3 className="font-black text-lg text-foreground uppercase tracking-tight">Ingredienser</h3>
+        {Object.values(checkedIngredients).some(Boolean) && onClearIngredients && (
+          <button
+            onClick={onClearIngredients}
+            type="button"
+            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-[9px] uppercase tracking-wider rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0"
+          >
+            <RotateCcw className="h-3 w-3" />
+            <span>Rensa</span>
+          </button>
+        )}
+      </div>
       
       <ul className="divide-y-2 divide-foreground/20 space-y-0.5">
         {ingredients.map((ing, idx) => {

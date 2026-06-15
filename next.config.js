@@ -16,7 +16,8 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'images.recept.se' },
       { protocol: 'https', hostname: 'www.petitchef.se' },
-      { protocol: 'https', hostname: 'static.bonniernews.se' }
+      { protocol: 'https', hostname: 'static.bonniernews.se' },
+      { protocol: 'https', hostname: 'eu-central-1.linodeobjects.com' }
     ],
   },
   async redirects() {

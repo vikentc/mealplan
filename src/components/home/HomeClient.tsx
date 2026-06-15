@@ -18,7 +18,6 @@ import {
 import RecommendationSelector from '@/components/recipe/RecommendationSelector';
 import RecommendationCard from '@/components/recipe/RecommendationCard';
 import RecipeCard from '@/components/recipe/RecipeCard';
-import SearchFiltersWrapper from '@/components/recipe/SearchFiltersWrapper';
 
 interface HomeClientProps {
   mealType: string;
@@ -71,17 +70,19 @@ export default function HomeClient({
 
   // Determine section title
   let sectionTitle = 'Våra goda recept';
-  if (isRecommendationActive) {
-    const parts = [];
-    if (mealType) parts.push(mealTypeLabels[mealType] || mealType);
-    if (craving) parts.push(cravingLabels[craving]?.split(' ').slice(1).join(' ') || craving);
-    sectionTitle = `Måltidsrekommendationer: ${parts.join(' + ')}`;
-  } else if (isSearchActive) {
+  if (isSearchActive || isRecommendationActive) {
     const parts = [];
     if (filters.query) parts.push(`"${filters.query}"`);
+    if (mealType) parts.push(mealTypeLabels[mealType] || mealType);
+    if (craving) parts.push(cravingLabels[craving]?.split(' ').slice(1).join(' ') || craving);
     if (filters.cuisine) parts.push(filters.cuisine);
     if (filters.nutritionGoal) parts.push(filters.nutritionGoal);
-    sectionTitle = `Sökresultat för: ${parts.join(', ') || 'avancerat filter'}`;
+    
+    if (isSearchActive) {
+      sectionTitle = `Sökresultat för: ${parts.join(' + ')}`;
+    } else {
+      sectionTitle = `Mealfinder val: ${parts.join(' + ')}`;
+    }
   }
 
   return (
@@ -143,11 +144,6 @@ export default function HomeClient({
           <p className="text-sm md:text-base text-foreground font-medium leading-relaxed max-w-lg mx-auto">
             Planera dina måltider, sök recept med avancerade filter och hitta förslag utifrån dina cravings!
           </p>
-
-          {/* Search focus */}
-          <div className="w-full max-w-4xl mx-auto pt-3 text-left">
-            <SearchFiltersWrapper initialFilters={filters} flat={true} />
-          </div>
         </div>
       </motion.section>
 

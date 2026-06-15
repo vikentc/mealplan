@@ -165,6 +165,79 @@ function filterRecipesList(recipes: any[], query: string, filters: any) {
     if (filters.mealType) {
       results = results.filter((r) => (r.mealType || '').toLowerCase() === filters.mealType.toLowerCase());
     }
+    if (filters.craving) {
+      const c = filters.craving.toLowerCase();
+      switch (c) {
+        case 'high-protein':
+          results = results.filter((r) => 
+            (r.nutrition?.protein || 0) >= 30 || 
+            (r.moodTags || []).map((t: string) => t.toLowerCase()).includes('high protein')
+          );
+          break;
+        case 'comfort-food':
+          results = results.filter((r) => 
+            (r.moodTags || []).map((t: string) => t.toLowerCase()).includes('comfort food') ||
+            (r.occasions || []).map((t: string) => t.toLowerCase()).includes('helgmys')
+          );
+          break;
+        case 'spicy':
+          results = results.filter((r) => 
+            (r.spiceLevel || 0) > 0 || 
+            (r.flavorProfile || []).map((t: string) => t.toLowerCase()).includes('spicy')
+          );
+          break;
+        case 'sweet':
+          results = results.filter((r) => 
+            (r.flavorProfile || []).map((t: string) => t.toLowerCase()).includes('sweet')
+          );
+          break;
+        case 'cheesy':
+          results = results.filter((r) => 
+            (r.flavorProfile || []).map((t: string) => t.toLowerCase()).includes('cheesy') ||
+            (r.ingredients || []).some((ing: any) => 
+              (ing.name || '').toLowerCase().includes('ost') || 
+              (ing.name || '').toLowerCase().includes('parmesan') ||
+              (ing.name || '').toLowerCase().includes('feta') ||
+              (ing.name || '').toLowerCase().includes('mozzarella')
+            )
+          );
+          break;
+        case 'fresh-light':
+          results = results.filter((r) => 
+            (r.flavorProfile || []).map((t: string) => t.toLowerCase()).includes('fresh') ||
+            (r.moodTags || []).map((t: string) => t.toLowerCase()).includes('healthy') ||
+            (r.nutrition?.calories || 0) <= 500
+          );
+          break;
+        case 'warm-hearty':
+          results = results.filter((r) => 
+            (r.moodTags || []).map((t: string) => t.toLowerCase()).includes('cozy') ||
+            (r.name || '').toLowerCase().includes('gryta') ||
+            (r.name || '').toLowerCase().includes('soppa') ||
+            (r.name || '').toLowerCase().includes('stuvning')
+          );
+          break;
+        case 'quick-easy':
+          results = results.filter((r) => {
+            const ingCount = Array.isArray(r.ingredients) ? r.ingredients.length : 0;
+            return (r.totalTime <= 30 && ingCount <= 10) || r.totalTime <= 15;
+          });
+          break;
+        case 'rich-creamy':
+          results = results.filter((r) => 
+            (r.flavorProfile || []).map((t: string) => t.toLowerCase()).includes('rich') ||
+            (r.flavorProfile || []).map((t: string) => t.toLowerCase()).includes('creamy') ||
+            (r.ingredients || []).some((ing: any) => 
+              (ing.name || '').toLowerCase().includes('grädde') || 
+              (ing.name || '').toLowerCase().includes('smör') || 
+              (ing.name || '').toLowerCase().includes('kokosmjölk')
+            )
+          );
+          break;
+        default:
+          break;
+      }
+    }
     if (filters.flavor) {
       results = results.filter((r) => Array.isArray(r.flavorProfile) && r.flavorProfile.map((f: string) => f.toLowerCase()).includes(filters.flavor.toLowerCase()));
     }
@@ -196,6 +269,7 @@ export async function getRecipes(filters?: {
   spiceLevel?: number;
   nutritionGoal?: string;
   mealType?: string;
+  craving?: string;
 }) {
   // Fetch all recipes from DB / Fallback
   const allRecipes = await runWithFallback(

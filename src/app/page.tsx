@@ -25,6 +25,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     flavor: resolvedParams.flavor || '',
     mood: resolvedParams.mood || '',
     mealType: resolvedParams.mealType || '',
+    craving: resolvedParams.craving || '',
     nutritionGoal: resolvedParams.nutritionGoal || '',
   };
 
@@ -35,22 +36,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const currentWeekPlans = await getWeeklyPlan(0);
   const currentWeekRecipeIds = currentWeekPlans.map((p: any) => p.recipeId);
 
-  let recipes: any[] = [];
-  let isSearchActive = !!(filters.query || filters.cuisine || filters.flavor || filters.mood || filters.nutritionGoal);
-  let isRecommendationActive = !!(mealType || craving) && !isSearchActive;
+  // Fetch filtered recipes with combined filters and cravings
+  const searchResult = await getRecipes(filters);
+  const recipes = searchResult.recipes;
 
-  if (isRecommendationActive) {
-    // Fetch dynamic recommendations
-    recipes = await getRecommendationsByCraving({
-      mealType,
-      craving,
-      currentWeekRecipeIds
-    });
-  } else {
-    // Fetch filtered recipes search results
-    const searchResult = await getRecipes(filters);
-    recipes = searchResult.recipes;
-  }
+  const isSearchActive = !!filters.query;
+  const isRecommendationActive = !isSearchActive && !!(mealType || craving || filters.cuisine || filters.flavor || filters.mood || filters.nutritionGoal);
 
   return (
     <HomeClient

@@ -50,6 +50,22 @@ const cravingLabels: Record<string, string> = {
   'high-protein': '💪 Proteinrikt',
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.05
+    }
+  }
+} as const;
+
+const itemVariants = {
+  hidden: { y: 25, opacity: 0 },
+  show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 90, damping: 14 } }
+} as const;
+
 export default function HomeClient({
   mealType,
   craving,
@@ -139,66 +155,56 @@ export default function HomeClient({
         <Sparkles className="h-24 w-24 transform -rotate-45" />
       </motion.div>
 
-      {/* Welcome Hero Panel */}
+      {/* Welcome Hero Panel (Clean, borderless text style with staggered spring variants) */}
       <motion.section 
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 80, delay: 0.1 }}
-        className="bg-card bg-[radial-gradient(rgba(0,0,0,0.06)_1.5px,transparent_1.5px)] [background-size:20px_20px] border-3 border-foreground p-8 md:p-12 rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center text-center justify-center gap-6 overflow-hidden relative"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="py-10 md:py-16 flex flex-col items-center text-center justify-center gap-6 w-full select-none"
       >
-        {/* Hipster decorative stamp */}
-        <div className="absolute -top-4 -right-4 bg-amber-500 text-foreground border-2 border-foreground px-5 py-2 font-black text-xs uppercase tracking-widest transform rotate-12 shadow-md">
-          Grundat 2026
-        </div>
-
-        {/* Second Hipster decorative stamp */}
-        <div className="absolute -bottom-4 -left-4 bg-emerald-500 text-foreground border-2 border-foreground px-5 py-2 font-black text-[9px] uppercase tracking-widest transform -rotate-12 shadow-md">
-          WCAG AA Godkänd 🥑
-        </div>
-
-        <div className="space-y-4 max-w-2xl w-full">
-          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-800 bg-emerald-100 border-2 border-foreground px-3.5 py-1.5 rounded-full inline-block">
+        <motion.div variants={itemVariants} className="space-y-4 max-w-2xl w-full flex flex-col items-center">
+          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-800 bg-emerald-100 border-2 border-foreground px-3.5 py-1.5 rounded-full inline-block animate-bounce-subtle">
             🥑 Maja & Kents Familjekök
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-none">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-none uppercase">
             Maja & Kents Matpalats
           </h2>
           <p className="text-sm md:text-base text-foreground font-medium leading-relaxed max-w-lg mx-auto">
             Planera dina måltider, sök recept med avancerade filter och hitta förslag utifrån dina cravings!
           </p>
+        </motion.div>
 
-          {/* Search focus */}
-          <div className="w-full max-w-4xl mx-auto pt-3 text-left">
-            <form onSubmit={handleSearchSubmit} className="relative w-full">
-              <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground z-10" />
-              <input
-                type="text"
-                placeholder="Sök på receptnamn eller ingrediens..."
-                value={queryText}
-                onChange={(e) => setQueryText(e.target.value)}
-                className="w-full pl-12 pr-28 py-4 bg-card border-3 border-foreground rounded-2xl text-foreground text-xs font-black uppercase tracking-wide focus:outline-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] placeholder:text-foreground/50 transition-all"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-foreground hover:bg-foreground/90 text-background text-xs font-black rounded-xl transition-all cursor-pointer uppercase tracking-wider z-10"
-              >
-                Sök
-              </button>
-            </form>
-          </div>
-
-          {/* Suggest button */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+        {/* Search focus */}
+        <motion.div variants={itemVariants} className="w-full max-w-3xl mx-auto pt-3 text-left">
+          <form onSubmit={handleSearchSubmit} className="relative w-full">
+            <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground z-10" />
+            <input
+              type="text"
+              placeholder="Sök på receptnamn eller ingrediens..."
+              value={queryText}
+              onChange={(e) => setQueryText(e.target.value)}
+              className="w-full pl-12 pr-28 py-4 bg-card border-3 border-foreground rounded-2xl text-foreground text-xs font-black uppercase tracking-wide focus:outline-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] placeholder:text-foreground/50 transition-all"
+            />
             <button
-              type="button"
-              onClick={() => setIsSuggestOpen(true)}
-              className="px-6 py-3 bg-amber-400 hover:bg-amber-500 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-2"
+              type="submit"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-foreground hover:bg-foreground/90 text-background text-xs font-black rounded-xl transition-all cursor-pointer uppercase tracking-wider z-10"
             >
-              <Sparkles className="h-4.5 w-4.5 text-foreground shrink-0 animate-pulse" />
-              <span>Find me a meal 🎲</span>
+              Sök
             </button>
-          </div>
-        </div>
+          </form>
+        </motion.div>
+
+        {/* Suggest button */}
+        <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => setIsSuggestOpen(true)}
+            className="px-6 py-3 bg-amber-400 hover:bg-amber-500 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-2"
+          >
+            <Sparkles className="h-4.5 w-4.5 text-foreground shrink-0 animate-pulse" />
+            <span>Find me a meal 🎲</span>
+          </button>
+        </motion.div>
       </motion.section>
 
       {/* Selector Grid (cravings + meal types selection) */}

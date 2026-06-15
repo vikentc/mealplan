@@ -107,12 +107,49 @@ function filterRecipesList(recipes: any[], query: string, filters: any) {
 
   if (query) {
     const q = query.toLowerCase();
-    results = results.filter((r) =>
-      (r.name || '').toLowerCase().includes(q) ||
-      (r.description || '').toLowerCase().includes(q) ||
-      (Array.isArray(r.ingredients) && r.ingredients.some((i: any) => (i.name || '').toLowerCase().includes(q))) ||
-      (r.cuisine || '').toLowerCase().includes(q)
-    );
+    results = results.filter((r) => {
+      const name = (r.name || '').toLowerCase();
+      const description = (r.description || '').toLowerCase();
+      const cuisine = (r.cuisine || '').toLowerCase();
+
+      // Check name or cuisine matches
+      if (name.includes(q) || cuisine.includes(q)) return true;
+
+      // Check description matches
+      if (description.includes(q)) {
+        if (q === 'pasta') {
+          // If query is "pasta", verify it's not just "bönpasta", "chilipasta", "currypasta"
+          const cleanDesc = description.replace(/(chili|bön|curry|miso|wasa|tomat|vitlök)pasta/g, '');
+          if (!cleanDesc.includes('pasta')) return false;
+        }
+        return true;
+      }
+
+      // Check ingredients matches
+      if (Array.isArray(r.ingredients)) {
+        return r.ingredients.some((i: any) => {
+          const ingName = (i.name || '').toLowerCase();
+          if (ingName.includes(q)) {
+            if (q === 'pasta') {
+              // Exclude condiment pastes (chilipasta, currypasta, bönpasta, etc.)
+              if (/(chili|bön|curry|miso|wasa|tomat|vitlök)pasta/.test(ingName)) return false;
+              // Exclude generic side dishes unless the recipe itself is a pasta dish
+              const isPastaDish = name.includes('pasta') || name.includes('carbonara') || name.includes('spaghetti') || name.includes('lasagne') || name.includes('ravioli') || name.includes('makaroner');
+              if (ingName === 'pasta, ris eller potatis' && !isPastaDish) return false;
+            }
+            if (q === 'ris') {
+              // Exclude generic side dishes unless the recipe itself is a rice dish
+              const isRiceDish = name.includes('ris') || name.includes('risotto') || name.includes('paella');
+              if (ingName === 'pasta, ris eller potatis' && !isRiceDish) return false;
+            }
+            return true;
+          }
+          return false;
+        });
+      }
+
+      return false;
+    });
   }
 
   if (filters) {
@@ -646,10 +683,10 @@ export async function getRecommendationsByCraving(criteria: {
         );
         break;
       case 'quick-easy':
-        available = available.filter((r: any) => 
-          r.totalTime <= 30 || 
-          r.difficulty?.toLowerCase() === 'easy'
-        );
+        available = available.filter((r: any) => {
+          const ingCount = Array.isArray(r.ingredients) ? r.ingredients.length : 0;
+          return (r.totalTime <= 30 && ingCount <= 10) || r.totalTime <= 15;
+        });
         break;
       case 'rich-creamy':
         available = available.filter((r: any) => 

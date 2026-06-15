@@ -231,7 +231,6 @@ export const recipes: Recipe[] = [
     ],
     "moodTags": [
       "energizing",
-      "quick and easy",
       "comfort food"
     ],
     "spiceLevel": 1,
@@ -402,7 +401,8 @@ export const recipes: Recipe[] = [
       "healthy",
       "energizing",
       "cozy",
-      "comfort food"
+      "comfort food",
+      "quick and easy"
     ],
     "spiceLevel": 3,
     "ingredients": [
@@ -764,7 +764,8 @@ export const recipes: Recipe[] = [
       "healthy",
       "energizing",
       "cozy",
-      "comfort food"
+      "comfort food",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -1472,7 +1473,8 @@ export const recipes: Recipe[] = [
     "moodTags": [
       "cozy",
       "comfort food",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 0,
     "ingredients": [
@@ -2333,7 +2335,6 @@ export const recipes: Recipe[] = [
       "fresh"
     ],
     "moodTags": [
-      "quick and easy",
       "comfort food"
     ],
     "spiceLevel": 0,
@@ -2538,7 +2539,8 @@ export const recipes: Recipe[] = [
       "comfort food",
       "healthy",
       "cozy",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 2,
     "ingredients": [
@@ -4019,9 +4021,7 @@ export const recipes: Recipe[] = [
     "flavorProfile": [
       "savory"
     ],
-    "moodTags": [
-      "quick and easy"
-    ],
+    "moodTags": [],
     "spiceLevel": 0,
     "ingredients": [
       {
@@ -4426,7 +4426,8 @@ export const recipes: Recipe[] = [
     "moodTags": [
       "energizing",
       "cozy",
-      "comfort food"
+      "comfort food",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -4686,7 +4687,8 @@ export const recipes: Recipe[] = [
       "comfort food",
       "healthy",
       "cozy",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -5037,7 +5039,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "breakfast",
+    "mealType": "snack",
     "occasions": [
       "weekday",
       "family dinner"
@@ -5052,7 +5054,8 @@ export const recipes: Recipe[] = [
     "moodTags": [
       "energizing",
       "comfort food",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -5326,7 +5329,8 @@ export const recipes: Recipe[] = [
     "moodTags": [
       "energizing",
       "cozy",
-      "comfort food"
+      "comfort food",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -5586,7 +5590,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Mexican",
     "countryOfOrigin": "Mexico",
     "region": "North America",
-    "mealType": "dinner",
+    "mealType": "snack",
     "occasions": [
       "weekday",
       "family dinner"
@@ -5600,7 +5604,8 @@ export const recipes: Recipe[] = [
     "moodTags": [
       "energizing",
       "comfort food",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 2,
     "ingredients": [
@@ -5699,7 +5704,6 @@ export const recipes: Recipe[] = [
     ],
     "moodTags": [
       "energizing",
-      "quick and easy",
       "comfort food",
       "high protein"
     ],
@@ -6134,7 +6138,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "breakfast",
+    "mealType": "snack",
     "occasions": [
       "weekday",
       "family dinner"
@@ -6142,7 +6146,8 @@ export const recipes: Recipe[] = [
     "flavorProfile": [
       "savory",
       "creamy",
-      "rich"
+      "rich",
+      "sweet"
     ],
     "moodTags": [
       "comfort food"
@@ -6312,16 +6317,15 @@ export const recipes: Recipe[] = [
     "cuisine": "International",
     "countryOfOrigin": "Unknown",
     "region": "Unknown",
-    "mealType": "dinner",
+    "mealType": "dessert",
     "occasions": [
       "weekday"
     ],
     "flavorProfile": [
-      "savory"
+      "savory",
+      "sweet"
     ],
-    "moodTags": [
-      "quick and easy"
-    ],
+    "moodTags": [],
     "spiceLevel": 0,
     "ingredients": [
       {
@@ -6378,7 +6382,6 @@ export const recipes: Recipe[] = [
     ],
     "moodTags": [
       "energizing",
-      "quick and easy",
       "comfort food"
     ],
     "spiceLevel": 1,
@@ -6471,7 +6474,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -6551,7 +6554,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -6639,7 +6642,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -6713,7 +6716,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -6852,7 +6855,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -7095,7 +7098,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -7193,7 +7196,7 @@ export const recipes: Recipe[] = [
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"

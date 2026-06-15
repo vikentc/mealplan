@@ -182,7 +182,6 @@
     ],
     "moodTags": [
       "energizing",
-      "quick and easy",
       "comfort food"
     ],
     "spiceLevel": 1,
@@ -353,7 +352,8 @@
       "healthy",
       "energizing",
       "cozy",
-      "comfort food"
+      "comfort food",
+      "quick and easy"
     ],
     "spiceLevel": 3,
     "ingredients": [
@@ -715,7 +715,8 @@
       "healthy",
       "energizing",
       "cozy",
-      "comfort food"
+      "comfort food",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -1423,7 +1424,8 @@
     "moodTags": [
       "cozy",
       "comfort food",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 0,
     "ingredients": [
@@ -2284,7 +2286,6 @@
       "fresh"
     ],
     "moodTags": [
-      "quick and easy",
       "comfort food"
     ],
     "spiceLevel": 0,
@@ -2489,7 +2490,8 @@
       "comfort food",
       "healthy",
       "cozy",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 2,
     "ingredients": [
@@ -3970,9 +3972,7 @@
     "flavorProfile": [
       "savory"
     ],
-    "moodTags": [
-      "quick and easy"
-    ],
+    "moodTags": [],
     "spiceLevel": 0,
     "ingredients": [
       {
@@ -4377,7 +4377,8 @@
     "moodTags": [
       "energizing",
       "cozy",
-      "comfort food"
+      "comfort food",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -4637,7 +4638,8 @@
       "comfort food",
       "healthy",
       "cozy",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -4988,7 +4990,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "breakfast",
+    "mealType": "snack",
     "occasions": [
       "weekday",
       "family dinner"
@@ -5003,7 +5005,8 @@
     "moodTags": [
       "energizing",
       "comfort food",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -5277,7 +5280,8 @@
     "moodTags": [
       "energizing",
       "cozy",
-      "comfort food"
+      "comfort food",
+      "quick and easy"
     ],
     "spiceLevel": 1,
     "ingredients": [
@@ -5537,7 +5541,7 @@
     "cuisine": "Mexican",
     "countryOfOrigin": "Mexico",
     "region": "North America",
-    "mealType": "dinner",
+    "mealType": "snack",
     "occasions": [
       "weekday",
       "family dinner"
@@ -5551,7 +5555,8 @@
     "moodTags": [
       "energizing",
       "comfort food",
-      "high protein"
+      "high protein",
+      "quick and easy"
     ],
     "spiceLevel": 2,
     "ingredients": [
@@ -5650,7 +5655,6 @@
     ],
     "moodTags": [
       "energizing",
-      "quick and easy",
       "comfort food",
       "high protein"
     ],
@@ -6085,7 +6089,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "breakfast",
+    "mealType": "snack",
     "occasions": [
       "weekday",
       "family dinner"
@@ -6093,7 +6097,8 @@
     "flavorProfile": [
       "savory",
       "creamy",
-      "rich"
+      "rich",
+      "sweet"
     ],
     "moodTags": [
       "comfort food"
@@ -6263,16 +6268,15 @@
     "cuisine": "International",
     "countryOfOrigin": "Unknown",
     "region": "Unknown",
-    "mealType": "dinner",
+    "mealType": "dessert",
     "occasions": [
       "weekday"
     ],
     "flavorProfile": [
-      "savory"
+      "savory",
+      "sweet"
     ],
-    "moodTags": [
-      "quick and easy"
-    ],
+    "moodTags": [],
     "spiceLevel": 0,
     "ingredients": [
       {
@@ -6329,7 +6333,6 @@
     ],
     "moodTags": [
       "energizing",
-      "quick and easy",
       "comfort food"
     ],
     "spiceLevel": 1,
@@ -6422,7 +6425,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -6502,7 +6505,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -6590,7 +6593,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -6664,7 +6667,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -6803,7 +6806,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -7046,7 +7049,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"
@@ -7144,7 +7147,7 @@
     "cuisine": "Swedish",
     "countryOfOrigin": "Sweden",
     "region": "Europe / Scandinavia",
-    "mealType": "snack",
+    "mealType": "dessert",
     "occasions": [
       "celebration",
       "weekend"

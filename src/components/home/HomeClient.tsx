@@ -19,6 +19,7 @@ import {
 import RecommendationSelector from '@/components/recipe/RecommendationSelector';
 import RecommendationCard from '@/components/recipe/RecommendationCard';
 import RecipeCard from '@/components/recipe/RecipeCard';
+import FindMeAMealModal from '@/components/recipe/FindMeAMealModal';
 
 interface HomeClientProps {
   mealType: string;
@@ -59,6 +60,7 @@ export default function HomeClient({
 }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showRules, setShowRules] = useState(false);
+  const [isSuggestOpen, setIsSuggestOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeQuery = searchParams.get('query') || '';
@@ -183,6 +185,18 @@ export default function HomeClient({
                 Sök
               </button>
             </form>
+          </div>
+
+          {/* Suggest button */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setIsSuggestOpen(true)}
+              className="px-6 py-3 bg-amber-400 hover:bg-amber-500 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-2"
+            >
+              <Sparkles className="h-4.5 w-4.5 text-foreground shrink-0 animate-pulse" />
+              <span>Find me a meal 🎲</span>
+            </button>
           </div>
         </div>
       </motion.section>
@@ -333,6 +347,9 @@ export default function HomeClient({
           </div>
         </div>
       )}
+
+      {/* Suggests modal */}
+      <FindMeAMealModal isOpen={isSuggestOpen} onClose={() => setIsSuggestOpen(false)} />
 
     </div>
   );

@@ -13,6 +13,7 @@ export async function GET(request: Request) {
     const spiceLevelStr = searchParams.get('spiceLevel');
     const spiceLevel = spiceLevelStr !== null ? Number(spiceLevelStr) : undefined;
     const nutritionGoal = searchParams.get('nutritionGoal') || undefined;
+    const mealType = searchParams.get('mealType') || undefined;
 
     const recipes = await getRecipes({
       query,
@@ -21,7 +22,8 @@ export async function GET(request: Request) {
       mood,
       occasion,
       spiceLevel,
-      nutritionGoal
+      nutritionGoal,
+      mealType
     });
 
     return NextResponse.json(recipes);

@@ -133,12 +133,6 @@ function LoginFormContent() {
         </button>
       </form>
 
-      {/* Small tip/note */}
-      <div className="mt-8 pt-4 border-t border-dashed border-foreground/30 text-center">
-        <p className="text-[10px] text-muted-foreground font-semibold">
-          Tips: Användarnamn är <span className="font-bold text-foreground">maja</span> (lösenord: <span className="font-bold text-foreground">Maja</span>) eller <span className="font-bold text-foreground">kent</span> (lösenord: <span className="font-bold text-foreground">Kent</span>).
-        </p>
-      </div>
 
     </div>
   );

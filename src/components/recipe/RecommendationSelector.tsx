@@ -10,11 +10,12 @@ import {
   Sparkles, 
   Smile, 
   X,
-  Search,
   SlidersHorizontal,
   ChevronDown,
   ChevronUp,
-  RotateCcw
+  RotateCcw,
+  Globe,
+  Flame
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -40,13 +41,6 @@ const CRAVINGS = [
 
 const CUISINES = ['Vietnamese', 'Thai', 'Japanese', 'Swedish', 'Italian', 'Mexican'];
 const FLAVORS = ['spicy', 'sweet', 'savory', 'sour', 'umami', 'creamy', 'tangy', 'rich', 'light', 'fresh'];
-const MOODS = ['comfort food', 'healthy', 'high protein', 'cozy', 'refreshing', 'indulgent', 'energizing', 'quick and easy'];
-const NUTRITION_GOALS = [
-  { value: 'high-protein', label: 'Proteinrik (>= 30g)' },
-  { value: 'low-carb', label: 'Lågkolhydrat (<= 30g)' },
-  { value: 'low-calorie', label: 'Kalorisnål (<= 400 kcal)' },
-  { value: 'high-fiber', label: 'Fiberrik (>= 5g)' },
-];
 
 const cuisineLabels: Record<string, string> = {
   'Vietnamese': 'Vietnamesiskt',
@@ -58,43 +52,29 @@ const cuisineLabels: Record<string, string> = {
 };
 
 const flavorLabels: Record<string, string> = {
-  'spicy': 'Stark',
-  'sweet': 'Söt',
-  'savory': 'Fyllig/Smakrik',
-  'sour': 'Sur',
+  'spicy': 'Starkt',
+  'sweet': 'Sött',
+  'savory': 'Matigt/Fylligt',
+  'sour': 'Surt',
   'umami': 'Umami',
-  'creamy': 'Krämig',
-  'tangy': 'Syrlig',
-  'rich': 'Mäktig',
+  'creamy': 'Krämigt',
+  'tangy': 'Syrligt',
+  'rich': 'Mäktigt',
   'light': 'Lätt',
-  'fresh': 'Fräsch'
-};
-
-const moodLabels: Record<string, string> = {
-  'comfort food': 'Husmanskost/Comfort food',
-  'healthy': 'Hälsosam',
-  'high protein': 'Högprotein',
-  'cozy': 'Mysig',
-  'refreshing': 'Uppfriskande',
-  'indulgent': 'Lyxig',
-  'energizing': 'Energigivande',
-  'quick and easy': 'Snabb & enkel'
+  'fresh': 'Fräscht'
 };
 
 export default function RecommendationSelector() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   
   // Collapsible state for desktop card: defaults to expanded if any filter is active
   const [isExpanded, setIsExpanded] = useState(!!(
     searchParams.get('mealType') || 
     searchParams.get('craving') || 
     searchParams.get('cuisine') || 
-    searchParams.get('flavor') || 
-    searchParams.get('mood') || 
-    searchParams.get('nutritionGoal')
+    searchParams.get('flavor')
   ));
 
   // Read URL search params
@@ -103,17 +83,13 @@ export default function RecommendationSelector() {
   const activeCraving = searchParams.get('craving') || '';
   const activeCuisine = searchParams.get('cuisine') || '';
   const activeFlavor = searchParams.get('flavor') || '';
-  const activeMood = searchParams.get('mood') || '';
-  const activeNutritionGoal = searchParams.get('nutritionGoal') || '';
 
-  // Local state for mobile dialog & search bar typing
+  // Local state for mobile dialog
   const [tempQuery, setTempQuery] = useState(activeQuery);
   const [tempMealType, setTempMealType] = useState(activeMealType);
   const [tempCraving, setTempCraving] = useState(activeCraving);
   const [tempCuisine, setTempCuisine] = useState(activeCuisine);
   const [tempFlavor, setTempFlavor] = useState(activeFlavor);
-  const [tempMood, setTempMood] = useState(activeMood);
-  const [tempNutritionGoal, setTempNutritionGoal] = useState(activeNutritionGoal);
 
   // Sync temp states when URL search parameters change
   useEffect(() => {
@@ -122,9 +98,7 @@ export default function RecommendationSelector() {
     setTempCraving(activeCraving);
     setTempCuisine(activeCuisine);
     setTempFlavor(activeFlavor);
-    setTempMood(activeMood);
-    setTempNutritionGoal(activeNutritionGoal);
-  }, [activeQuery, activeMealType, activeCraving, activeCuisine, activeFlavor, activeMood, activeNutritionGoal]);
+  }, [activeQuery, activeMealType, activeCraving, activeCuisine, activeFlavor]);
 
   const handleOpenDialog = () => {
     setTempQuery(activeQuery);
@@ -132,8 +106,6 @@ export default function RecommendationSelector() {
     setTempCraving(activeCraving);
     setTempCuisine(activeCuisine);
     setTempFlavor(activeFlavor);
-    setTempMood(activeMood);
-    setTempNutritionGoal(activeNutritionGoal);
     setIsDialogOpen(true);
   };
 
@@ -158,23 +130,22 @@ export default function RecommendationSelector() {
     router.push(`/?${params.toString()}`);
   };
 
-  const handleDropdownChange = (field: string, value: string) => {
+  const handleSelectCuisine = (id: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(field, value);
+    if (activeCuisine === id) {
+      params.delete('cuisine');
     } else {
-      params.delete(field);
+      params.set('cuisine', id);
     }
     router.push(`/?${params.toString()}`);
   };
 
-  const handleTextSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSelectFlavor = (id: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (tempQuery) {
-      params.set('query', tempQuery);
+    if (activeFlavor === id) {
+      params.delete('flavor');
     } else {
-      params.delete('query');
+      params.set('flavor', id);
     }
     router.push(`/?${params.toString()}`);
   };
@@ -188,6 +159,14 @@ export default function RecommendationSelector() {
     setTempCraving(prev => prev === id ? '' : id);
   };
 
+  const handleSelectCuisineMobile = (id: string) => {
+    setTempCuisine(prev => prev === id ? '' : id);
+  };
+
+  const handleSelectFlavorMobile = (id: string) => {
+    setTempFlavor(prev => prev === id ? '' : id);
+  };
+
   // Reset actions
   const handleReset = () => {
     setTempQuery('');
@@ -195,8 +174,6 @@ export default function RecommendationSelector() {
     setTempCraving('');
     setTempCuisine('');
     setTempFlavor('');
-    setTempMood('');
-    setTempNutritionGoal('');
     router.push('/');
   };
 
@@ -215,12 +192,6 @@ export default function RecommendationSelector() {
     if (tempFlavor) params.set('flavor', tempFlavor);
     else params.delete('flavor');
 
-    if (tempMood) params.set('mood', tempMood);
-    else params.delete('mood');
-
-    if (tempNutritionGoal) params.set('nutritionGoal', tempNutritionGoal);
-    else params.delete('nutritionGoal');
-
     router.push(`/?${params.toString()}`);
     setIsDialogOpen(false);
   };
@@ -231,8 +202,6 @@ export default function RecommendationSelector() {
     setTempCraving('');
     setTempCuisine('');
     setTempFlavor('');
-    setTempMood('');
-    setTempNutritionGoal('');
     router.push('/');
     setIsDialogOpen(false);
   };
@@ -241,15 +210,13 @@ export default function RecommendationSelector() {
     activeMealType || 
     activeCraving || 
     activeCuisine || 
-    activeFlavor || 
-    activeMood || 
-    activeNutritionGoal
+    activeFlavor
   );
 
   const activeMealLabel = MEAL_TYPES.find(t => t.id === activeMealType)?.label || '';
   const activeCravingLabel = CRAVINGS.find(c => c.id === activeCraving)?.label || '';
 
-  let triggerText = '🔍 Anpassa måltid & cravings';
+  let triggerText = '🧭 Anpassa Käk-Kompassen';
   if (activeMealLabel || activeCravingLabel) {
     const parts = [];
     if (activeMealLabel) parts.push(activeMealLabel);
@@ -262,15 +229,13 @@ export default function RecommendationSelector() {
     const currentCraving = isMobile ? tempCraving : activeCraving;
     const currentCuisine = isMobile ? tempCuisine : activeCuisine;
     const currentFlavor = isMobile ? tempFlavor : activeFlavor;
-    const currentMood = isMobile ? tempMood : activeMood;
-    const currentGoal = isMobile ? tempNutritionGoal : activeNutritionGoal;
 
     return (
       <>
         {/* Meal type selection */}
         <div className="space-y-3 pt-2">
           <h3 className="text-xs font-black uppercase text-foreground/80 tracking-wider flex items-center gap-1.5">
-            <Utensils className="h-4 w-4" />
+            <Utensils className="h-4 w-4 text-foreground/70" />
             <span>Välj måltid</span>
           </h3>
           
@@ -305,7 +270,7 @@ export default function RecommendationSelector() {
         {/* Cravings selection */}
         <div className="space-y-3 pt-4">
           <h3 className="text-xs font-black uppercase text-foreground/80 tracking-wider flex items-center gap-1.5">
-            <Smile className="h-4 w-4" />
+            <Smile className="h-4 w-4 text-foreground/70" />
             <span>Vad är du sugen på? (Cravings)</span>
           </h3>
 
@@ -332,85 +297,76 @@ export default function RecommendationSelector() {
           </div>
         </div>
 
-        {/* Collapsible Advanced Section */}
-        <div className="pt-4 space-y-3">
-          <button
-            type="button"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="px-5 py-2.5 bg-card border-2 border-foreground hover:bg-secondary text-foreground text-xs font-black uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] flex items-center gap-2 cursor-pointer transition-all"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
+        {/* Kluriga följdfrågor (Cuisine & Flavor) */}
+        <div className="space-y-4 pt-4 border-t-2 border-dashed border-foreground/20">
+          <h3 className="text-xs font-black uppercase text-foreground/80 tracking-wider flex items-center gap-1.5">
+            <SlidersHorizontal className="h-4 w-4 text-foreground/70" />
             <span>Kluriga följdfrågor</span>
-            {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
+          </h3>
 
-          {showAdvanced && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-5 bg-card border-3 border-foreground rounded-2xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] animate-in slide-in-from-top-2 duration-150">
-              {/* Cuisine Dropdown */}
-              <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Från vilket hörn av världen? (Kök)</label>
-                <div className="relative">
-                  <select
-                    value={currentCuisine}
-                    onChange={(e) => isMobile ? setTempCuisine(e.target.value) : handleDropdownChange('cuisine', e.target.value)}
-                    className="w-full py-2.5 pl-4 pr-9 bg-white border-2 border-foreground rounded-xl text-foreground text-[11px] font-black uppercase tracking-wide focus:outline-none appearance-none cursor-pointer"
-                  >
-                    <option value="">Alla hörn</option>
-                    {CUISINES.map(c => <option key={c} value={c}>{cuisineLabels[c] || c}</option>)}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground pointer-events-none" />
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Cuisine Selectable Tags */}
+            <div className="space-y-3 p-4 bg-secondary/5 border-2 border-foreground/10 rounded-2xl">
+              <h4 className="text-[10px] font-black uppercase text-foreground/70 tracking-wider flex items-center gap-1.5">
+                <Globe className="h-3.5 w-3.5 text-foreground/60" />
+                <span>Från vilket hörn av världen? (Kök)</span>
+              </h4>
 
-              {/* Flavor Dropdown */}
-              <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Hur ska smaklökarna kittlas? (Smak)</label>
-                <div className="relative">
-                  <select
-                    value={currentFlavor}
-                    onChange={(e) => isMobile ? setTempFlavor(e.target.value) : handleDropdownChange('flavor', e.target.value)}
-                    className="w-full py-2.5 pl-4 pr-9 bg-white border-2 border-foreground rounded-xl text-foreground text-[11px] font-black uppercase tracking-wide focus:outline-none appearance-none cursor-pointer"
-                  >
-                    <option value="">Alla smaker</option>
-                    {FLAVORS.map(f => <option key={f} value={f}>{flavorLabels[f] || f}</option>)}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Category Dropdown */}
-              <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Vilken mat-vibe letar vi efter? (Kategori)</label>
-                <div className="relative">
-                  <select
-                    value={currentMood}
-                    onChange={(e) => isMobile ? setTempMood(e.target.value) : handleDropdownChange('mood', e.target.value)}
-                    className="w-full py-2.5 pl-4 pr-9 bg-white border-2 border-foreground rounded-xl text-foreground text-[11px] font-black uppercase tracking-wide focus:outline-none appearance-none cursor-pointer"
-                  >
-                    <option value="">Alla vibes</option>
-                    {MOODS.map(m => <option key={m} value={m}>{moodLabels[m] || m}</option>)}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Nutrition Dropdown */}
-              <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-foreground uppercase tracking-widest block">Har vi något hälsomål i sikte? (Näring)</label>
-                <div className="relative">
-                  <select
-                    value={currentGoal}
-                    onChange={(e) => isMobile ? setTempNutritionGoal(e.target.value) : handleDropdownChange('nutritionGoal', e.target.value)}
-                    className="w-full py-2.5 pl-4 pr-9 bg-white border-2 border-foreground rounded-xl text-foreground text-[11px] font-black uppercase tracking-wide focus:outline-none appearance-none cursor-pointer"
-                  >
-                    <option value="">Inget särskilt</option>
-                    {NUTRITION_GOALS.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground pointer-events-none" />
-                </div>
+              <div className="flex flex-wrap gap-2">
+                {CUISINES.map((cuisine) => {
+                  const label = cuisineLabels[cuisine] || cuisine;
+                  const isActive = currentCuisine === cuisine;
+                  
+                  return (
+                    <button
+                      key={cuisine}
+                      onClick={() => isMobile ? handleSelectCuisineMobile(cuisine) : handleSelectCuisine(cuisine)}
+                      type="button"
+                      className={cn(
+                        "px-4 py-2.5 border-2 rounded-xl text-xs font-black uppercase tracking-wide transition-all duration-200 cursor-pointer active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
+                        isActive
+                          ? "border-foreground bg-cyan-100 text-cyan-950 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-y-[-1px]"
+                          : "bg-white border-foreground/30 hover:border-foreground hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-1px] text-foreground/85"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          )}
+
+            {/* Flavor Selectable Tags */}
+            <div className="space-y-3 p-4 bg-secondary/5 border-2 border-foreground/10 rounded-2xl">
+              <h4 className="text-[10px] font-black uppercase text-foreground/70 tracking-wider flex items-center gap-1.5">
+                <Flame className="h-3.5 w-3.5 text-foreground/60" />
+                <span>Hur ska smaklökarna kittlas? (Smak)</span>
+              </h4>
+
+              <div className="flex flex-wrap gap-2">
+                {FLAVORS.map((flavor) => {
+                  const label = flavorLabels[flavor] || flavor;
+                  const isActive = currentFlavor === flavor;
+                  
+                  return (
+                    <button
+                      key={flavor}
+                      onClick={() => isMobile ? handleSelectFlavorMobile(flavor) : handleSelectFlavor(flavor)}
+                      type="button"
+                      className={cn(
+                        "px-4 py-2.5 border-2 rounded-xl text-xs font-black uppercase tracking-wide transition-all duration-200 cursor-pointer active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
+                        isActive
+                          ? "border-foreground bg-orange-100 text-orange-950 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-y-[-1px]"
+                          : "bg-white border-foreground/30 hover:border-foreground hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-1px] text-foreground/85"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </>
     );

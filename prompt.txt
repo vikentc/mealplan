@@ -1,0 +1,131 @@
+Build a production-quality MVP from the attached GEMINI.md specification.
+
+Requirements:
+
+1. Create a modern Next.js application using:
+
+   * Next.js App Router
+   * TypeScript
+   * Tailwind CSS
+   * shadcn/ui
+   * Prisma
+   * PostgreSQL
+
+2. Create the following pages:
+
+   * Dashboard
+   * Recipes
+   * Recipe Details
+   * Add/Edit Recipe
+   * Weekly Planner
+   * Recommendations
+   * Search Results
+
+3. Implement recipe management:
+
+   * CRUD operations
+   * Images
+   * Ingredients
+   * Instructions
+   * Nutrition data
+   * Tags
+   * Cuisine metadata
+   * Flavor metadata
+   * Mood metadata
+   * Occasion metadata
+
+4. Implement recipe scaling:
+
+   * Dynamic serving adjustment
+   * Real-time ingredient recalculation
+   * No page refresh
+
+5. Implement spice scaling:
+
+   * Spice slider 0-5
+   * Automatically recalculate spicy ingredients
+   * Show ingredient adjustments visually
+
+6. Implement advanced search:
+
+   * Search by ingredient
+   * Search by recipe name
+   * Search by cuisine
+   * Search by country
+   * Search by flavor profile
+   * Search by mood
+   * Search by occasion
+   * Search by nutrition goals
+
+7. Build a recommendation engine:
+
+   * Recommend Meal button
+   * High Protein recommendation
+   * Healthy recommendation
+   * Quick Meal recommendation
+   * Meal Prep recommendation
+   * Family Favorite recommendation
+
+8. Build weekly planner:
+
+   * Monday-Sunday layout
+   * Breakfast/Lunch/Dinner slots
+   * Drag-and-drop recipe assignment
+   * Save plans to database
+
+9. Build nutrition analytics:
+
+   * Weekly macro analysis
+   * Weekly micro analysis
+   * Protein-focused scoring
+   * Nutrition health score
+   * Meal balance recommendations
+
+10. Create reusable components:
+
+* Recipe Card
+* Nutrition Badge
+* Ingredient List
+* Portion Scaler
+* Spice Scaler
+* Search Filters
+* Recommendation Card
+* Weekly Calendar
+* Nutrition Dashboard
+
+11. Seed database with example recipes from:
+
+* Vietnamese cuisine
+* Thai cuisine
+* Japanese cuisine
+* Swedish cuisine
+* Italian cuisine
+* Mexican cuisine
+
+12. Add realistic mock nutrition data.
+
+13. Create responsive layouts for:
+
+* Mobile
+* Tablet
+* Desktop
+
+14. Follow clean architecture:
+
+* Feature-based folders
+* Reusable hooks
+* Server actions
+* Strong typing throughout
+
+15. Include:
+
+* Prisma schema
+* Database seed scripts
+* Example API routes
+* README
+* Environment variable examples
+
+16. Generate the application with polished UI, modern interactions, loading states, empty states, and excellent UX.
+
+Output complete project structure and all implementation code required to run locally.
+

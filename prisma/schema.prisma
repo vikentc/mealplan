@@ -1,0 +1,47 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Recipe {
+  id              String       @id @default(cuid())
+  name            String
+  url             String?
+  description     String?      @db.Text
+  image           String?      @db.Text
+  preparationTime Int          @default(15)
+  cookingTime     Int          @default(20)
+  totalTime       Int          @default(35)
+  servings        Int          @default(4)
+  difficulty      String       @default("Medium")
+  cuisine         String       @default("International")
+  countryOfOrigin String?
+  region          String?
+  mealType        String       @default("dinner")
+  occasions       String[]
+  flavorProfile   String[]
+  moodTags        String[]
+  spiceLevel      Int          @default(0)
+  ingredients     Json         // List of { name: string, quantity: number | null, unit: string | null, optional: boolean }
+  instructions    String[]     // List of cooking steps
+  nutrition       Json         // Object of { calories, protein, carbohydrates, fat, fiber, sugar, sodium, iron, calcium, potassium, magnesium, vitaminA, vitaminC, vitaminD, vitaminB12 }
+  weeklyPlans     WeeklyPlan[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model WeeklyPlan {
+  id         String   @id @default(cuid())
+  weekOffset Int      @default(0) // 0 = current week, 1 = next week, etc.
+  dayOfWeek  String   // "Monday", "Tuesday", ..., "Sunday"
+  mealSlot   String   // "breakfast", "lunch", "dinner", "snack"
+  recipeId   String
+  recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([weekOffset, dayOfWeek, mealSlot])
+}

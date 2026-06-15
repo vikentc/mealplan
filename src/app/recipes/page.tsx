@@ -16,8 +16,7 @@ interface RecipesPageProps {
     cuisine?: string;
     flavor?: string;
     mood?: string;
-    occasion?: string;
-    spiceLevel?: string;
+    mealType?: string;
     nutritionGoal?: string;
   }>;
 }
@@ -31,10 +30,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
     cuisine: resolvedParams.cuisine || '',
     flavor: resolvedParams.flavor || '',
     mood: resolvedParams.mood || '',
-    occasion: resolvedParams.occasion || '',
-    spiceLevel: resolvedParams.spiceLevel !== undefined && resolvedParams.spiceLevel !== '' 
-      ? Number(resolvedParams.spiceLevel) 
-      : undefined,
+    mealType: resolvedParams.mealType || '',
     nutritionGoal: resolvedParams.nutritionGoal || '',
   };
 

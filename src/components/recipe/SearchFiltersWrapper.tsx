@@ -20,10 +20,7 @@ export default function SearchFiltersWrapper({ initialFilters, flat = false }: S
     if (filters.cuisine) params.set('cuisine', filters.cuisine);
     if (filters.flavor) params.set('flavor', filters.flavor);
     if (filters.mood) params.set('mood', filters.mood);
-    if (filters.occasion) params.set('occasion', filters.occasion);
-    if (filters.spiceLevel !== undefined && filters.spiceLevel !== '') {
-      params.set('spiceLevel', String(filters.spiceLevel));
-    }
+    if (filters.mealType) params.set('mealType', filters.mealType);
     if (filters.nutritionGoal) params.set('nutritionGoal', filters.nutritionGoal);
 
     const queryStr = params.toString();

@@ -10,8 +10,6 @@ interface DashboardPageProps {
     cuisine?: string;
     flavor?: string;
     mood?: string;
-    occasion?: string;
-    spiceLevel?: string;
     nutritionGoal?: string;
     mealType?: string;
     craving?: string;
@@ -26,10 +24,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     cuisine: resolvedParams.cuisine || '',
     flavor: resolvedParams.flavor || '',
     mood: resolvedParams.mood || '',
-    occasion: resolvedParams.occasion || '',
-    spiceLevel: resolvedParams.spiceLevel !== undefined && resolvedParams.spiceLevel !== '' 
-      ? Number(resolvedParams.spiceLevel) 
-      : undefined,
+    mealType: resolvedParams.mealType || '',
     nutritionGoal: resolvedParams.nutritionGoal || '',
   };
 
@@ -41,8 +36,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const currentWeekRecipeIds = currentWeekPlans.map((p: any) => p.recipeId);
 
   let recipes: any[] = [];
-  let isSearchActive = !!(filters.query || filters.cuisine || filters.flavor || filters.mood || filters.occasion || filters.spiceLevel !== undefined || filters.nutritionGoal);
-  let isRecommendationActive = !!(mealType || craving);
+  let isSearchActive = !!(filters.query || filters.cuisine || filters.flavor || filters.mood || filters.nutritionGoal);
+  let isRecommendationActive = !!(mealType || craving) && !isSearchActive;
 
   if (isRecommendationActive) {
     // Fetch dynamic recommendations

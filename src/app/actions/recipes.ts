@@ -125,6 +125,9 @@ function filterRecipesList(recipes: any[], query: string, filters: any) {
     if (filters.occasion) {
       results = results.filter((r) => Array.isArray(r.occasions) && r.occasions.map((o: string) => o.toLowerCase()).includes(filters.occasion.toLowerCase()));
     }
+    if (filters.mealType) {
+      results = results.filter((r) => (r.mealType || '').toLowerCase() === filters.mealType.toLowerCase());
+    }
     if (filters.flavor) {
       results = results.filter((r) => Array.isArray(r.flavorProfile) && r.flavorProfile.map((f: string) => f.toLowerCase()).includes(filters.flavor.toLowerCase()));
     }
@@ -155,6 +158,7 @@ export async function getRecipes(filters?: {
   occasion?: string;
   spiceLevel?: number;
   nutritionGoal?: string;
+  mealType?: string;
 }) {
   // Fetch all recipes from DB / Fallback
   const allRecipes = await runWithFallback(

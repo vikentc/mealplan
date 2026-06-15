@@ -10,8 +10,13 @@ interface SearchFiltersProps {
 const CUISINES = ['Vietnamese', 'Thai', 'Japanese', 'Swedish', 'Italian', 'Mexican'];
 const FLAVORS = ['spicy', 'sweet', 'savory', 'sour', 'umami', 'creamy', 'tangy', 'rich', 'light', 'fresh'];
 const MOODS = ['comfort food', 'healthy', 'high protein', 'cozy', 'refreshing', 'indulgent', 'energizing', 'quick and easy'];
-const OCCASIONS = ['weekday', 'weekend', 'family dinner', 'celebration', 'meal prep', 'date night', 'quick meal'];
-const SPICES = [0, 1, 2, 3, 4, 5];
+const MEAL_TYPES = [
+  { value: 'breakfast', label: 'Frukost' },
+  { value: 'lunch', label: 'Lunch' },
+  { value: 'dinner', label: 'Middag' },
+  { value: 'dessert', label: 'Efterrätt' },
+  { value: 'snack', label: 'Mellanmål' },
+];
 const NUTRITION_GOALS = [
   { value: 'high-protein', label: 'Proteinrik (>= 30g)' },
   { value: 'low-carb', label: 'Lågkolhydrat (<= 30g)' },
@@ -52,16 +57,6 @@ const moodLabels: Record<string, string> = {
   'quick and easy': 'Snabb & enkel'
 };
 
-const occasionLabels: Record<string, string> = {
-  'weekday': 'Vardag',
-  'weekend': 'Helg',
-  'family dinner': 'Familjemiddag',
-  'celebration': 'Fest/Firande',
-  'meal prep': 'Matlåda/Meal prep',
-  'date night': 'Dejt',
-  'quick meal': 'Snabbmåltid'
-};
-
 export default function SearchFilters({ onSearch, initialFilters = {}, flat = false }: SearchFiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [filters, setFilters] = useState({
@@ -69,8 +64,7 @@ export default function SearchFilters({ onSearch, initialFilters = {}, flat = fa
     cuisine: initialFilters.cuisine || '',
     flavor: initialFilters.flavor || '',
     mood: initialFilters.mood || '',
-    occasion: initialFilters.occasion || '',
-    spiceLevel: initialFilters.spiceLevel !== undefined ? initialFilters.spiceLevel : '',
+    mealType: initialFilters.mealType || '',
     nutritionGoal: initialFilters.nutritionGoal || '',
   });
 
@@ -95,8 +89,7 @@ export default function SearchFilters({ onSearch, initialFilters = {}, flat = fa
       cuisine: '',
       flavor: '',
       mood: '',
-      occasion: '',
-      spiceLevel: '',
+      mealType: '',
       nutritionGoal: '',
     };
     setFilters(reset);
@@ -212,33 +205,17 @@ export default function SearchFilters({ onSearch, initialFilters = {}, flat = fa
               </div>
             </div>
  
-            {/* Occasion Select */}
+            {/* Meal Type Select */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-foreground uppercase tracking-widest block">Tillfälle</label>
+              <label className="text-[10px] font-black text-foreground uppercase tracking-widest block">Måltid</label>
               <div className="relative">
                 <select
-                  value={filters.occasion}
-                  onChange={(e) => handleChange('occasion', e.target.value)}
+                  value={filters.mealType}
+                  onChange={(e) => handleChange('mealType', e.target.value)}
                   className="w-full py-3 pl-6 pr-12 bg-card border-3 border-foreground rounded-xl text-foreground text-xs font-black uppercase tracking-wide focus:outline-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] appearance-none transition-all cursor-pointer"
                 >
-                  <option value="">Alla tillfällen</option>
-                  {OCCASIONS.map(o => <option key={o} value={o}>{occasionLabels[o] || o}</option>)}
-                </select>
-                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground pointer-events-none" />
-              </div>
-            </div>
- 
-            {/* Spice Level Select */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-foreground uppercase tracking-widest block">Kryddstyrka</label>
-              <div className="relative">
-                <select
-                  value={filters.spiceLevel}
-                  onChange={(e) => handleChange('spiceLevel', e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full py-3 pl-6 pr-12 bg-card border-3 border-foreground rounded-xl text-foreground text-xs font-black uppercase tracking-wide focus:outline-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] appearance-none transition-all cursor-pointer"
-                >
-                  <option value="">Alla styrkor</option>
-                  {SPICES.map(s => <option key={s} value={s}>Nivå {s}</option>)}
+                  <option value="">Alla måltider</option>
+                  {MEAL_TYPES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                 </select>
                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground pointer-events-none" />
               </div>

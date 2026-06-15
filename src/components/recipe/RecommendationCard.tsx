@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Sparkles, Clock, Flame, Award, ChevronRight } from 'lucide-react';
+import { Sparkles, Clock, ChevronRight } from 'lucide-react';
 import { getDifficultyColor, formatTime } from '@/lib/utils';
 
 interface RecommendedRecipe {

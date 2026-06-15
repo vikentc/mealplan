@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, Flame, Award } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { cn, formatTime } from '@/lib/utils';
 
 interface RecipeCardProps {
@@ -19,7 +19,6 @@ interface RecipeCardProps {
 }
 
 export default function RecipeCard({ recipe }: RecipeCardProps) {
-  const isSpicy = recipe.spiceLevel > 0;
   
   return (
     <Link href={`/recipes/${recipe.id}`} className="block h-full group">
@@ -48,13 +47,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           </div>
 
 
-          {/* Spice Level Indicator */}
-          {isSpicy && (
-            <div className="absolute top-4 right-4 flex items-center gap-1 px-2.5 py-1 rounded-md bg-red-100 text-red-800 border-2 border-foreground text-[10px] font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <Flame className="h-3.5 w-3.5 fill-current" />
-              <span>Nivå {recipe.spiceLevel}</span>
-            </div>
-          )}
+
         </div>
 
         {/* Card Body */}

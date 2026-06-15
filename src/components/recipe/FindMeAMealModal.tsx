@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   X, Coffee, Utensils, ChefHat, Cookie, Sparkles, 
-  Clock, Users, RotateCcw, ArrowLeft, Flame, Eye
+  Clock, Users, RotateCcw, ArrowLeft, Eye
 } from 'lucide-react';
 import { cn, formatTime } from '@/lib/utils';
 import Link from 'next/link';
@@ -172,7 +172,6 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                 /* 3 Recipe cards grid */
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-2">
                   {suggestedRecipes.map((recipe) => {
-                    const isSpicy = recipe.spiceLevel > 0;
                     return (
                       <div 
                         key={recipe.id} 
@@ -201,12 +200,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                             </span>
                           </div>
 
-                          {isSpicy && (
-                            <div className="absolute top-2 right-2 flex items-center gap-0.5 px-2 py-0.5 rounded bg-red-100 text-red-800 border border-foreground text-[8px] font-black uppercase shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                              <Flame className="h-3 w-3 fill-current" />
-                              <span>Styrka {recipe.spiceLevel}</span>
-                            </div>
-                          )}
+
                         </div>
 
                         {/* Card details */}

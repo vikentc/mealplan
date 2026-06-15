@@ -6259,53 +6259,107 @@
     "id": "recipe_48",
     "name": "Smulpaj med äpple – Camilla Hamid",
     "url": "https://mykitchenstories.se/smulpaj-med-apple/",
-    "description": "Recipe for Smulpaj med äpple – Camilla Hamid. Fetching failed, please check the original URL.",
-    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "description": "Världens godaste smulpaj med äpple och hemgjord vaniljsås. Låt mig presentera pajen som jag bakat nästan varje vecka de senaste månaderna: smulpaj med äpple. Inga konstigheter, inga krusiduller. Bara en riktigt god smulpaj.",
+    "image": "https://mykitchenstories.se/wp-content/uploads/2022/01/IMG_0610-scaled-1.jpg",
     "preparationTime": 15,
-    "cookingTime": 20,
-    "totalTime": 35,
-    "servings": 4,
-    "difficulty": "Medium",
-    "cuisine": "International",
-    "countryOfOrigin": "Unknown",
-    "region": "Unknown",
+    "cookingTime": 35,
+    "totalTime": 50,
+    "servings": 6,
+    "difficulty": "Easy",
+    "cuisine": "Swedish",
+    "countryOfOrigin": "Sweden",
+    "region": "Europe / Scandinavia",
     "mealType": "dessert",
     "occasions": [
-      "weekday"
+      "family dinner",
+      "celebration",
+      "weekend"
     ],
     "flavorProfile": [
-      "savory",
-      "sweet"
+      "sweet",
+      "sour",
+      "creamy",
+      "fresh"
     ],
-    "moodTags": [],
+    "moodTags": [
+      "comfort food",
+      "cozy"
+    ],
     "spiceLevel": 0,
     "ingredients": [
       {
-        "name": "Ingredients from link",
+        "name": "små äpplen (ca 600 g)",
+        "quantity": 8,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "malen kanel",
+        "quantity": 2,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "strösocker (till fyllningen)",
+        "quantity": 4,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "kylskåpskallt smör",
+        "quantity": 100,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "strösocker (till degen)",
         "quantity": 1,
-        "unit": "pkg",
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "vetemjöl",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "havregryn",
+        "quantity": 0.75,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "salt",
+        "quantity": 0.5,
+        "unit": "tsk",
         "optional": false
       }
     ],
     "instructions": [
-      "Visit the recipe URL to cook: https://mykitchenstories.se/smulpaj-med-apple/"
+      "Sätt ugnen på 200 grader (över- och undervärme).",
+      "Skala, kärna ur och skär äpplena i tärningar. Lägg dem i pajformen (diameter på ca 23 cm).",
+      "Tillsätt kanel och strösocker. Blanda ihop tills alla äppelbitar har fått kanel på sig. Fördela äppelfyllningen i ett jämnt lager i botten på formen.",
+      "Nyp ihop alla ingredienserna till pajsmulet (smör, strösocker, vetemjöl, havregryn, salt) till en smulig deg. Strö smulet över äppelfyllningen i ett jämnt lager.",
+      "Grädda pajen i mitten av ugnen i ca 30-40 minuter eller tills den fått en fin gyllenbrun färg.",
+      "Servera pajen varm eller kall med vaniljglass eller hemgjord vaniljsås."
     ],
     "nutrition": {
-      "calories": 150,
-      "protein": 5,
-      "carbohydrates": 15,
-      "fat": 5,
-      "fiber": 0.1,
-      "sugar": 0.3,
-      "sodium": 6.3,
-      "iron": 0.1,
-      "calcium": 2.5,
-      "potassium": 18.8,
-      "magnesium": 1.9,
-      "vitaminA": 2.5,
-      "vitaminC": 0.3,
-      "vitaminD": 0,
-      "vitaminB12": 0
+      "calories": 380,
+      "protein": 3.5,
+      "carbohydrates": 48,
+      "fat": 18,
+      "fiber": 3.2,
+      "sugar": 28,
+      "sodium": 180,
+      "iron": 0.8,
+      "calcium": 24,
+      "potassium": 140,
+      "magnesium": 18,
+      "vitaminA": 120,
+      "vitaminC": 4.5,
+      "vitaminD": 0.1,
+      "vitaminB12": 0.1
     }
   },
   {

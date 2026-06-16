@@ -4,6 +4,13 @@ import { db } from '@/lib/db';
 import fs from 'fs';
 import path from 'path';
 import { cookies } from 'next/headers';
+import { getTranslatedRecipe } from '@/lib/recipeTranslations';
+import { 
+  capitalizeWord, 
+  decodeHtmlEntities, 
+  parseIngredientLineHeuristic, 
+  scrapeHtmlFallback 
+} from '@/lib/recipeParser';
 
 async function checkAuth() {
   const cookieStore = await cookies();
@@ -162,38 +169,43 @@ function filterRecipesList(recipes: any[], query: string, filters: any) {
   if (query) {
     const q = query.toLowerCase();
     results = results.filter((r) => {
+      const transR = getTranslatedRecipe(r, 'en');
       const name = (r.name || '').toLowerCase();
+      const transName = (transR?.name || '').toLowerCase();
       const description = (r.description || '').toLowerCase();
+      const transDesc = (transR?.description || '').toLowerCase();
       const cuisine = (r.cuisine || '').toLowerCase();
 
       // Check name or cuisine matches
-      if (name.includes(q) || cuisine.includes(q)) return true;
+      if (name.includes(q) || transName.includes(q) || cuisine.includes(q)) return true;
 
       // Check description matches
-      if (description.includes(q)) {
+      if (description.includes(q) || transDesc.includes(q)) {
         if (q === 'pasta') {
           // If query is "pasta", verify it's not just "bönpasta", "chilipasta", "currypasta"
           const cleanDesc = description.replace(/(chili|bön|curry|miso|wasa|tomat|vitlök)pasta/g, '');
-          if (!cleanDesc.includes('pasta')) return false;
+          const cleanTransDesc = transDesc.replace(/(chili|bean|curry|miso|wasa|tomato|garlic)pasta/g, '');
+          if (!cleanDesc.includes('pasta') && !cleanTransDesc.includes('pasta')) return false;
         }
         return true;
       }
 
       // Check ingredients matches
       if (Array.isArray(r.ingredients)) {
-        return r.ingredients.some((i: any) => {
+        return r.ingredients.some((i: any, idx: number) => {
           const ingName = (i.name || '').toLowerCase();
-          if (ingName.includes(q)) {
+          const transIngName = (transR?.ingredients?.[idx]?.name || '').toLowerCase();
+          if (ingName.includes(q) || transIngName.includes(q)) {
             if (q === 'pasta') {
               // Exclude condiment pastes (chilipasta, currypasta, bönpasta, etc.)
               if (/(chili|bön|curry|miso|wasa|tomat|vitlök)pasta/.test(ingName)) return false;
               // Exclude generic side dishes unless the recipe itself is a pasta dish
-              const isPastaDish = name.includes('pasta') || name.includes('carbonara') || name.includes('spaghetti') || name.includes('lasagne') || name.includes('ravioli') || name.includes('makaroner');
+              const isPastaDish = name.includes('pasta') || name.includes('carbonara') || name.includes('spaghetti') || name.includes('lasagne') || name.includes('ravioli') || name.includes('makaroner') || transName.includes('pasta');
               if (ingName === 'pasta, ris eller potatis' && !isPastaDish) return false;
             }
             if (q === 'ris') {
               // Exclude generic side dishes unless the recipe itself is a rice dish
-              const isRiceDish = name.includes('ris') || name.includes('risotto') || name.includes('paella');
+              const isRiceDish = name.includes('ris') || name.includes('risotto') || name.includes('paella') || transName.includes('rice') || transName.includes('risotto');
               if (ingName === 'pasta, ris eller potatis' && !isRiceDish) return false;
             }
             return true;
@@ -337,12 +349,19 @@ export async function getRecipes(filters?: {
   // 1. Build dictionary of vocabulary words from recipe names, descriptions, cuisines, and ingredients
   const vocabSet = new Set<string>();
   allRecipes.forEach((r: any) => {
+    const transR = getTranslatedRecipe(r, 'en');
     tokenizeText(r.name || '').forEach(w => vocabSet.add(w));
+    tokenizeText(transR?.name || '').forEach(w => vocabSet.add(w));
     tokenizeText(r.description || '').forEach(w => vocabSet.add(w));
+    tokenizeText(transR?.description || '').forEach(w => vocabSet.add(w));
     tokenizeText(r.cuisine || '').forEach(w => vocabSet.add(w));
     if (Array.isArray(r.ingredients)) {
-      r.ingredients.forEach((ing: any) => {
+      r.ingredients.forEach((ing: any, idx: number) => {
         tokenizeText(ing.name || '').forEach(w => vocabSet.add(w));
+        const transIng = transR?.ingredients?.[idx];
+        if (transIng) {
+          tokenizeText(transIng.name || '').forEach(w => vocabSet.add(w));
+        }
       });
     }
   });
@@ -854,4 +873,183 @@ export async function getRecommendationsByCraving(criteria: {
 
   // Shuffle or sort so we get varied recommendations
   return available.sort(() => 0.5 - Math.random()).slice(0, 6);
+}
+
+export async function autofillFromUrl(url: string) {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      },
+      next: { revalidate: 0 }
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch URL: ${response.statusText}`);
+    }
+    const html = await response.text();
+
+    // Look for JSON-LD
+    const jsonLdRegex = /<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
+    let match;
+    let recipeData: any = null;
+
+    while ((match = jsonLdRegex.exec(html)) !== null) {
+      try {
+        const content = match[1].trim();
+        const parsed = JSON.parse(content);
+        
+        // JSON-LD can be an object, array, or @graph
+        const findRecipe = (obj: any): any => {
+          if (!obj) return null;
+          if (Array.isArray(obj)) {
+            for (const item of obj) {
+              const res = findRecipe(item);
+              if (res) return res;
+            }
+          }
+          if (obj['@type'] === 'Recipe' || obj['type'] === 'Recipe') {
+            return obj;
+          }
+          if (obj['@graph']) {
+            return findRecipe(obj['@graph']);
+          }
+          // Recursively look for embedded recipe object
+          if (typeof obj === 'object') {
+            for (const key of Object.keys(obj)) {
+              if (typeof obj[key] === 'object') {
+                const res = findRecipe(obj[key]);
+                if (res) return res;
+              }
+            }
+          }
+          return null;
+        };
+
+        const recipeObj = findRecipe(parsed);
+        if (recipeObj) {
+          recipeData = recipeObj;
+          break;
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    }
+
+    if (!recipeData) {
+      return scrapeHtmlFallback(html, url);
+    }
+
+    return parseJsonLdRecipe(recipeData, url);
+  } catch (error: any) {
+    console.error('Error autofilling from URL:', error);
+    throw new Error(error.message || 'Failed to parse recipe from URL');
+  }
+}
+
+function parseJsonLdRecipe(data: any, originalUrl: string) {
+  const name = decodeHtmlEntities(data.name || '');
+  const description = decodeHtmlEntities(data.description || '');
+  
+  let servings = 4;
+  if (data.recipeYield) {
+    const yieldStr = String(Array.isArray(data.recipeYield) ? data.recipeYield[0] : data.recipeYield);
+    const servingsMatch = yieldStr.match(/\d+/);
+    if (servingsMatch) {
+      servings = Number(servingsMatch[0]);
+    }
+  }
+
+  const parseDuration = (isoStr: string) => {
+    if (!isoStr) return 0;
+    const match = isoStr.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
+    if (!match) return 0;
+    const hours = Number(match[1] || 0);
+    const minutes = Number(match[2] || 0);
+    return hours * 60 + minutes;
+  };
+
+  const preparationTime = parseDuration(data.prepTime) || 15;
+  const cookingTime = parseDuration(data.cookTime) || 20;
+
+  const cuisine = Array.isArray(data.recipeCuisine) ? data.recipeCuisine[0] : (data.recipeCuisine || 'International');
+
+  let image = null;
+  if (data.image) {
+    if (typeof data.image === 'string') image = data.image;
+    else if (Array.isArray(data.image)) image = data.image[0];
+    else if (data.image.url) image = data.image.url;
+  }
+
+  const rawIngredients = data.recipeIngredient || data.ingredients || [];
+  const ingredients = rawIngredients.map((ingStr: string) => {
+    return parseIngredientLineHeuristic(decodeHtmlEntities(ingStr));
+  });
+
+  const parseInstructionsList = (instructionsData: any): string[] => {
+    if (!instructionsData) return [];
+    if (typeof instructionsData === 'string') {
+      return instructionsData.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+    if (Array.isArray(instructionsData)) {
+      let steps: string[] = [];
+      for (const item of instructionsData) {
+        if (typeof item === 'string') {
+          steps.push(item);
+        } else if (typeof item === 'object' && item !== null) {
+          if (item['@type'] === 'HowToStep' || item['type'] === 'HowToStep' || item.text) {
+            if (item.text) steps.push(item.text);
+            else if (item.name) steps.push(item.name);
+          } else if (item['@type'] === 'HowToSection' || item['type'] === 'HowToSection' || item.itemListElement) {
+            if (item.itemListElement) {
+              steps = steps.concat(parseInstructionsList(item.itemListElement));
+            }
+          } else if (item.text) {
+            steps.push(item.text);
+          } else if (item.name) {
+            steps.push(item.name);
+          }
+        }
+      }
+      return steps;
+    }
+    if (typeof instructionsData === 'object' && instructionsData !== null) {
+      if (instructionsData.text) return [instructionsData.text];
+      if (instructionsData.itemListElement) return parseInstructionsList(instructionsData.itemListElement);
+    }
+    return [];
+  };
+
+  let instructions = parseInstructionsList(data.recipeInstructions).map(step => decodeHtmlEntities(step).trim());
+
+  const rawNut = data.nutrition || {};
+  const calories = parseInt(rawNut.calories) || 0;
+  const protein = parseFloat(rawNut.proteinContent) || 0;
+  const carbohydrates = parseFloat(rawNut.carbohydrateContent) || 0;
+  const fat = parseFloat(rawNut.fatContent) || 0;
+  const fiber = parseFloat(rawNut.fiberContent) || 0;
+  const sugar = parseFloat(rawNut.sugarContent) || 0;
+  const sodium = parseInt(rawNut.sodiumContent) || 0;
+
+  return {
+    name: name.trim() || 'Scraped Recipe',
+    description: description.trim() || null,
+    image,
+    url: originalUrl,
+    preparationTime,
+    cookingTime,
+    servings,
+    cuisine: capitalizeWord(cuisine),
+    ingredients,
+    instructions,
+    nutrition: {
+      calories,
+      protein,
+      carbohydrates,
+      fat,
+      fiber,
+      sugar,
+      sodium,
+      iron: 0, calcium: 0, potassium: 0, magnesium: 0, vitaminA: 0, vitaminC: 0, vitaminD: 0, vitaminB12: 0
+    }
+  };
 }

@@ -7340,5 +7340,174 @@
       "vitaminB12": 0
     },
     "id": "recipe_57"
+  },
+  {
+    "id": "recipe_1781593225799",
+    "name": "Kvarg",
+    "url": "https://www.gymgrossisten.com/barskvarg-frukost.html?srsltid=AfmBOoo_XtpvaqkK14nO2N5ygwO8ZtM5UbZ7rPyVG2y4xhUlCudfj_Ga",
+    "description": "Perfekt som bas i frukosten – den håller dig mätt länge tack vare sitt höga proteininnehåll och kan ätas naturell eller smaksatt, toppad med bär, nötter och frön.",
+    "image": "https://www.gymgrossisten.com/on/demandware.static/-/Sites-Gymgrossisten-Library/default/dwf85f8fc5/Editorial/shutterstock_1342453403.jpg",
+    "preparationTime": 15,
+    "cookingTime": 5,
+    "totalTime": 20,
+    "servings": 1,
+    "difficulty": "Medium",
+    "cuisine": "International",
+    "countryOfOrigin": "Unknown",
+    "region": "Unknown",
+    "mealType": "breakfast",
+    "occasions": [],
+    "flavorProfile": [],
+    "moodTags": [],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "Kvarg",
+        "quantity": 250,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "Protein pulver",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Blandade bär",
+        "quantity": 150,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "Pumpakärnor",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": true
+      },
+      {
+        "name": "Honung",
+        "quantity": 2.5,
+        "unit": "cl",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Häll upp hälften av kvargen i ett stort glas",
+      "Tillsätt protein pulver och blanda tills den är slät",
+      "Tillsätt pumpakärnorna och hälften av bären",
+      "Tillsätt resten av kvargen över bären och pumpakärnorna",
+      "Häll upp resterande bär",
+      "Ringla honungen över bären"
+    ],
+    "nutrition": {
+      "calories": 320,
+      "protein": 50,
+      "carbohydrates": 26,
+      "fat": 8.5,
+      "fiber": 0,
+      "sugar": 0,
+      "sodium": 0,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "createdAt": "2026-06-16T07:00:25.799Z",
+    "updatedAt": "2026-06-16T07:12:10.794Z"
+  },
+  {
+    "id": "recipe_1781600927447",
+    "name": "Plättar",
+    "url": "https://www.arla.se/recept/plattar-med-sommarbar/",
+    "description": "Plättar är en klassisk och älskad rätt som passar perfekt till helgfrukost, brunch eller som ett lyxigt mellanmål. Stek plättarna frasiga och servera gärna med färska bär som smultron, blåbär, hallon eller jordgubbar. Toppad med vispad grädde blir detta en både enkel och lyxig dessert som sprider värme och glädje vid varje tugga.",
+    "image": "https://images.arla.com/recordid/5462ABB2-5DD1-4E3C-859E215C6693DFE7/picture.jpg?width=1300&height=525&mode=crop&crop=(0,247,0,-284)&format=webp",
+    "preparationTime": 20,
+    "cookingTime": 20,
+    "totalTime": 40,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "International",
+    "countryOfOrigin": "Unknown",
+    "region": "Unknown",
+    "mealType": "dinner",
+    "occasions": [],
+    "flavorProfile": [],
+    "moodTags": [],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "vetemjöl",
+        "quantity": 3,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Arla Ko® Standardmjölk",
+        "quantity": 6,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "ägg",
+        "quantity": 3,
+        "unit": null,
+        "optional": false
+      },
+      {
+        "name": "salt",
+        "quantity": 0.5,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "Arla Köket® Smör- & rapsolja, till stekning",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "Arla Ko® Vispgrädde",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "blandade färska bär, t ex smultron, hallon, jordgubbar eller blåbär",
+        "quantity": 250,
+        "unit": "g",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Mät upp mjölet i en bunke. Vispa ner hälften av mjölken till en slät smet. Tillsätt ägg, salt och resten av mjölken.",
+      "Hetta upp smör- & rapsolja i en plättlagg. Stek plättar i omgångar på medelvärme.",
+      "Vänd plättarna när smeten stannat på ovansidan.",
+      "Vispa grädden fluffig tills det bildas toppar, helst för hand.",
+      "Servera plättarna med färska bär och grädde."
+    ],
+    "nutrition": {
+      "calories": 562,
+      "protein": 15,
+      "carbohydrates": 45,
+      "fat": 35,
+      "fiber": 3,
+      "sugar": 0,
+      "sodium": 0,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "createdAt": "2026-06-16T09:08:47.447Z",
+    "updatedAt": "2026-06-16T09:08:47.447Z"
   }
 ]

@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Sparkles, Clock, ChevronRight } from 'lucide-react';
 import { getDifficultyColor, formatTime } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n';
+import { getTranslatedRecipe } from '@/lib/recipeTranslations';
 
 interface RecommendedRecipe {
   id: string;
@@ -32,21 +34,16 @@ const CATEGORY_COLORS: Record<string, string> = {
   'New Recipe Suggestion': 'bg-purple-500/10 text-purple-700 border-purple-500/20',
 };
 
-const categoryLabels: Record<string, string> = {
-  'High Protein Pick': 'Proteinrikt val',
-  'Healthy Pick': 'Hälsosamt val',
-  'Quick Dinner': 'Snabb middag',
-  'Family Favorite': 'Familjefavorit',
-  'Meal Prep Choice': 'Bra för matlådan',
-  'New Recipe Suggestion': 'Nytt receptförslag',
-};
-
 export default function RecommendationCard({
-  recipe,
+  recipe: originalRecipe,
   category,
   description,
   onAddToPlanner
 }: RecommendationCardProps) {
+  const { language, t } = useLanguage();
+  const recipe = getTranslatedRecipe(originalRecipe, language);
+
+
   return (
     <div className="group bg-card border-3 border-foreground rounded-[2rem] overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] transition-all duration-300 flex flex-col md:flex-row h-full">
       {/* Recipe Image (Left on desktop, Top on mobile) */}
@@ -61,14 +58,14 @@ export default function RecommendationCard({
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-foreground font-black uppercase text-xs tracking-wider bg-secondary/50">
-            Bild saknas
+            {t('card.no_image')}
           </div>
         )}
         
         {/* Absolute Recommendation Category Tag on Image */}
         <div className="absolute top-4 left-4 z-10 md:hidden">
           <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-100 text-amber-850 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            {categoryLabels[category] || category}
+            {t(`category.${category}`) || category}
           </span>
         </div>
       </div>
@@ -79,12 +76,12 @@ export default function RecommendationCard({
           {/* Top category label & stats */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="hidden md:inline-block text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-100 text-amber-850 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              {categoryLabels[category] || category}
+              {t(`category.${category}`) || category}
             </span>
 
             <div className="flex items-center gap-3 text-[10px] font-black uppercase text-foreground/80">
               <span className="px-2 py-0.5 rounded-md border-2 border-foreground bg-blue-100 text-blue-900 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                {recipe.difficulty.toLowerCase() === 'easy' ? 'Enkel' : recipe.difficulty.toLowerCase() === 'medium' ? 'Medelsvår' : 'Svår'}
+                {t(`details.${recipe.difficulty.toLowerCase()}`)}
               </span>
               <div className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 text-foreground" />
@@ -103,7 +100,7 @@ export default function RecommendationCard({
               <span>{description}</span>
             </p>
             <p className="text-xs text-foreground/85 font-medium line-clamp-2">
-              {recipe.description || "Ett utsökt val utvalt för din hälsosamma veckoplanering."}
+              {recipe.description || t('card.default_desc')}
             </p>
           </div>
         </div>
@@ -113,15 +110,15 @@ export default function RecommendationCard({
           <div className="flex gap-4 text-[10px] font-black uppercase text-foreground/85">
             <div>
               <span className="font-black text-foreground block text-xs leading-none mb-0.5">{recipe.nutrition?.protein || 0}g</span>
-              <span>Protein</span>
+              <span>{t('dashboard.protein')}</span>
             </div>
             <div className="border-l-2 border-foreground pl-4">
               <span className="font-black text-foreground block text-xs leading-none mb-0.5">{recipe.nutrition?.calories || 0}</span>
-              <span>kcal</span>
+              <span>{t('card.kcal')}</span>
             </div>
             <div className="border-l-2 border-foreground pl-4">
               <span className="font-black text-foreground block text-xs leading-none mb-0.5">{recipe.nutrition?.carbohydrates || 0}g</span>
-              <span>kolh</span>
+              <span>{t('card.carb')}</span>
             </div>
           </div>
 
@@ -131,14 +128,14 @@ export default function RecommendationCard({
                 onClick={() => onAddToPlanner(recipe.id)}
                 className="px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
               >
-                Planera
+                {t('card.reco_desc_plan')}
               </button>
             )}
             <Link
               href={`/recipes/${recipe.id}`}
               className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-foreground border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl flex items-center gap-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
             >
-              <span>Recept</span>
+              <span>{t('card.reco_desc_recipe')}</span>
               <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>

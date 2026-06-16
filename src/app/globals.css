@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --border-width-3: 3px;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -148,4 +152,10 @@ button:focus-visible,
 a:focus-visible {
   outline: 2px solid hsl(var(--primary)) !important;
   outline-offset: 2.5px !important;
+}
+
+/* Fix Safari rounded corner clipping & child element bleed over borders */
+.border-3 {
+  transform: translate3d(0, 0, 0);
+  isolation: isolate;
 }

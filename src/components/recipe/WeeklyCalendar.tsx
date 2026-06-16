@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { saveWeeklyPlan } from '@/app/actions/recipes';
+import { useLanguage } from '@/lib/i18n';
+import { getTranslatedRecipe } from '@/lib/recipeTranslations';
 
 interface Recipe {
   id: string;
@@ -66,10 +68,26 @@ const dayNamesSv: Record<string, string> = {
   'Sunday': 'Söndag'
 };
 
+const dayNamesEn: Record<string, string> = {
+  'Monday': 'Monday',
+  'Tuesday': 'Tuesday',
+  'Wednesday': 'Wednesday',
+  'Thursday': 'Thursday',
+  'Friday': 'Friday',
+  'Saturday': 'Saturday',
+  'Sunday': 'Sunday'
+};
+
 const slotNamesSv: Record<string, string> = {
   'breakfast': 'Frukost',
   'lunch': 'Lunch',
   'dinner': 'Middag'
+};
+
+const slotNamesEn: Record<string, string> = {
+  'breakfast': 'Breakfast',
+  'lunch': 'Lunch',
+  'dinner': 'Dinner'
 };
 
 export default function WeeklyCalendar({
@@ -83,6 +101,14 @@ export default function WeeklyCalendar({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [activeSelectCell, setActiveSelectCell] = useState<{ day: string; slot: string } | null>(null);
+  
+  const { t, language } = useLanguage();
+  const dayNames = language === 'sv' ? dayNamesSv : dayNamesEn;
+  const slotNames = language === 'sv' ? slotNamesSv : slotNamesEn;
+
+  const translatedRecipes = React.useMemo(() => {
+    return recipes.map(r => getTranslatedRecipe(r, language));
+  }, [recipes, language]);
 
   const getYesterdayMeal = (day: string, slot: string) => {
     const dayIndex = DAYS.indexOf(day);
@@ -291,7 +317,7 @@ export default function WeeklyCalendar({
   };
 
   const handleClearAll = () => {
-    if (confirm('Är du säker på att du vill rensa hela veckans planering?')) {
+    if (confirm(t('planner.confirm_clear'))) {
       const clearedPlans: Record<string, Record<string, Recipe | null>> = {};
       DAYS.forEach(day => {
         clearedPlans[day] = {};
@@ -305,7 +331,7 @@ export default function WeeklyCalendar({
   };
 
   // Filter recipes for dialog picker
-  const filteredRecipes = recipes.filter(r => 
+  const filteredRecipes = translatedRecipes.filter(r => 
     r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     r.cuisine.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -340,8 +366,8 @@ export default function WeeklyCalendar({
               <Calendar className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-black text-md text-foreground uppercase tracking-tight">Veckoplanering</h3>
-              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Planera dina måltider och näringsintag</p>
+              <h3 className="font-black text-md text-foreground uppercase tracking-tight">{t('planner.title')}</h3>
+              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{t('planner.subtitle')}</p>
             </div>
           </div>
 
@@ -350,17 +376,17 @@ export default function WeeklyCalendar({
             <button
               onClick={() => onWeekOffsetChange(weekOffset - 1)}
               className="h-10 w-10 bg-card border-2 border-foreground hover:bg-secondary flex items-center justify-center rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
-              title="Föregående vecka"
+              title={language === 'sv' ? 'Föregående vecka' : 'Previous week'}
             >
               <ChevronLeft className="h-4.5 w-4.5" />
             </button>
             <span className="px-4 py-2 bg-amber-100 text-amber-950 border-2 border-foreground rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-[10px] font-black uppercase tracking-wider select-none">
-              {weekOffset === 0 ? 'Denna vecka' : weekOffset === 1 ? 'Nästa vecka' : `Vecka +${weekOffset}`}
+              {weekOffset === 0 ? t('planner.this_week') : weekOffset === 1 ? t('planner.next_week') : t('planner.week_offset', { offset: weekOffset.toString() })}
             </span>
             <button
               onClick={() => onWeekOffsetChange(weekOffset + 1)}
               className="h-10 w-10 bg-card border-2 border-foreground hover:bg-secondary flex items-center justify-center rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
-              title="Nästa vecka"
+              title={language === 'sv' ? 'Nästa vecka' : 'Next week'}
             >
               <ChevronRight className="h-4.5 w-4.5" />
             </button>
@@ -370,10 +396,10 @@ export default function WeeklyCalendar({
               onClick={handleAutofill}
               type="button"
               className="ml-2 px-5 py-2.5 bg-cyan-400 hover:bg-cyan-300 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2 cursor-pointer"
-              title="Autofyll hela veckan baserat på näringsbalans"
+              title={t('planner.autofill_title')}
             >
               <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Autofyll vecka</span>
+              <span className="hidden sm:inline">{t('planner.autofill_btn')}</span>
             </button>
 
             {/* Clear Plan Button */}
@@ -381,10 +407,10 @@ export default function WeeklyCalendar({
               onClick={handleClearAll}
               type="button"
               className="ml-2 px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2 cursor-pointer"
-              title="Rensa hela veckans planering"
+              title={t('planner.clear_title')}
             >
               <Trash2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Rensa vecka</span>
+              <span className="hidden sm:inline">{t('planner.clear_btn')}</span>
             </button>
 
             {/* Save Button */}
@@ -399,7 +425,7 @@ export default function WeeklyCalendar({
               )}
             >
               <Save className="h-4 w-4" />
-              <span>{isSaving ? 'Sparar...' : saveSuccess ? 'Sparat!' : 'Spara planering'}</span>
+              <span>{isSaving ? t('planner.saving') : saveSuccess ? t('planner.saved') : t('planner.save')}</span>
             </button>
           </div>
         </div>
@@ -419,19 +445,19 @@ export default function WeeklyCalendar({
                 <div className="flex lg:flex-col justify-between items-center lg:items-start shrink-0 w-full lg:w-36 border-b lg:border-b-0 lg:border-r-3 border-foreground/30 pb-3.5 lg:pb-0 lg:pr-4">
                   <div>
                     <span className="font-black text-base md:text-lg text-foreground uppercase tracking-tight block">
-                      {dayNamesSv[day] || day}
+                      {dayNames[day] || day}
                     </span>
                     <span className="text-[9px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5 block">
-                      Planering
+                      {t('planner.plan')}
                     </span>
                   </div>
 
                   <div className="flex items-center lg:flex-col gap-2 lg:gap-1.5 mt-2 font-mono">
                     <span className="text-[10px] font-black text-orange-950 bg-orange-100 border-2 border-foreground px-2 py-0.5 rounded-md whitespace-nowrap">
-                      🔥 {calories} kcal
+                      🔥 {calories} {t('card.kcal')}
                     </span>
                     <span className="text-[10px] font-black text-blue-950 bg-blue-100 border-2 border-foreground px-2 py-0.5 rounded-md whitespace-nowrap">
-                      💪 {protein}g prot
+                      💪 {protein.toFixed(1)}g {t('card.prot')}
                     </span>
                   </div>
                 </div>
@@ -442,7 +468,8 @@ export default function WeeklyCalendar({
                   slots.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"
                 )}>
                   {slots.map(slot => {
-                    const recipe = plans[day]?.[slot];
+                    const originalRecipe = plans[day]?.[slot];
+                    const recipe = originalRecipe ? getTranslatedRecipe(originalRecipe, language) : null;
                     const isSelectTarget = activeSelectCell?.day === day && activeSelectCell?.slot === slot;
                     const yesterdayMeal = getYesterdayMeal(day, slot);
 
@@ -462,7 +489,7 @@ export default function WeeklyCalendar({
                         {/* Slot category label */}
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-[9px] uppercase font-black text-foreground/80 tracking-widest leading-none block">
-                            {slotNamesSv[slot] || slot}
+                            {slotNames[slot] || slot}
                           </span>
                         </div>
 
@@ -479,7 +506,7 @@ export default function WeeklyCalendar({
                                 />
                               ) : (
                                 <div className="h-full w-full bg-secondary flex items-center justify-center text-[8px] text-muted-foreground font-extrabold uppercase">
-                                  Måltid
+                                  {t('planner.meal')}
                                 </div>
                               )}
                             </div>
@@ -489,14 +516,14 @@ export default function WeeklyCalendar({
                                 {recipe.name}
                               </span>
                               <span className="text-[10px] text-muted-foreground font-bold block mt-0.5 whitespace-nowrap">
-                                {recipe.nutrition?.calories || 0} kcal · <span className="text-emerald-800 bg-emerald-100 border border-foreground/30 px-1 py-0.25 rounded font-black inline-block">{recipe.nutrition?.protein || 0}g P</span>
+                                {recipe.nutrition?.calories || 0} {t('card.kcal')} · <span className="text-emerald-800 bg-emerald-100 border border-foreground/30 px-1 py-0.25 rounded font-black inline-block">{recipe.nutrition?.protein || 0}g P</span>
                               </span>
                             </div>
 
                             <button
                               onClick={(e) => handleRemoveRecipe(day, slot, e)}
                               className="p-1.5 bg-red-100 hover:bg-red-200 border-2 border-foreground text-red-800 rounded-xl transition-all shrink-0 hover:scale-105 active:scale-95 lg:opacity-0 lg:group-hover/slot:opacity-100 focus:opacity-100 cursor-pointer shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
-                              title="Rensa måltid"
+                              title={t('planner.clear_cell')}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
@@ -505,7 +532,7 @@ export default function WeeklyCalendar({
                           <div className="flex flex-col items-center justify-center gap-1.5 py-2 flex-1 w-full text-center">
                             <span className="text-[10px] font-black text-foreground/60 group-hover/slot:text-foreground transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wide">
                               <Plus className="h-3.5 w-3.5" />
-                              <span>Planera</span>
+                              <span>{t('planner.plan')}</span>
                             </span>
                             {yesterdayMeal && (
                               <button
@@ -516,7 +543,7 @@ export default function WeeklyCalendar({
                                 }}
                                 className="px-2 py-1 bg-amber-100 border border-foreground text-[8px] font-black uppercase tracking-wider rounded-md hover:bg-amber-200 transition-all cursor-pointer shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none"
                               >
-                                🍱 Ät rester
+                                {t('planner.leftovers')}
                               </button>
                             )}
                           </div>
@@ -538,15 +565,15 @@ export default function WeeklyCalendar({
             <div className="flex justify-between items-center mb-5">
               <div>
                 <h4 className="font-black text-lg text-foreground uppercase tracking-tight">
-                  Lägg till på {dayNamesSv[activeSelectCell.day]?.toLowerCase() || activeSelectCell.day}
+                  {t('planner.add_to_day', { day: language === 'sv' ? (dayNames[activeSelectCell.day] || activeSelectCell.day).toLowerCase() : (dayNames[activeSelectCell.day] || activeSelectCell.day) })}
                 </h4>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase">Välj recept för {slotNamesSv[activeSelectCell.slot]?.toLowerCase() || activeSelectCell.slot}</p>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase">{t('planner.choose_for_slot', { slot: (slotNames[activeSelectCell.slot] || activeSelectCell.slot).toLowerCase() })}</p>
               </div>
               <button
                 onClick={() => setActiveSelectCell(null)}
                 className="text-foreground hover:bg-red-100 border-2 border-foreground px-4.5 py-1.5 rounded-xl font-black uppercase text-[10px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer active:translate-y-[1px]"
               >
-                Stäng
+                {t('planner.close')}
               </button>
             </div>
 
@@ -555,7 +582,7 @@ export default function WeeklyCalendar({
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground z-10" />
               <input
                 type="text"
-                placeholder="Sök recept..."
+                placeholder={t('planner.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-card border-3 border-foreground rounded-2xl text-xs font-black uppercase placeholder:text-foreground/50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
@@ -583,7 +610,7 @@ export default function WeeklyCalendar({
                           />
                         ) : (
                           <div className="h-full w-full bg-secondary flex items-center justify-center text-[9px] text-muted-foreground font-black uppercase">
-                            Måltid
+                            {t('planner.meal')}
                           </div>
                         )}
                       </div>
@@ -600,7 +627,7 @@ export default function WeeklyCalendar({
                 </div>
               ) : (
                 <div className="text-center py-10 text-xs text-muted-foreground font-bold uppercase">
-                  Inga recept matchar sökningen
+                  {t('planner.no_matches')}
                 </div>
               )}
             </div>

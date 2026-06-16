@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Award, ShieldAlert, Sparkles, TrendingUp, Info } from 'lucide-react';
+import { Award, ShieldAlert, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n';
 
 interface Recipe {
   id: string;
@@ -58,6 +59,7 @@ const DAILY_TARGET = {
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
+  const { t, language } = useLanguage();
   // 1. Calculate weekly aggregates
   let totalCalories = 0;
   let totalProtein = 0;
@@ -189,11 +191,23 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
     'Sunday': 'söndag'
   };
 
+  const dayNamesEn: Record<string, string> = {
+    'Monday': 'Monday',
+    'Tuesday': 'Tuesday',
+    'Wednesday': 'Wednesday',
+    'Thursday': 'Thursday',
+    'Friday': 'Friday',
+    'Saturday': 'Saturday',
+    'Sunday': 'Sunday'
+  };
+
+  const dayNames = language === 'sv' ? dayNamesSv : dayNamesEn;
+
   // Protein check
   if (totalProtein < weeklyTarget.protein * 0.8) {
-    suggestions.push("Ditt proteinintag ligger något under målet. Prioritera att lägga till kyckling eller fisk i luncherna.");
+    suggestions.push(t('dashboard.suggestion.protein_low'));
   } else {
-    suggestions.push("Utmärkt proteinintag! Du uppnår dina träningsmål.");
+    suggestions.push(t('dashboard.suggestion.protein_ok'));
   }
 
   // Daily protein consistency checks
@@ -201,30 +215,32 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
     plans.some(p => p.dayOfWeek === day) && dailyProtein[day] < DAILY_TARGET.protein * 0.6
   );
   if (lowProteinDays.length > 0) {
-    suggestions.push(`Proteinintaget är lägre på ${lowProteinDays.map(day => dayNamesSv[day] || day).join(', ')}. Försök lägga till ett proteinrikt recept där.`);
+    suggestions.push(t('dashboard.suggestion.protein_consistency', {
+      days: lowProteinDays.map(day => dayNames[day] || day).join(', ')
+    }));
   }
 
   // Micronutrient warnings
   const lowestMicro = Object.entries(microPct).sort((a, b) => a[1] - b[1])[0];
   if (lowestMicro && lowestMicro[1] < 60) {
     const name = lowestMicro[0];
-    if (name === 'iron') suggestions.push("Lägg till en järnrik måltid (t.ex. spenat, nötkött eller linser).");
-    if (name === 'calcium') suggestions.push("Lägg till fler kalciumrika ingredienser (t.ex. ost, yoghurt eller broccoli).");
-    if (name === 'vitaminD') suggestions.push("Vitamin D-intaget är lågt. Överväg att lägga till lax- eller äggulerätter i helgplaneringen.");
-    if (name === 'vitaminC') suggestions.push("Lägg till färsk citron, lime eller paprika för att öka Vitamin C-intaget.");
-    if (name === 'vitaminB12') suggestions.push("Inkludera kött, fisk eller mejeriprodukter för att öka Vitamin B12.");
+    if (name === 'iron') suggestions.push(t('dashboard.suggestion.iron'));
+    if (name === 'calcium') suggestions.push(t('dashboard.suggestion.calcium'));
+    if (name === 'vitaminD') suggestions.push(t('dashboard.suggestion.vitaminD'));
+    if (name === 'vitaminC') suggestions.push(t('dashboard.suggestion.vitaminC'));
+    if (name === 'vitaminB12') suggestions.push(t('dashboard.suggestion.vitaminB12'));
   } else {
-    suggestions.push("Superb variation av mikronäringsämnen! Ditt näringsintag ser välbalanserat ut.");
+    suggestions.push(t('dashboard.suggestion.micro_ok'));
   }
 
   // Fiber warning
   if (totalFiber < weeklyTarget.fiber * 0.7) {
-    suggestions.push("Fiberintaget ligger under målet. Lägg till fler grönsaksbaserade recept (som tomatsoppa eller sallad).");
+    suggestions.push(t('dashboard.suggestion.fiber'));
   }
 
   // Sodium warnings
   if (totalSodium > weeklyTarget.sodium * 1.2) {
-    suggestions.push("Natriumnivåerna är höga denna vecka. Begränsa processat bacon eller konserverade produkter.");
+    suggestions.push(t('dashboard.suggestion.sodium'));
   }
 
   return (
@@ -237,9 +253,9 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
         <div className="bg-card border-3 border-foreground p-6 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-center flex flex-col justify-between items-center min-h-[270px]">
           <div>
             <h4 className="font-black text-md text-foreground uppercase tracking-tight">
-              Hälsopoäng
+              {t('dashboard.score_title')}
             </h4>
-            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase">Övergripande hälsopoäng</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase">{t('dashboard.score_subtitle')}</p>
           </div>
 
           <div className="relative flex items-center justify-center h-32 w-32">
@@ -271,13 +287,13 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
                 {weeklyNutritionScore}
               </span>
               <span className="text-[9px] uppercase font-black text-muted-foreground tracking-wider block mt-1">
-                Poäng
+                {t('dashboard.points')}
               </span>
             </div>
           </div>
 
           <span className="text-xs font-black text-primary px-4 py-1.5 rounded-xl bg-primary/10 border-2 border-foreground/30 uppercase tracking-wide">
-            {weeklyNutritionScore >= 80 ? 'Utmärkt näringsintag' : weeklyNutritionScore >= 60 ? 'Hälsosam balans' : 'Kan optimeras'}
+            {weeklyNutritionScore >= 80 ? t('dashboard.score_excellent') : weeklyNutritionScore >= 60 ? t('dashboard.score_healthy') : t('dashboard.score_optimize')}
           </span>
         </div>
 
@@ -285,17 +301,17 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
         <div className="bg-card border-3 border-foreground p-6 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-between min-h-[270px]">
           <div>
             <h4 className="font-black text-md text-foreground uppercase tracking-tight">
-              Makrobalans
+              {t('dashboard.macro_title')}
             </h4>
-            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase">Avvikelse från träningsmålen</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase">{t('dashboard.macro_subtitle')}</p>
           </div>
 
           <div className="space-y-4 my-2">
             {/* Protein bar */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
-                <span className="text-cyan-800 font-black">Protein ({Math.round(proteinRatio)}%)</span>
-                <span className="text-muted-foreground">Mål: 25%</span>
+                <span className="text-cyan-800 font-black">{t('dashboard.protein')} ({Math.round(proteinRatio)}%)</span>
+                <span className="text-muted-foreground">{t('dashboard.target')}: 25%</span>
               </div>
               <div className="h-3 w-full bg-card border-2 border-foreground rounded-full overflow-hidden">
                 <div 
@@ -308,8 +324,8 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
             {/* Carbs bar */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
-                <span className="text-amber-800 font-black">Kolhydrater ({Math.round(carbsRatio)}%)</span>
-                <span className="text-muted-foreground">Mål: 45%</span>
+                <span className="text-amber-800 font-black">{t('dashboard.carbs')} ({Math.round(carbsRatio)}%)</span>
+                <span className="text-muted-foreground">{t('dashboard.target')}: 45%</span>
               </div>
               <div className="h-3 w-full bg-card border-2 border-foreground rounded-full overflow-hidden">
                 <div 
@@ -322,8 +338,8 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
             {/* Fat bar */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
-                <span className="text-rose-800 font-black">Fett ({Math.round(fatRatio)}%)</span>
-                <span className="text-muted-foreground">Mål: 30%</span>
+                <span className="text-rose-800 font-black">{t('dashboard.fat')} ({Math.round(fatRatio)}%)</span>
+                <span className="text-muted-foreground">{t('dashboard.target')}: 30%</span>
               </div>
               <div className="h-3 w-full bg-card border-2 border-foreground rounded-full overflow-hidden">
                 <div 
@@ -335,7 +351,7 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
           </div>
 
           <div className="flex justify-between items-center border-t-2 border-foreground/30 pt-3 text-xs font-black uppercase tracking-wide">
-            <span className="text-muted-foreground">Total balans</span>
+            <span className="text-muted-foreground">{t('dashboard.total_balance')}</span>
             <span className="text-foreground">{macroBalanceScore}/100</span>
           </div>
         </div>
@@ -344,14 +360,14 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
         <div className="bg-card border-3 border-foreground p-6 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-between min-h-[270px]">
           <div>
             <h4 className="font-black text-md text-foreground uppercase tracking-tight">
-              Mikronäringsämnen
+              {t('dashboard.micro_title')}
             </h4>
-            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase">Poäng för vitaminer & mineraler</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase">{t('dashboard.micro_subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3.5 my-2">
             <div>
-              <span className="text-[9px] text-muted-foreground block font-black uppercase">Järn</span>
+              <span className="text-[9px] text-muted-foreground block font-black uppercase">{t('dashboard.iron')}</span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="flex-grow h-2.5 bg-card border-2 border-foreground rounded-full overflow-hidden">
                   <div className="h-full bg-red-400" style={{ width: `${microPct.iron}%` }} />
@@ -362,7 +378,7 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
 
             {/* Calcium */}
             <div>
-              <span className="text-[9px] text-muted-foreground block font-black uppercase">Kalcium</span>
+              <span className="text-[9px] text-muted-foreground block font-black uppercase">{t('dashboard.calcium')}</span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="flex-grow h-2.5 bg-card border-2 border-foreground rounded-full overflow-hidden">
                   <div className="h-full bg-indigo-400" style={{ width: `${microPct.calcium}%` }} />
@@ -373,7 +389,7 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
 
             {/* Vitamin A */}
             <div>
-              <span className="text-[9px] text-muted-foreground block font-black uppercase">Vitamin A</span>
+              <span className="text-[9px] text-muted-foreground block font-black uppercase">{t('dashboard.vitaminA')}</span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="flex-grow h-2.5 bg-card border-2 border-foreground rounded-full overflow-hidden">
                   <div className="h-full bg-emerald-400" style={{ width: `${microPct.vitaminA}%` }} />
@@ -384,7 +400,7 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
 
             {/* Vitamin D */}
             <div>
-              <span className="text-[9px] text-muted-foreground block font-black uppercase">Vitamin D</span>
+              <span className="text-[9px] text-muted-foreground block font-black uppercase">{t('dashboard.vitaminD')}</span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="flex-grow h-2.5 bg-card border-2 border-foreground rounded-full overflow-hidden">
                   <div className="h-full bg-amber-400" style={{ width: `${microPct.vitaminD}%` }} />
@@ -395,40 +411,14 @@ export default function NutritionDashboard({ plans }: NutritionDashboardProps) {
           </div>
 
           <div className="flex justify-between items-center border-t-2 border-foreground/30 pt-3 text-xs font-black uppercase tracking-wide">
-            <span className="text-muted-foreground">Essentiell täckning</span>
+            <span className="text-muted-foreground">{t('dashboard.micro_coverage')}</span>
             <span className="text-foreground">{microCoverageScore}%</span>
           </div>
         </div>
 
       </div>
 
-      {/* Suggestion list */}
-      <div className="bg-card border-3 border-foreground p-6 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-[radial-gradient(rgba(0,0,0,0.02)_1.5px,transparent_1.5px)] [background-size:16px_16px]">
-        <h4 className="font-black text-md text-foreground flex items-center gap-2 mb-4 uppercase tracking-tight">
-          <Sparkles className="h-5 w-5 text-foreground animate-pulse" />
-          <span>Kostrekommendationer & Tips</span>
-        </h4>
 
-        {plans.length > 0 ? (
-          <ul className="space-y-3.5">
-            {suggestions.map((sug, idx) => (
-              <li 
-                key={idx} 
-                className="text-xs leading-relaxed text-foreground flex gap-2.5 p-3.5 rounded-2xl bg-white border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-semibold"
-              >
-                <div className="h-5 w-5 rounded-lg bg-amber-100 border border-foreground text-foreground flex items-center justify-center shrink-0 shadow-sm">
-                  <Info className="h-3.5 w-3.5" />
-                </div>
-                <span>{sug}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="text-center py-6 text-xs text-muted-foreground font-black uppercase">
-            Planera veckans recept i veckoplaneringen för att låsa upp smarta näringsinsikter
-          </div>
-        )}
-      </div>
       
     </div>
   );

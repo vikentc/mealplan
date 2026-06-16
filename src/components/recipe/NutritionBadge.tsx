@@ -1,8 +1,7 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { Award, Zap, Wheat, Droplets, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n';
 
 interface Nutrition {
   calories: number;
@@ -31,6 +30,7 @@ interface NutritionBadgeProps {
 export default function NutritionBadge({ nutrition, scale = 1, servings }: NutritionBadgeProps) {
   const [isMacrosOpen, setIsMacrosOpen] = useState(false);
   const [isDetailedOpen, setIsDetailedOpen] = useState(false);
+  const { t } = useLanguage();
 
   // Auto-expand on desktop on mount to prevent hydration mismatch
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function NutritionBadge({ nutrition, scale = 1, servings }: Nutri
         >
           <span className="flex items-center gap-2">
             <Zap className="h-4.5 w-4.5 fill-current text-foreground" />
-            <span>Näringsvärden ({perPortion.calories} kcal | {perPortion.protein}g protein)</span>
+            <span>{t('details.nutrition_values')} ({perPortion.calories} {t('card.kcal')} | {perPortion.protein}g {t('dashboard.protein').toLowerCase()})</span>
           </span>
           {isMacrosOpen ? <ChevronUp className="h-4.5 w-4.5" /> : <ChevronDown className="h-4.5 w-4.5" />}
         </button>
@@ -109,11 +109,11 @@ export default function NutritionBadge({ nutrition, scale = 1, servings }: Nutri
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl md:text-2xl font-black text-foreground tracking-tight">{perPortion.calories}</span>
-                <span className="text-[10px] text-foreground/80 font-black uppercase tracking-wider">kcal / port</span>
+                <span className="text-[10px] text-foreground/80 font-black uppercase tracking-wider">{t('card.kcal')} / {t('details.port')}</span>
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
                 <span className="text-xs md:text-sm font-extrabold text-foreground/70 tracking-tight">{wholeMeal.calories}</span>
-                <span className="text-[8px] text-foreground/50 font-black uppercase tracking-wider">kcal / hela ({currentServings}p)</span>
+                <span className="text-[8px] text-foreground/50 font-black uppercase tracking-wider">{t('card.kcal')} / {t('details.whole')} ({currentServings}p)</span>
               </div>
             </div>
           </div>
@@ -132,11 +132,11 @@ export default function NutritionBadge({ nutrition, scale = 1, servings }: Nutri
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl md:text-2xl font-black tracking-tight">{perPortion.protein}g</span>
-                <span className={`text-[10px] font-black uppercase tracking-wider ${isHighProtein ? "text-emerald-800/80" : "text-foreground/80"}`}>/ port</span>
+                <span className={`text-[10px] font-black uppercase tracking-wider ${isHighProtein ? "text-emerald-800/80" : "text-foreground/80"}`}>/ {t('details.port')}</span>
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
                 <span className={`text-xs md:text-sm font-extrabold tracking-tight ${isHighProtein ? "text-emerald-800/70" : "text-foreground/70"}`}>{wholeMeal.protein}g</span>
-                <span className={`text-[8px] font-black uppercase tracking-wider ${isHighProtein ? "text-emerald-800/50" : "text-foreground/50"}`}>/ hela ({currentServings}p)</span>
+                <span className={`text-[8px] font-black uppercase tracking-wider ${isHighProtein ? "text-emerald-800/50" : "text-foreground/50"}`}>/ {t('details.whole')} ({currentServings}p)</span>
               </div>
             </div>
           </div>
@@ -149,11 +149,11 @@ export default function NutritionBadge({ nutrition, scale = 1, servings }: Nutri
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl md:text-2xl font-black text-foreground tracking-tight">{perPortion.carbs}g</span>
-                <span className="text-[10px] text-cyan-800 font-black uppercase tracking-wider">/ port</span>
+                <span className="text-[10px] text-cyan-800 font-black uppercase tracking-wider">/ {t('details.port')}</span>
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
                 <span className="text-xs md:text-sm font-extrabold text-cyan-800/70 tracking-tight">{wholeMeal.carbs}g</span>
-                <span className="text-[8px] text-cyan-800/50 font-black uppercase tracking-wider">/ hela ({currentServings}p)</span>
+                <span className="text-[8px] text-cyan-800/50 font-black uppercase tracking-wider">/ {t('details.whole')} ({currentServings}p)</span>
               </div>
             </div>
           </div>
@@ -166,11 +166,11 @@ export default function NutritionBadge({ nutrition, scale = 1, servings }: Nutri
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl md:text-2xl font-black text-foreground tracking-tight">{perPortion.fat}g</span>
-                <span className="text-[10px] text-red-800 font-black uppercase tracking-wider">/ port</span>
+                <span className="text-[10px] text-red-800 font-black uppercase tracking-wider">/ {t('details.port')}</span>
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
                 <span className="text-xs md:text-sm font-extrabold text-red-800/70 tracking-tight">{wholeMeal.fat}g</span>
-                <span className="text-[8px] text-red-800/50 font-black uppercase tracking-wider">/ hela ({currentServings}p)</span>
+                <span className="text-[8px] text-red-800/50 font-black uppercase tracking-wider">/ {t('details.whole')} ({currentServings}p)</span>
               </div>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function NutritionBadge({ nutrition, scale = 1, servings }: Nutri
         >
           <span className="flex items-center gap-2">
             <Award className="h-4 w-4 text-foreground/60" />
-            <span>Visa detaljerad näringsdeklaration (port vs hela)</span>
+            <span>{t('details.nutrition_declaration_title')}</span>
           </span>
           {isDetailedOpen ? <ChevronUp className="h-4.5 w-4.5 text-foreground/60" /> : <ChevronDown className="h-4.5 w-4.5 text-foreground/60" />}
         </button>
@@ -194,95 +194,95 @@ export default function NutritionBadge({ nutrition, scale = 1, servings }: Nutri
         {isDetailedOpen && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-6 mt-4 pt-4 border-t border-dashed border-foreground/20 animate-in slide-in-from-top-2 duration-150">
             <div>
-              <span className="text-[10px] font-black uppercase text-foreground/60 block">Fiber</span>
+              <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.fiber')}</span>
               <div className="font-black text-sm text-foreground flex flex-col">
-                <span>{perPortion.fiber} g <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.fiber} g</span>
+                <span>{perPortion.fiber} g <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.fiber} g</span>
               </div>
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase text-foreground/60 block">Socker</span>
+              <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.sugar')}</span>
               <div className="font-black text-sm text-foreground flex flex-col">
-                <span>{perPortion.sugar} g <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.sugar} g</span>
+                <span>{perPortion.sugar} g <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.sugar} g</span>
               </div>
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase text-foreground/60 block">Natrium</span>
+              <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.sodium')}</span>
               <div className="font-black text-sm text-foreground flex flex-col">
-                <span>{perPortion.sodium} mg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.sodium} mg</span>
+                <span>{perPortion.sodium} mg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.sodium} mg</span>
               </div>
             </div>
             {perPortion.iron > 0 && (
               <div>
-                <span className="text-[10px] font-black uppercase text-foreground/60 block">Järn</span>
+                <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.iron')}</span>
                 <div className="font-black text-sm text-foreground flex flex-col">
-                  <span>{perPortion.iron} mg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                  <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.iron} mg</span>
+                  <span>{perPortion.iron} mg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                  <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.iron} mg</span>
                 </div>
               </div>
             )}
             {perPortion.calcium > 0 && (
               <div>
-                <span className="text-[10px] font-black uppercase text-foreground/60 block">Kalcium</span>
+                <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.calcium')}</span>
                 <div className="font-black text-sm text-foreground flex flex-col">
-                  <span>{perPortion.calcium} mg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                  <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.calcium} mg</span>
+                  <span>{perPortion.calcium} mg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                  <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.calcium} mg</span>
                 </div>
               </div>
             )}
             {perPortion.potassium > 0 && (
               <div>
-                <span className="text-[10px] font-black uppercase text-foreground/60 block">Kalium</span>
+                <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.potassium')}</span>
                 <div className="font-black text-sm text-foreground flex flex-col">
-                  <span>{perPortion.potassium} mg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                  <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.potassium} mg</span>
+                  <span>{perPortion.potassium} mg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                  <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.potassium} mg</span>
                 </div>
               </div>
             )}
             {perPortion.magnesium > 0 && (
               <div>
-                <span className="text-[10px] font-black uppercase text-foreground/60 block">Magnesium</span>
+                <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.magnesium')}</span>
                 <div className="font-black text-sm text-foreground flex flex-col">
-                  <span>{perPortion.magnesium} mg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                  <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.magnesium} mg</span>
+                  <span>{perPortion.magnesium} mg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                  <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.magnesium} mg</span>
                 </div>
               </div>
             )}
             {perPortion.vitaminA > 0 && (
               <div>
-                <span className="text-[10px] font-black uppercase text-foreground/60 block">Vitamin A</span>
+                <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.vitaminA')}</span>
                 <div className="font-black text-sm text-foreground flex flex-col">
-                  <span>{perPortion.vitaminA} mcg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                  <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.vitaminA} mcg</span>
+                  <span>{perPortion.vitaminA} mcg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                  <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.vitaminA} mcg</span>
                 </div>
               </div>
             )}
             {perPortion.vitaminC > 0 && (
               <div>
-                <span className="text-[10px] font-black uppercase text-foreground/60 block">Vitamin C</span>
+                <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.vitaminC')}</span>
                 <div className="font-black text-sm text-foreground flex flex-col">
-                  <span>{perPortion.vitaminC} mg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                  <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.vitaminC} mg</span>
+                  <span>{perPortion.vitaminC} mg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                  <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.vitaminC} mg</span>
                 </div>
               </div>
             )}
             {perPortion.vitaminD > 0 && (
               <div>
-                <span className="text-[10px] font-black uppercase text-foreground/60 block">Vitamin D</span>
+                <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.vitaminD')}</span>
                 <div className="font-black text-sm text-foreground flex flex-col">
-                  <span>{perPortion.vitaminD} mcg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                  <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.vitaminD} mcg</span>
+                  <span>{perPortion.vitaminD} mcg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                  <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.vitaminD} mcg</span>
                 </div>
               </div>
             )}
             {perPortion.vitaminB12 > 0 && (
               <div>
-                <span className="text-[10px] font-black uppercase text-foreground/60 block">Vitamin B12</span>
+                <span className="text-[10px] font-black uppercase text-foreground/60 block">{t('nutrition.vitaminB12')}</span>
                 <div className="font-black text-sm text-foreground flex flex-col">
-                  <span>{perPortion.vitaminB12} mcg <span className="text-[9px] text-foreground/50 font-black">/ port</span></span>
-                  <span className="text-[10px] text-foreground/65 font-bold">Hela: {wholeMeal.vitaminB12} mcg</span>
+                  <span>{perPortion.vitaminB12} mcg <span className="text-[9px] text-foreground/50 font-black">/ {t('details.port')}</span></span>
+                  <span className="text-[10px] text-foreground/65 font-bold">{t('details.whole')}: {wholeMeal.vitaminB12} mcg</span>
                 </div>
               </div>
             )}

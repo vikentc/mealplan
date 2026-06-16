@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import NavbarLayout from '@/components/layout/NavbarLayout';
+import { LanguageProvider } from '@/lib/i18n';
 
 export const metadata: Metadata = {
   title: 'Maja & Kents Matpalats - Familjens recept & veckoplanering',
@@ -19,9 +20,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="h-full antialiased selection:bg-primary selection:text-primary-foreground">
-        <NavbarLayout>
-          {children}
-        </NavbarLayout>
+        <LanguageProvider>
+          <NavbarLayout>
+            {children}
+          </NavbarLayout>
+        </LanguageProvider>
       </body>
     </html>
   );

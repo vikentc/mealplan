@@ -13,13 +13,18 @@ import {
   Globe, 
   Sparkles,
   Link as LinkIcon,
-  RotateCcw
+  RotateCcw,
+  Loader2,
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import { deleteRecipe } from '@/app/actions/recipes';
 import { cn, getDifficultyColor, formatTime } from '@/lib/utils';
 import PortionScaler from './PortionScaler';
 import IngredientList from './IngredientList';
 import NutritionBadge from './NutritionBadge';
+import { useLanguage } from '@/lib/i18n';
+import { getTranslatedRecipe } from '@/lib/recipeTranslations';
 
 interface Ingredient {
   name: string;
@@ -56,14 +61,19 @@ interface RecipeDetailsContainerProps {
   recipe: Recipe;
 }
 
-export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContainerProps) {
+export default function RecipeDetailsContainer({ recipe: originalRecipe }: RecipeDetailsContainerProps) {
   const router = useRouter();
+  const { language, t } = useLanguage();
+  const recipe = getTranslatedRecipe(originalRecipe, language);
   const [servings, setServings] = useState(recipe.servings || 4);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteStatus, setDeleteStatus] = useState<'idle' | 'confirming' | 'deleting' | 'success' | 'error'>('idle');
+  const [deleteStatusMsg, setDeleteStatusMsg] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [checkedIngredients, setCheckedIngredients] = useState<Record<number, boolean>>({});
   const [checkedInstructions, setCheckedInstructions] = useState<Record<number, boolean>>({});
+
 
   // Load checklist state on mount
   useEffect(() => {
@@ -106,18 +116,28 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
     localStorage.removeItem(`recipe-checked-insts-${recipe.id}`);
   };
 
-  const handleDelete = async () => {
-    if (confirm(`Är du säker på att du vill ta bort ${recipe.name}?`)) {
-      setIsDeleting(true);
-      try {
-        await deleteRecipe(recipe.id);
+  const handleDelete = () => {
+    setDeleteStatus('confirming');
+  };
+
+  const confirmDeleteAction = async () => {
+    setIsDeleting(true);
+    setDeleteStatus('deleting');
+    setDeleteStatusMsg(language === 'sv' ? 'Tar bort receptet...' : 'Deleting recipe...');
+    try {
+      await deleteRecipe(recipe.id);
+      setDeleteStatus('success');
+      setDeleteStatusMsg(language === 'sv' ? 'Receptet har tagits bort framgångsrikt! Omdirigerar...' : 'Recipe has been deleted successfully! Redirecting...');
+      
+      setTimeout(() => {
         router.push('/');
         router.refresh();
-      } catch (error) {
-        console.error('Failed to delete recipe:', error);
-        alert('Det gick inte att ta bort receptet.');
-        setIsDeleting(false);
-      }
+      }, 1000);
+    } catch (error: any) {
+      console.error('Failed to delete recipe:', error);
+      setDeleteStatus('error');
+      setDeleteStatusMsg(error.message || t('details.error_delete'));
+      setIsDeleting(false);
     }
   };
 
@@ -133,7 +153,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
           className="px-5 py-3 bg-amber-100 hover:bg-amber-200 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer shrink-0"
         >
           <ChevronLeft className="h-4.5 w-4.5 text-foreground" />
-          <span>Tillbaka till recept</span>
+          <span>{t('details.back')}</span>
         </Link>
 
         {isLoggedIn && (
@@ -143,7 +163,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
               className="px-5 py-3 bg-cyan-100 hover:bg-cyan-200 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer"
             >
               <Edit3 className="h-4.5 w-4.5" />
-              <span>Redigera</span>
+              <span>{t('details.edit')}</span>
             </Link>
             <button
               onClick={handleDelete}
@@ -151,7 +171,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
               className="px-5 py-3 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer"
             >
               <Trash2 className="h-4.5 w-4.5" />
-              <span>{isDeleting ? 'Tar bort...' : 'Ta bort'}</span>
+              <span>{isDeleting ? t('details.deleting') : t('details.delete')}</span>
             </button>
           </div>
         )}
@@ -172,7 +192,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
             />
           ) : (
             <div className="h-full w-full flex items-center justify-center bg-secondary/50 text-foreground font-black uppercase text-xs tracking-wider">
-              Bild saknas
+              {t('details.no_image')}
             </div>
           )}
         </div>
@@ -181,19 +201,19 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
         <div className="p-6 md:p-8 space-y-5">
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-100 text-amber-850 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              {recipe.cuisine}
+              {t(`cuisine.${recipe.cuisine}`) || recipe.cuisine}
             </span>
             
             {recipe.nutrition?.protein >= 30 && (
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                💪 Högprotein
+                {t('details.high_protein')}
               </span>
             )}
 
             <span className={cn(
               "text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-blue-100 text-blue-900"
             )}>
-              {recipe.difficulty?.toLowerCase() === 'easy' ? 'Enkel' : recipe.difficulty?.toLowerCase() === 'medium' ? 'Medelsvår' : 'Svår'}
+              {t(`details.${recipe.difficulty?.toLowerCase()}`)}
             </span>
             
             {recipe.url && (
@@ -203,7 +223,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
                 rel="noopener noreferrer"
                 className="text-[10px] font-black uppercase tracking-wider bg-secondary hover:bg-amber-100/50 text-foreground px-2.5 py-1 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1.5 transition-all"
               >
-                <LinkIcon className="h-3.5 w-3.5" /> Originalkälla
+                <LinkIcon className="h-3.5 w-3.5" /> {t('details.original_source')}
               </a>
             )}
           </div>
@@ -225,7 +245,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
               <Clock className="h-5 w-5 text-foreground" />
               <div>
                 <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.preparationTime)}</span>
-                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Förberedelse</span>
+                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">{t('details.prep_time')}</span>
               </div>
             </div>
 
@@ -233,7 +253,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
               <Clock className="h-5 w-5 text-foreground" />
               <div>
                 <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.cookingTime)}</span>
-                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Tillagning</span>
+                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">{t('details.cook_time')}</span>
               </div>
             </div>
 
@@ -241,7 +261,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
               <Clock className="h-5 w-5 text-foreground animate-pulse" />
               <div>
                 <span className="text-foreground font-black block text-sm leading-none">{formatTime(recipe.totalTime)}</span>
-                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">Total tid</span>
+                <span className="text-[10px] uppercase font-black text-foreground/60 tracking-wider block mt-1">{t('details.total_time')}</span>
               </div>
             </div>
           </div>
@@ -282,7 +302,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
           <section className="space-y-4">
             <h3 className="font-black text-lg text-foreground uppercase tracking-tight flex items-center gap-2">
               <ChefHat className="h-5 w-5 text-foreground" />
-              <span>Näringsanalys</span>
+              <span>{t('details.nutrition_analysis')}</span>
             </h3>
             <NutritionBadge nutrition={recipe.nutrition} scale={scaleFactor} servings={servings} />
           </section>
@@ -290,7 +310,7 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
           {/* Step-by-step Instructions */}
           <section className="bg-card border-3 border-foreground p-6 md:p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-4">
             <div className="flex justify-between items-center flex-wrap gap-2">
-              <h3 className="font-black text-lg text-foreground uppercase tracking-tight">Instruktioner</h3>
+              <h3 className="font-black text-lg text-foreground uppercase tracking-tight">{t('details.instructions')}</h3>
               {Object.values(checkedInstructions).some(Boolean) && (
                 <button
                   onClick={clearInstructions}
@@ -298,13 +318,13 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
                   className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-[9px] uppercase tracking-wider rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0"
                 >
                   <RotateCcw className="h-3 w-3" />
-                  <span>Rensa</span>
+                  <span>{t('details.clear')}</span>
                 </button>
               )}
             </div>
 
             <ol className="space-y-4">
-              {recipe.instructions.map((step, idx) => {
+              {recipe.instructions.map((step: string, idx: number) => {
                 const isChecked = !!checkedInstructions[idx];
                 return (
                   <li 
@@ -339,6 +359,104 @@ export default function RecipeDetailsContainer({ recipe }: RecipeDetailsContaine
         </div>
 
       </div>
+      {/* Delete Confirmation & Status Overlay Modal */}
+      {deleteStatus !== 'idle' && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white border-3 border-foreground p-8 rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-md w-full text-center space-y-6 animate-in fade-in zoom-in duration-200">
+            
+            {deleteStatus === 'confirming' && (
+              <div className="space-y-5">
+                <div className="h-16 w-16 rounded-full bg-red-100 border-3 border-foreground flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-auto animate-pulse">
+                  <Trash2 className="h-8 w-8 text-red-650" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-black uppercase tracking-wider text-foreground">
+                    {language === 'sv' ? 'Ta bort recept' : 'Delete Recipe'}
+                  </h3>
+                  <p className="text-xs font-semibold text-foreground/70 leading-relaxed">
+                    {language === 'sv' 
+                      ? `Är du säker på att du vill ta bort "${recipe.name}"? Detta kan inte ångras.` 
+                      : `Are you sure you want to delete "${recipe.name}"? This action cannot be undone.`}
+                  </p>
+                </div>
+                <div className="flex gap-4 justify-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDeleteStatus('idle')}
+                    className="px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                  >
+                    {language === 'sv' ? 'Avbryt' : 'Cancel'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmDeleteAction}
+                    className="px-5 py-2.5 bg-red-500 hover:bg-red-400 text-white border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                  >
+                    {language === 'sv' ? 'Ja, ta bort' : 'Yes, Delete'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {deleteStatus === 'deleting' && (
+              <div className="flex flex-col items-center space-y-4">
+                <div className="h-16 w-16 rounded-full bg-red-100 border-3 border-foreground flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-bounce">
+                  <Loader2 className="h-8 w-8 text-foreground animate-spin" />
+                </div>
+                <h3 className="text-lg font-black uppercase tracking-wider text-foreground">
+                  {language === 'sv' ? 'Tar bort recept' : 'Deleting Recipe'}
+                </h3>
+                <p className="text-xs font-semibold text-foreground/70 animate-pulse">
+                  {deleteStatusMsg}
+                </p>
+              </div>
+            )}
+
+            {deleteStatus === 'success' && (
+              <div className="flex flex-col items-center space-y-4">
+                <div className="h-16 w-16 rounded-full bg-emerald-300 border-3 border-foreground flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <Check className="h-8 w-8 text-foreground stroke-[3]" />
+                </div>
+                <h3 className="text-lg font-black uppercase tracking-wider text-foreground">
+                  {language === 'sv' ? 'Borttaget!' : 'Deleted!'}
+                </h3>
+                <p className="text-xs font-black uppercase text-emerald-800">
+                  {language === 'sv' ? 'Receptet raderat' : 'Recipe Deleted'}
+                </p>
+                <p className="text-[11px] font-semibold text-foreground/70">
+                  {deleteStatusMsg}
+                </p>
+              </div>
+            )}
+
+            {deleteStatus === 'error' && (
+              <div className="space-y-5">
+                <div className="h-16 w-16 rounded-full bg-red-100 border-3 border-foreground flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-auto">
+                  <AlertCircle className="h-8 w-8 text-red-700" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-black uppercase tracking-wider text-foreground">
+                    {language === 'sv' ? 'Ett fel uppstod' : 'An error occurred'}
+                  </h3>
+                  <p className="text-xs font-semibold text-red-800 leading-relaxed">
+                    {deleteStatusMsg}
+                  </p>
+                </div>
+                <div className="flex justify-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDeleteStatus('idle')}
+                    className="px-6 py-2.5 bg-foreground text-background hover:bg-foreground/80 border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                  >
+                    {language === 'sv' ? 'Stäng' : 'Close'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
       
     </div>
   );

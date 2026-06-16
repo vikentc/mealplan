@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logout } from '@/app/actions/auth';
+import { useLanguage } from '@/lib/i18n';
 
 interface NavItem {
   label: string;
@@ -33,6 +34,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const { language, setLanguage, t } = useLanguage();
 
   // Force light mode only to ensure strict compliance
   useEffect(() => {
@@ -54,6 +56,10 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
     setCurrentUser(null);
     router.push('/login');
     router.refresh();
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'sv' ? 'en' : 'sv');
   };
 
   const visibleNavItems = navItems.filter((item) => {
@@ -109,7 +115,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
             className="flex items-center gap-2 text-foreground font-black text-xs uppercase tracking-wider bg-amber-100 hover:bg-amber-200 border-2 border-foreground px-3 py-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group"
           >
             <ChefHat className="h-4.5 w-4.5 text-foreground group-hover:rotate-12 transition-transform duration-300" />
-            <span className="hidden sm:inline">Maja & Kents Kök</span>
+            <span className="hidden sm:inline">{t('nav.brand')}</span>
           </Link>
 
           {/* Desktop Links (Dynamic centred pills) */}
@@ -120,13 +126,22 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
                 href={item.href}
                 className={getNavItemStyle(item.href)}
               >
-                {item.label}
+                {item.href === '/' ? t('nav.overview') : item.href === '/planner' ? t('nav.planner') : t('nav.create')}
               </Link>
             ))}
           </nav>
 
           {/* Desktop Auth State */}
           <div className="hidden md:flex items-center gap-3 shrink-0">
+            {/* Language Switcher */}
+            <button
+              onClick={toggleLanguage}
+              type="button"
+              className="px-3 py-1.5 border-2 border-foreground rounded-xl text-[10px] font-black uppercase tracking-wider bg-white hover:bg-amber-50/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all flex items-center gap-1 shrink-0"
+            >
+              {language === 'sv' ? '🇸🇪 SV' : '🇬🇧 EN'}
+            </button>
+
             {currentUser ? (
               <>
                 <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-950 border-2 border-foreground px-3 py-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
@@ -136,7 +151,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
                   onClick={handleLogout}
                   className="text-[10px] font-black uppercase tracking-wider bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground px-3.5 py-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
                 >
-                  Logga ut
+                  {t('nav.logout')}
                 </button>
               </>
             ) : (
@@ -144,13 +159,23 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
                 href="/login"
                 className="text-[10px] font-black uppercase tracking-wider bg-cyan-100 hover:bg-cyan-200 text-cyan-950 border-2 border-foreground px-3.5 py-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer text-center font-bold"
               >
-                Logga in
+                {t('nav.login')}
               </Link>
             )}
           </div>
 
-          {/* Mobile Hamburger menu */}
-          <div className="flex items-center gap-4 md:hidden shrink-0">
+          {/* Mobile Actions */}
+          <div className="flex items-center gap-3 md:hidden shrink-0">
+            {/* Language Switcher */}
+            <button
+              onClick={toggleLanguage}
+              type="button"
+              className="px-2.5 py-1.5 border-2 border-foreground rounded-xl text-[10px] font-black uppercase tracking-wider bg-white hover:bg-amber-50/50 shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all flex items-center gap-0.5 shrink-0"
+            >
+              {language === 'sv' ? '🇸🇪' : '🇬🇧'}
+            </button>
+
+            {/* Hamburger menu */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="h-10 w-10 border-2 border-foreground bg-amber-100 text-foreground flex items-center justify-center rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
@@ -165,7 +190,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed top-24 left-4 right-4 z-40 bg-white border-3 border-foreground rounded-[2rem] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-6 overflow-hidden">
+        <div className="md:hidden fixed top-24 left-4 right-4 z-40 bg-white border-3 border-foreground rounded-[2rem] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-6 overflow-hidden animate-in slide-in-from-top-5 duration-200">
           <nav className="flex flex-col gap-4">
             {visibleNavItems.map((item) => (
               <Link
@@ -174,7 +199,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={getMobileItemStyle(item.href)}
               >
-                {item.label}
+                {item.href === '/' ? t('nav.overview') : item.href === '/planner' ? t('nav.planner') : t('nav.create')}
               </Link>
             ))}
           </nav>
@@ -183,7 +208,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
             {currentUser ? (
               <>
                 <span className="inline-block bg-emerald-100 text-emerald-950 border-2 border-foreground px-4 py-2 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs font-black uppercase tracking-wider">
-                  👤 Inloggad: {currentUser}
+                  👤 {t('nav.logged_in')} {currentUser}
                 </span>
                 <button
                   onClick={() => {
@@ -192,7 +217,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
                   }}
                   className="w-full text-center py-3 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-black uppercase text-xs tracking-wider rounded-xl transition-all active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
                 >
-                  Logga ut
+                  {t('nav.logout')}
                 </button>
               </>
             ) : (
@@ -201,7 +226,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="w-full text-center py-3 bg-cyan-100 hover:bg-cyan-200 text-cyan-950 border-2 border-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-black uppercase text-xs tracking-wider rounded-xl transition-all active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
               >
-                Logga in
+                {t('nav.login')}
               </Link>
             )}
           </div>

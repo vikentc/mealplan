@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Clock } from 'lucide-react';
 import { cn, formatTime } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n';
+import { getTranslatedRecipe } from '@/lib/recipeTranslations';
 
 interface RecipeCardProps {
   recipe: {
@@ -18,7 +20,10 @@ interface RecipeCardProps {
   };
 }
 
-export default function RecipeCard({ recipe }: RecipeCardProps) {
+export default function RecipeCard({ recipe: originalRecipe }: RecipeCardProps) {
+  const { language, t } = useLanguage();
+  const recipe = getTranslatedRecipe(originalRecipe, language);
+
   
   return (
     <Link href={`/recipes/${recipe.id}`} className="block h-full group">
@@ -35,14 +40,14 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             />
           ) : (
             <div className="h-full w-full flex items-center justify-center text-foreground font-black uppercase text-xs tracking-wider bg-secondary/50">
-              Bild saknas
+              {t('card.no_image')}
             </div>
           )}
           
           {/* Absolute Badges on Image */}
           <div className="absolute top-4 left-4 flex flex-wrap gap-1.5 z-10">
             <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-100 text-amber-850 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              {recipe.cuisine}
+              {t(`cuisine.${recipe.cuisine}`) || recipe.cuisine}
             </span>
           </div>
 
@@ -57,7 +62,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             <div className="flex items-center gap-2 mb-3">
               {recipe.nutrition?.protein >= 30 && (
                 <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border-2 border-foreground bg-emerald-100 text-emerald-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                  💪 Högprotein
+                  {t('details.high_protein')}
                 </span>
               )}
               <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-foreground bg-secondary/50 border-2 border-foreground px-2 py-0.5 rounded-md">
@@ -71,7 +76,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             </h3>
 
             <p className="text-xs text-foreground/80 font-medium line-clamp-2 mb-4">
-              {recipe.description || "Ingen beskrivning tillgänglig. Upplev detta goda recept i din veckoplanering."}
+              {recipe.description || t('card.no_desc')}
             </p>
           </div>
 
@@ -80,15 +85,15 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             <div className="flex gap-3 text-[10px] font-black uppercase text-foreground/85">
               <div>
                 <span className="font-black text-foreground block text-xs leading-none mb-0.5">{recipe.nutrition?.calories || 0}</span>
-                <span>kcal</span>
+                <span>{t('card.kcal')}</span>
               </div>
               <div className="border-l-2 border-foreground pl-3">
                 <span className="font-black text-emerald-800 block text-xs leading-none mb-0.5">{recipe.nutrition?.protein || 0}g</span>
-                <span>prot</span>
+                <span>{t('card.prot')}</span>
               </div>
               <div className="border-l-2 border-foreground pl-3">
                 <span className="font-black text-foreground block text-xs leading-none mb-0.5">{recipe.nutrition?.carbohydrates || 0}g</span>
-                <span>kolh</span>
+                <span>{t('card.carb')}</span>
               </div>
             </div>
           </div>

@@ -4,11 +4,13 @@ import React, { useState, useTransition, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { login } from '@/app/actions/auth';
 import { ChefHat, Lock, User, AlertCircle, Sparkles } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirectUrl') || '/';
+  const { t } = useLanguage();
   
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -31,7 +33,7 @@ function LoginFormContent() {
         }
       } catch (err) {
         console.error(err);
-        setError('Ett oväntat fel inträffade. Försök igen.');
+        setError(t('login.error_unexpected'));
       }
     });
   };
@@ -49,13 +51,13 @@ function LoginFormContent() {
           <ChefHat className="h-8 w-8 text-foreground" />
         </div>
         <span className="text-[10px] font-black uppercase tracking-widest text-amber-800 bg-amber-100 border-2 border-foreground px-3 py-1 rounded-md inline-block">
-          Maja & Kents Matpalats 🏰
+          {t('home.title')} 🏰
         </span>
         <h2 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tight mt-3">
-          Vem vill äta idag?
+          {t('login.title')}
         </h2>
         <p className="text-xs text-muted-foreground font-semibold mt-1">
-          Logga in för att hantera veckoplaneringen och skapa smaskiga recept!
+          {t('login.subtitle')}
         </p>
       </div>
 
@@ -64,7 +66,7 @@ function LoginFormContent() {
         <div className="mb-6 p-4 bg-red-100 border-2 border-foreground rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-start gap-2.5 text-red-950 animate-in fade-in duration-200">
           <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs font-black uppercase tracking-wider">Inloggning misslyckades</p>
+            <p className="text-xs font-black uppercase tracking-wider">{t('login.failed_title')}</p>
             <p className="text-[11px] font-medium mt-0.5">{error}</p>
           </div>
         </div>
@@ -79,7 +81,7 @@ function LoginFormContent() {
             className="text-xs font-black uppercase tracking-wider text-foreground/80 flex items-center gap-1.5"
           >
             <User className="h-3.5 w-3.5" />
-            <span>Användarnamn</span>
+            <span>{t('login.username')}</span>
           </label>
           <input
             id="username"
@@ -88,7 +90,7 @@ function LoginFormContent() {
             required
             disabled={isPending}
             autoComplete="username"
-            placeholder="Användarnamn"
+            placeholder={t('login.username')}
             className="w-full p-3.5 bg-white border-2 border-foreground rounded-xl text-sm font-semibold focus:outline-none focus:bg-amber-50/20 focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all placeholder:text-foreground/30"
           />
         </div>
@@ -100,7 +102,7 @@ function LoginFormContent() {
             className="text-xs font-black uppercase tracking-wider text-foreground/80 flex items-center gap-1.5"
           >
             <Lock className="h-3.5 w-3.5" />
-            <span>Lösenord</span>
+            <span>{t('login.password')}</span>
           </label>
           <input
             id="password"
@@ -122,12 +124,12 @@ function LoginFormContent() {
         >
           {isPending ? (
             <span className="animate-pulse flex items-center gap-1.5">
-              Loggar in... 🗝️
+              {t('login.logging_in')}
             </span>
           ) : (
             <span className="flex items-center gap-1.5">
               <Sparkles className="h-4 w-4" />
-              Öppna dörren 🔓
+              {t('login.submit')}
             </span>
           )}
         </button>
@@ -139,6 +141,7 @@ function LoginFormContent() {
 }
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   return (
     <div className="w-full flex flex-col items-center justify-center py-12 px-4">
       <Suspense fallback={
@@ -146,7 +149,7 @@ export default function LoginPage() {
           <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-100 border-2 border-foreground rounded-full -z-10" />
           <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-cyan-100 border-2 border-foreground rounded-full -z-10 animate-pulse" />
           <div className="h-12 w-12 rounded-xl border-2 border-foreground bg-amber-100 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mb-4 animate-spin" />
-          <p className="font-black text-xs uppercase tracking-widest text-foreground animate-pulse">Laddar inloggning...</p>
+          <p className="font-black text-xs uppercase tracking-widest text-foreground animate-pulse">{t('login.loading')}</p>
         </div>
       }>
         <LoginFormContent />

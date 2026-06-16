@@ -1,5 +1,6 @@
 import React from 'react';
 import { Minus, Plus, Users } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 interface PortionScalerProps {
   servings: number;
@@ -8,6 +9,8 @@ interface PortionScalerProps {
 }
 
 export default function PortionScaler({ servings, originalServings, onChange }: PortionScalerProps) {
+  const { t } = useLanguage();
+
   const handleDecrement = () => {
     if (servings > 1) {
       onChange(servings - 1);
@@ -30,8 +33,8 @@ export default function PortionScaler({ servings, originalServings, onChange }: 
           <Users className="h-4.5 w-4.5" />
         </div>
         <div>
-          <h4 className="font-black text-xs text-foreground uppercase tracking-tight leading-tight">Anpassa portioner</h4>
-          <p className="text-[10px] text-foreground/80 font-medium">Justerar automatiskt ingrediensmängden</p>
+          <h4 className="font-black text-xs text-foreground uppercase tracking-tight leading-tight">{t('details.portions_title')}</h4>
+          <p className="text-[10px] text-foreground/80 font-medium">{t('details.portions_desc')}</p>
         </div>
       </div>
 
@@ -51,7 +54,7 @@ export default function PortionScaler({ servings, originalServings, onChange }: 
             {servings}
           </span>
           <span className="text-[9px] uppercase font-black text-foreground/75 tracking-wider block mt-1">
-            Portioner
+            {t('details.portions_label')}
           </span>
         </div>
 
@@ -68,7 +71,7 @@ export default function PortionScaler({ servings, originalServings, onChange }: 
       {isScaled && (
         <div className="mt-4 pt-3 border-t-2 border-foreground text-center">
           <span className="inline-block text-[10px] font-black uppercase tracking-wider text-foreground bg-cyan-100 px-3 py-1 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            Skalad med {scaleFactor.toFixed(2)}x
+            {t('details.scaled_by', { factor: scaleFactor.toFixed(2) })}
           </span>
         </div>
       )}

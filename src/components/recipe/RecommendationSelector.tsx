@@ -18,56 +18,36 @@ import {
   Flame
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n';
 
 const MEAL_TYPES = [
-  { id: 'breakfast', label: 'Frukost', icon: Coffee, bg: 'bg-amber-100', text: 'text-amber-950' },
-  { id: 'lunch', label: 'Lunch', icon: Utensils, bg: 'bg-emerald-100', text: 'text-emerald-950' },
-  { id: 'dinner', label: 'Middag', icon: ChefHat, bg: 'bg-cyan-100', text: 'text-cyan-950' },
-  { id: 'dessert', label: 'Efterrätt', icon: Sparkles, bg: 'bg-purple-100', text: 'text-purple-950' },
-  { id: 'snack', label: 'Mellanmål', icon: Cookie, bg: 'bg-red-100', text: 'text-red-950' },
+  { id: 'breakfast', icon: Coffee, bg: 'bg-amber-100', text: 'text-amber-950' },
+  { id: 'lunch', icon: Utensils, bg: 'bg-emerald-100', text: 'text-emerald-950' },
+  { id: 'dinner', icon: ChefHat, bg: 'bg-cyan-100', text: 'text-cyan-950' },
+  { id: 'dessert', icon: Sparkles, bg: 'bg-purple-100', text: 'text-purple-950' },
+  { id: 'snack', icon: Cookie, bg: 'bg-red-100', text: 'text-red-950' },
 ];
 
 const CRAVINGS = [
-  { id: 'comfort-food', label: '🍔 Comfort food', bg: 'bg-amber-100', text: 'text-amber-950' },
-  { id: 'spicy', label: '🌶️ Starkt & kryddigt', bg: 'bg-red-100', text: 'text-red-950' },
-  { id: 'sweet', label: '🍩 Sött & gott', bg: 'bg-pink-100', text: 'text-pink-950' },
-  { id: 'cheesy', label: '🧀 Ostigt & krämigt', bg: 'bg-yellow-100', text: 'text-yellow-950' },
-  { id: 'fresh-light', label: '🥗 Fräscht & lätt', bg: 'bg-green-100', text: 'text-green-950' },
-  { id: 'warm-hearty', label: '🍲 Varmt & mustigt', bg: 'bg-orange-100', text: 'text-orange-950' },
-  { id: 'quick-easy', label: '⏱️ Snabbt & enkelt', bg: 'bg-cyan-100', text: 'text-cyan-950' },
-  { id: 'rich-creamy', label: '✨ Fylligt & krämigt', bg: 'bg-purple-100', text: 'text-purple-950' },
-  { id: 'high-protein', label: '💪 Proteinrikt (>= 30g)', bg: 'bg-emerald-100', text: 'text-emerald-950' },
+  { id: 'comfort-food', bg: 'bg-amber-100', text: 'text-amber-950' },
+  { id: 'spicy', bg: 'bg-red-100', text: 'text-red-950' },
+  { id: 'sweet', bg: 'bg-pink-100', text: 'text-pink-950' },
+  { id: 'cheesy', bg: 'bg-yellow-100', text: 'text-yellow-950' },
+  { id: 'fresh-light', bg: 'bg-green-100', text: 'text-green-950' },
+  { id: 'warm-hearty', bg: 'bg-orange-100', text: 'text-orange-950' },
+  { id: 'quick-easy', bg: 'bg-cyan-100', text: 'text-cyan-950' },
+  { id: 'rich-creamy', bg: 'bg-purple-100', text: 'text-purple-950' },
+  { id: 'high-protein', bg: 'bg-emerald-100', text: 'text-emerald-950' },
 ];
 
 const CUISINES = ['Vietnamese', 'Thai', 'Japanese', 'Swedish', 'Italian', 'Mexican'];
 const FLAVORS = ['spicy', 'sweet', 'savory', 'sour', 'umami', 'creamy', 'tangy', 'rich', 'light', 'fresh'];
 
-const cuisineLabels: Record<string, string> = {
-  'Vietnamese': 'Vietnamesiskt',
-  'Thai': 'Thailändskt',
-  'Japanese': 'Japanskt',
-  'Swedish': 'Svenskt',
-  'Italian': 'Italienskt',
-  'Mexican': 'Mexikanskt'
-};
-
-const flavorLabels: Record<string, string> = {
-  'spicy': 'Starkt',
-  'sweet': 'Sött',
-  'savory': 'Matigt/Fylligt',
-  'sour': 'Surt',
-  'umami': 'Umami',
-  'creamy': 'Krämigt',
-  'tangy': 'Syrligt',
-  'rich': 'Mäktigt',
-  'light': 'Lätt',
-  'fresh': 'Fräscht'
-};
-
 export default function RecommendationSelector() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { t, language } = useLanguage();
   
   // Collapsible state for desktop card: defaults to expanded if any filter is active
   const [isExpanded, setIsExpanded] = useState(!!(
@@ -213,14 +193,14 @@ export default function RecommendationSelector() {
     activeFlavor
   );
 
-  const activeMealLabel = MEAL_TYPES.find(t => t.id === activeMealType)?.label || '';
-  const activeCravingLabel = CRAVINGS.find(c => c.id === activeCraving)?.label || '';
+  const activeMealLabel = activeMealType ? t(`meal.${activeMealType}`) : '';
+  const activeCravingLabel = activeCraving ? t(`craving.${activeCraving}`) : '';
 
-  let triggerText = '🧭 Anpassa Käk-Kompassen';
+  let triggerText = t('compass.trigger');
   if (activeMealLabel || activeCravingLabel) {
     const parts = [];
     if (activeMealLabel) parts.push(activeMealLabel);
-    if (activeCravingLabel) parts.push(activeCravingLabel.split(' ').slice(1).join(' ') || activeCravingLabel);
+    if (activeCravingLabel) parts.push(activeCravingLabel.includes(' ') ? activeCravingLabel.split(' ').slice(1).join(' ') : activeCravingLabel);
     triggerText = `🥑 ${parts.join(' + ')}`;
   }
 
@@ -236,7 +216,7 @@ export default function RecommendationSelector() {
         <div className="space-y-3 pt-2">
           <h3 className="text-xs font-black uppercase text-foreground/80 tracking-wider flex items-center gap-1.5">
             <Utensils className="h-4 w-4 text-foreground/70" />
-            <span>Välj måltid</span>
+            <span>{t('compass.choose_meal')}</span>
           </h3>
           
           <div className={cn(
@@ -260,7 +240,7 @@ export default function RecommendationSelector() {
                   )}
                 >
                   <Icon className="h-6 w-6 shrink-0" />
-                  <span className="font-black text-xs uppercase tracking-tight">{type.label}</span>
+                  <span className="font-black text-xs uppercase tracking-tight">{t(`meal.${type.id}`)}</span>
                 </button>
               );
             })}
@@ -271,7 +251,7 @@ export default function RecommendationSelector() {
         <div className="space-y-3 pt-4">
           <h3 className="text-xs font-black uppercase text-foreground/80 tracking-wider flex items-center gap-1.5">
             <Smile className="h-4 w-4 text-foreground/70" />
-            <span>Vad är du sugen på? (Cravings)</span>
+            <span>{t('compass.cravings')}</span>
           </h3>
 
           <div className="flex flex-wrap gap-2.5">
@@ -290,7 +270,7 @@ export default function RecommendationSelector() {
                       : "bg-white border-foreground/30 hover:border-foreground hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-1px] text-foreground/85"
                   )}
                 >
-                  {craving.label}
+                  {t(`craving.${craving.id}`)}
                 </button>
               );
             })}
@@ -301,7 +281,7 @@ export default function RecommendationSelector() {
         <div className="space-y-4 pt-4 border-t-2 border-dashed border-foreground/20">
           <h3 className="text-xs font-black uppercase text-foreground/80 tracking-wider flex items-center gap-1.5">
             <SlidersHorizontal className="h-4 w-4 text-foreground/70" />
-            <span>Kluriga följdfrågor</span>
+            <span>{t('compass.followup')}</span>
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -309,12 +289,12 @@ export default function RecommendationSelector() {
             <div className="space-y-3 p-4 bg-secondary/5 border-2 border-foreground/10 rounded-2xl">
               <h4 className="text-[10px] font-black uppercase text-foreground/70 tracking-wider flex items-center gap-1.5">
                 <Globe className="h-3.5 w-3.5 text-foreground/60" />
-                <span>Från vilket hörn av världen? (Kök)</span>
+                <span>{t('compass.cuisine')}</span>
               </h4>
 
               <div className="flex flex-wrap gap-2">
                 {CUISINES.map((cuisine) => {
-                  const label = cuisineLabels[cuisine] || cuisine;
+                  const label = t(`cuisine.${cuisine}`) || cuisine;
                   const isActive = currentCuisine === cuisine;
                   
                   return (
@@ -340,12 +320,12 @@ export default function RecommendationSelector() {
             <div className="space-y-3 p-4 bg-secondary/5 border-2 border-foreground/10 rounded-2xl">
               <h4 className="text-[10px] font-black uppercase text-foreground/70 tracking-wider flex items-center gap-1.5">
                 <Flame className="h-3.5 w-3.5 text-foreground/60" />
-                <span>Hur ska smaklökarna kittlas? (Smak)</span>
+                <span>{t('compass.flavor')}</span>
               </h4>
 
               <div className="flex flex-wrap gap-2">
                 {FLAVORS.map((flavor) => {
-                  const label = flavorLabels[flavor] || flavor;
+                  const label = t(`flavor.${flavor}`) || flavor;
                   const isActive = currentFlavor === flavor;
                   
                   return (
@@ -387,12 +367,12 @@ export default function RecommendationSelector() {
               <SlidersHorizontal className="h-5 w-5 text-foreground" />
             </div>
             <div>
-              <h2 className="text-xl font-black uppercase tracking-tight text-foreground">Maja & Kents Käk-Kompass</h2>
-              <p className="text-[10px] text-muted-foreground font-semibold">Vad i hela friden ska vi äta idag? 🧭</p>
+              <h2 className="text-xl font-black uppercase tracking-tight text-foreground">{t('compass.title')}</h2>
+              <p className="text-[10px] text-muted-foreground font-semibold">{t('compass.subtitle')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-foreground/75 shrink-0 pl-4">
-            <span>{isExpanded ? 'Dölj kompassen' : 'Visa kompassen'}</span>
+            <span>{isExpanded ? t('compass.hide') : t('compass.show')}</span>
             {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
           </div>
         </button>
@@ -410,7 +390,7 @@ export default function RecommendationSelector() {
                   className="px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <RotateCcw className="h-4 w-4" />
-                  <span>Rensa filter / Börja om</span>
+                  <span>{t('compass.clear')}</span>
                 </button>
               </div>
             )}
@@ -436,10 +416,10 @@ export default function RecommendationSelector() {
               {/* Header */}
               <div className="mb-4 pr-8">
                 <span className="text-[9px] font-black uppercase tracking-widest text-cyan-800 bg-cyan-100 border border-foreground px-2 py-0.5 rounded inline-block">
-                  Käk-Kompassen 🧭
+                  {t('compass.trigger')} 🧭
                 </span>
                 <h3 className="text-lg font-black text-foreground uppercase tracking-tight mt-1">
-                  Maja & Kents Käk-Kompass
+                  {t('compass.title')}
                 </h3>
               </div>
 
@@ -465,14 +445,14 @@ export default function RecommendationSelector() {
                   type="button"
                   className="px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] cursor-pointer"
                 >
-                  Nollställ
+                  {t('compass.reset')}
                 </button>
                 <button
                   type="button"
                   onClick={handleApplyMobile}
                   className="px-5 py-2.5 bg-foreground text-background font-black text-xs uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] cursor-pointer"
                 >
-                  Sök recept
+                  {t('compass.search')}
                 </button>
               </div>
 

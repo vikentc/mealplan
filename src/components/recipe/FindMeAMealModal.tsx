@@ -8,6 +8,8 @@ import {
 import { cn, formatTime } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/i18n';
+import { getTranslatedRecipe } from '@/lib/recipeTranslations';
 
 interface FindMeAMealModalProps {
   isOpen: boolean;
@@ -15,14 +17,14 @@ interface FindMeAMealModalProps {
 }
 
 const MEAL_TYPES = [
-  { id: 'breakfast', label: 'Frukost', icon: Coffee, bg: 'bg-amber-100', hoverBg: 'hover:bg-amber-200', border: 'border-amber-400', text: 'text-amber-950' },
-  { id: 'lunch', label: 'Lunch', icon: Utensils, bg: 'bg-emerald-100', hoverBg: 'hover:bg-emerald-200', border: 'border-emerald-400', text: 'text-emerald-950' },
-  { id: 'dinner', label: 'Middag', icon: ChefHat, bg: 'bg-cyan-100', hoverBg: 'hover:bg-cyan-200', border: 'border-cyan-400', text: 'text-cyan-950' },
-  { id: 'dessert', label: 'Efterrätt', icon: Sparkles, bg: 'bg-purple-100', hoverBg: 'hover:bg-purple-200', border: 'border-purple-400', text: 'text-purple-950' },
-  { id: 'snack', label: 'Mellanmål', icon: Cookie, bg: 'bg-red-100', hoverBg: 'hover:bg-red-200', border: 'border-red-400', text: 'text-red-950' },
+  { id: 'breakfast', icon: Coffee, bg: 'bg-amber-100', hoverBg: 'hover:bg-amber-200', border: 'border-amber-400', text: 'text-amber-950' },
+  { id: 'lunch', icon: Utensils, bg: 'bg-emerald-100', hoverBg: 'hover:bg-emerald-200', border: 'border-emerald-400', text: 'text-emerald-950' },
+  { id: 'dinner', icon: ChefHat, bg: 'bg-cyan-100', hoverBg: 'hover:bg-cyan-200', border: 'border-cyan-400', text: 'text-cyan-950' },
+  { id: 'dessert', icon: Sparkles, bg: 'bg-purple-100', hoverBg: 'hover:bg-purple-200', border: 'border-purple-400', text: 'text-purple-950' },
+  { id: 'snack', icon: Cookie, bg: 'bg-red-100', hoverBg: 'hover:bg-red-200', border: 'border-red-400', text: 'text-red-950' },
 ];
 
-const LOADING_MESSAGES = [
+const LOADING_MESSAGES_SV = [
   "Rör om i grytan... 🥣",
   "Smakar av kryddningen... 🌶️",
   "Konsulterar kocken Maja... 👩‍🍳",
@@ -31,22 +33,34 @@ const LOADING_MESSAGES = [
   "Dukar bordet... 🍽️",
 ];
 
+const LOADING_MESSAGES_EN = [
+  "Stirring the pot... 🥣",
+  "Tasting the seasoning... 🌶️",
+  "Consulting Chef Maja... 👩‍🍳",
+  "Asking hungry Kent... 👨‍🍳",
+  "Finding the freshest ingredients... 🌿",
+  "Setting the table... 🍽️",
+];
+
 export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalProps) {
   const [step, setStep] = useState<'select-type' | 'suggesting'>('select-type');
   const [selectedType, setSelectedType] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [suggestedRecipes, setSuggestedRecipes] = useState<any[]>([]);
-  const [loadingMsg, setLoadingMsg] = useState(LOADING_MESSAGES[0]);
+  
+  const { t, language } = useLanguage();
+  const loadingMessages = language === 'sv' ? LOADING_MESSAGES_SV : LOADING_MESSAGES_EN;
+  const [loadingMsg, setLoadingMsg] = useState(loadingMessages[0]);
 
   // Rotate loading messages during active loading
   useEffect(() => {
     if (!loading) return;
     const interval = setInterval(() => {
-      const randomMsg = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)];
+      const randomMsg = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
       setLoadingMsg(randomMsg);
     }, 1200);
     return () => clearInterval(interval);
-  }, [loading]);
+  }, [loading, loadingMessages]);
 
   if (!isOpen) return null;
 
@@ -58,7 +72,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
 
   const fetchSuggestions = async (typeId: string) => {
     setLoading(true);
-    setLoadingMsg(LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]);
+    setLoadingMsg(loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
     try {
       const response = await fetch(`/api/recipes?mealType=${typeId}`);
       if (!response.ok) throw new Error('Fetch failed');
@@ -88,7 +102,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
     setSuggestedRecipes([]);
   };
 
-  const mealTypeLabel = MEAL_TYPES.find(t => t.id === selectedType)?.label || '';
+  const mealTypeLabel = selectedType ? t(`meal.${selectedType}`) : '';
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -107,15 +121,15 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
         {/* Modal Header */}
         <div className="mb-6 pr-8">
           <span className="text-[10px] font-black uppercase tracking-widest text-amber-800 bg-amber-100 border-2 border-foreground px-3 py-1 rounded-md inline-block">
-            Måltidsväljare 🎲
+            {t('modal.tag')}
           </span>
           <h2 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tight mt-1.5 flex items-center gap-2">
-            <span>Hitta en måltid</span>
+            <span>{t('modal.title')}</span>
           </h2>
           <p className="text-xs text-muted-foreground font-semibold">
             {step === 'select-type' 
-              ? "Svårt att bestämma dig? Välj måltidstyp så drar vi tre smarriga förslag ur hatten!" 
-              : `Här är tre utmärkta förslag för din ${mealTypeLabel.toLowerCase()}!`
+              ? t('modal.select_desc')
+              : t('modal.suggest_desc', { type: mealTypeLabel.toLowerCase() })
             }
           </p>
         </div>
@@ -139,7 +153,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                     <div className={cn("h-12 w-12 rounded-xl border-2 border-foreground flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]", type.bg, type.text)}>
                       <Icon className="h-6 w-6 shrink-0" />
                     </div>
-                    <span className="font-black text-sm uppercase tracking-tight">{type.label}</span>
+                    <span className="font-black text-sm uppercase tracking-tight">{t(`meal.${type.id}`)}</span>
                   </button>
                 );
               })}
@@ -160,18 +174,19 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
               ) : suggestedRecipes.length === 0 ? (
                 /* Empty state */
                 <div className="text-center py-12">
-                  <p className="text-sm font-black uppercase text-foreground/60">Hittade inga recept för {mealTypeLabel.toLowerCase()} 😭</p>
+                  <p className="text-sm font-black uppercase text-foreground/60">{t('modal.no_recipes', { type: mealTypeLabel.toLowerCase() })}</p>
                   <button
                     onClick={handleBack}
                     className="mt-4 px-4 py-2 border-2 border-foreground rounded-xl bg-card hover:bg-secondary font-black text-xs uppercase"
                   >
-                    Gå tillbaka
+                    {t('modal.go_back')}
                   </button>
                 </div>
               ) : (
                 /* 3 Recipe cards grid */
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-2">
-                  {suggestedRecipes.map((recipe) => {
+                  {suggestedRecipes.map((originalRecipe) => {
+                    const recipe = getTranslatedRecipe(originalRecipe, language);
                     return (
                       <div 
                         key={recipe.id} 
@@ -189,14 +204,14 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                             />
                           ) : (
                             <div className="h-full w-full flex items-center justify-center text-foreground/40 font-black uppercase text-[10px] bg-secondary/50">
-                              Bild saknas
+                              {t('modal.no_image')}
                             </div>
                           )}
 
                           {/* Top Badges */}
                           <div className="absolute top-2 left-2 flex gap-1 z-10">
                             <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-950 border border-foreground shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                              {recipe.cuisine}
+                              {t(`cuisine.${recipe.cuisine}`) || recipe.cuisine}
                             </span>
                           </div>
 
@@ -209,7 +224,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                             <div className="flex items-center gap-1.5 mb-2">
                               {recipe.nutrition?.protein >= 30 && (
                                 <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border border-foreground bg-emerald-100 text-emerald-800">
-                                  💪 Proteinrik
+                                  {t('details.high_protein')}
                                 </span>
                               )}
                               <div className="flex items-center gap-1 text-[8px] font-black uppercase text-foreground bg-secondary/40 border border-foreground px-1.5 py-0.5 rounded">
@@ -222,15 +237,15 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                               {recipe.name}
                             </h3>
                             <p className="text-[10px] text-foreground/80 font-medium line-clamp-2 mb-3">
-                              {recipe.description || "Ingen beskrivning tillgänglig."}
+                              {recipe.description || t('card.no_desc')}
                             </p>
                           </div>
 
                           {/* Nutrition indicators & Link */}
                           <div className="space-y-3 pt-2 border-t border-dashed border-foreground/30">
                             <div className="flex justify-between items-center text-[9px] font-black uppercase text-foreground/75">
-                              <span>{recipe.nutrition?.calories || 0} kcal</span>
-                              <span>{recipe.nutrition?.protein || 0}g prot</span>
+                              <span>{recipe.nutrition?.calories || 0} {t('card.kcal')}</span>
+                              <span>{recipe.nutrition?.protein || 0}g {t('card.prot')}</span>
                             </div>
 
                             <Link
@@ -239,7 +254,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                               className="w-full py-2 bg-foreground hover:bg-foreground/90 text-background text-xs font-black uppercase rounded-xl border border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
                             >
                               <Eye className="h-3.5 w-3.5" />
-                              <span>Visa recept</span>
+                              <span>{t('modal.view_recipe')}</span>
                             </Link>
                           </div>
                         </div>
@@ -261,7 +276,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
               className="px-4 py-2 border-2 border-foreground bg-secondary/20 hover:bg-secondary/40 text-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] cursor-pointer flex items-center gap-1.5"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Ändra måltid</span>
+              <span>{t('modal.change_meal')}</span>
             </button>
             
             {suggestedRecipes.length > 0 && (
@@ -271,7 +286,7 @@ export default function FindMeAMealModal({ isOpen, onClose }: FindMeAMealModalPr
                 className="px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] cursor-pointer flex items-center gap-1.5 animate-bounce-subtle"
               >
                 <RotateCcw className="h-4 w-4" />
-                <span>Slumpa igen 🔄</span>
+                <span>{t('modal.random_again')}</span>
               </button>
             )}
           </div>

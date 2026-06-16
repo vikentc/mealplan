@@ -20,6 +20,7 @@ import RecommendationSelector from '@/components/recipe/RecommendationSelector';
 import RecommendationCard from '@/components/recipe/RecommendationCard';
 import RecipeCard from '@/components/recipe/RecipeCard';
 import FindMeAMealModal from '@/components/recipe/FindMeAMealModal';
+import { useLanguage } from '@/lib/i18n';
 
 interface HomeClientProps {
   mealType: string;
@@ -83,6 +84,7 @@ export default function HomeClient({
   const [queryText, setQueryText] = useState(activeQuery);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     setQueryText(activeQuery);
@@ -112,24 +114,27 @@ export default function HomeClient({
   const ySparkle = useTransform(scrollY, [0, 1000], [0, -250]);
 
   // Determine section title
-  let sectionTitle = 'Våra goda recept';
+  let sectionTitle = t('home.recipes_title');
   if (isSearchActive || isRecommendationActive) {
     const parts = [];
     if (filters.query) parts.push(`"${filters.query}"`);
-    if (mealType) parts.push(mealTypeLabels[mealType] || mealType);
-    if (craving) parts.push(cravingLabels[craving]?.split(' ').slice(1).join(' ') || craving);
-    if (filters.cuisine) parts.push(filters.cuisine);
+    if (mealType) parts.push(t(`meal.${mealType}`) || mealType);
+    if (craving) {
+      const translatedCraving = t(`craving.${craving}`);
+      parts.push(translatedCraving.includes(' ') ? translatedCraving.split(' ').slice(1).join(' ') : translatedCraving);
+    }
+    if (filters.cuisine) parts.push(t(`cuisine.${filters.cuisine}`) || filters.cuisine);
     if (filters.nutritionGoal) parts.push(filters.nutritionGoal);
     
     if (isSearchActive) {
-      sectionTitle = `Sökresultat för: ${parts.join(' + ')}`;
+      sectionTitle = `${t('home.search_results_for')} ${parts.join(' + ')}`;
     } else {
-      sectionTitle = `Mealfinder val: ${parts.join(' + ')}`;
+      sectionTitle = `${t('home.mealfinder_choices')} ${parts.join(' + ')}`;
     }
   }
 
   return (
-    <div ref={containerRef} className="relative overflow-hidden space-y-10 pb-12">
+    <div ref={containerRef} className="relative overflow-hidden px-3 -mx-3 space-y-10 pb-12">
       
       {/* Scroll-Parallax Floating Hipster Decors */}
       <motion.div 
@@ -169,13 +174,13 @@ export default function HomeClient({
       >
         <motion.div variants={itemVariants} className="space-y-4 max-w-2xl w-full flex flex-col items-center">
           <span className="text-[10px] font-black uppercase tracking-widest text-emerald-800 bg-emerald-100 border-2 border-foreground px-3.5 py-1.5 rounded-full inline-block animate-bounce-subtle">
-            🥑 Maja & Kents Familjekök
+            {t('home.tag')}
           </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-none uppercase">
-            Maja & Kents Matpalats
+            {t('home.title')}
           </h2>
           <p className="text-sm md:text-base text-foreground font-medium leading-relaxed max-w-lg mx-auto">
-            Planera dina måltider, sök recept med avancerade filter och hitta förslag utifrån dina cravings!
+            {t('home.description')}
           </p>
         </motion.div>
 
@@ -185,7 +190,7 @@ export default function HomeClient({
             <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground z-10" />
             <input
               type="text"
-              placeholder="Sök på receptnamn eller ingrediens..."
+              placeholder={t('home.search_placeholder')}
               value={queryText}
               onChange={(e) => setQueryText(e.target.value)}
               className="w-full pl-12 pr-28 py-4 bg-card border-3 border-foreground rounded-2xl text-foreground text-xs font-black uppercase tracking-wide focus:outline-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] placeholder:text-foreground/50 transition-all"
@@ -194,7 +199,7 @@ export default function HomeClient({
               type="submit"
               className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-foreground hover:bg-foreground/90 text-background text-xs font-black rounded-xl transition-all cursor-pointer uppercase tracking-wider z-10"
             >
-              Sök
+              {t('home.search_btn')}
             </button>
           </form>
         </motion.div>
@@ -207,7 +212,7 @@ export default function HomeClient({
             className="px-6 py-3 bg-amber-400 hover:bg-amber-500 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-2"
           >
             <Sparkles className="h-4.5 w-4.5 text-foreground shrink-0 animate-pulse" />
-            <span>Hitta en måltid 🎲</span>
+            <span>{t('home.find_meal_btn')}</span>
           </button>
         </motion.div>
       </motion.section>
@@ -219,7 +224,7 @@ export default function HomeClient({
       <div className="border-b-3 border-foreground pb-2 pt-2">
         <h3 className="font-black text-lg text-foreground uppercase tracking-tight flex items-center gap-2.5">
           <ChefHat className="h-5.5 w-5.5 text-foreground animate-pulse" />
-          <span>{sectionTitle} ({recipes.length} st)</span>
+          <span>{sectionTitle} ({recipes.length} {language === 'sv' ? 'st' : 'pcs'})</span>
         </h3>
       </div>
 
@@ -231,11 +236,11 @@ export default function HomeClient({
               <RecommendationCard
                 key={recipe.id}
                 recipe={recipe}
-                category={mealTypeLabels[recipe.mealType] || 'Förslag'}
+                category={t(`category.${recipe.mealType}`) || t(`meal.${recipe.mealType}`) || (language === 'sv' ? 'Förslag' : 'Suggestion')}
                 description={
                   craving
-                    ? `Passar ditt sug efter: ${cravingLabels[craving] || craving}`
-                    : `Utsökt val för din ${mealTypeLabels[recipe.mealType]?.toLowerCase() || 'måltid'}`
+                    ? t('card.reco_desc_craving', { craving: t(`craving.${craving}`).includes(' ') ? t(`craving.${craving}`).split(' ').slice(1).join(' ') : t(`craving.${craving}`) })
+                    : t('card.reco_desc_default', { type: (t(`meal.${recipe.mealType}`) || t('card.reco_desc_default_generic')).toLowerCase() })
                 }
               />
             ))}
@@ -253,9 +258,9 @@ export default function HomeClient({
             <X className="h-7 w-7" />
           </div>
           <div>
-            <h4 className="font-black text-lg text-foreground uppercase tracking-tight">Inga träffar hittades</h4>
+            <h4 className="font-black text-lg text-foreground uppercase tracking-tight">{t('home.no_results_title')}</h4>
             <p className="text-xs text-foreground/80 font-medium max-w-xs mx-auto mt-1 leading-relaxed">
-              Vi hittade inga recept som matchar just den valda kombinationen av filter för tillfället. Skapa ett nytt recept eller rensa filtren!
+              {t('home.no_results_desc')}
             </p>
           </div>
           {isLoggedIn && (
@@ -263,7 +268,7 @@ export default function HomeClient({
               href="/recipes/add"
               className="inline-block px-5 py-2.5 bg-card border-2 border-foreground hover:bg-secondary text-xs font-black uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
             >
-              Skapa ett recept
+              {t('home.create_recipe_btn')}
             </Link>
           )}
         </div>

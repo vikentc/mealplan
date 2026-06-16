@@ -1,5 +1,6 @@
 import React from 'react';
 import { RotateCcw } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 interface Ingredient {
   name: string;
@@ -41,6 +42,7 @@ export default function IngredientList({
   onClearIngredients
 }: IngredientListProps) {
   const portionFactor = servings / originalServings;
+  const { t } = useLanguage();
   
   // Calculate spicy factor
   let spiceFactor = 1;
@@ -63,7 +65,7 @@ export default function IngredientList({
   return (
     <div className="bg-card border-3 border-foreground p-6 rounded-[2rem] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="flex justify-between items-center gap-2 mb-4 flex-wrap">
-        <h3 className="font-black text-lg text-foreground uppercase tracking-tight">Ingredienser</h3>
+        <h3 className="font-black text-lg text-foreground uppercase tracking-tight">{t('details.ingredients')}</h3>
         {Object.values(checkedIngredients).some(Boolean) && onClearIngredients && (
           <button
             onClick={onClearIngredients}
@@ -71,7 +73,7 @@ export default function IngredientList({
             className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-[9px] uppercase tracking-wider rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0"
           >
             <RotateCcw className="h-3 w-3" />
-            <span>Rensa</span>
+            <span>{t('details.clear')}</span>
           </button>
         )}
       </div>
@@ -139,7 +141,7 @@ export default function IngredientList({
                     </span>
                     {ing.optional && (
                       <span className="text-[9px] text-foreground ml-1.5 font-black uppercase tracking-wider bg-amber-100 px-1.5 py-0.5 rounded-md border-2 border-foreground shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                        Valfri
+                        {t('details.optional')}
                       </span>
                     )}
                   </div>
@@ -164,10 +166,10 @@ export default function IngredientList({
                           ? "text-foreground bg-cyan-100 px-2 py-0.5 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-[10px]" 
                           : "text-foreground"
                   }`}>
-                    {isRemoved ? 'Borttagen' : `${formatQuantity(finalQty)} ${ing.unit || ''}`}
+                    {isRemoved ? t('details.removed') : `${formatQuantity(finalQty)} ${ing.unit || ''}`}
                   </span>
                 ) : (
-                  <span className="text-foreground/75 text-[10px] font-black uppercase tracking-wider italic">efter smak</span>
+                  <span className="text-foreground/75 text-[10px] font-black uppercase tracking-wider italic">{t('details.to_taste')}</span>
                 )}
               </div>
             </li>

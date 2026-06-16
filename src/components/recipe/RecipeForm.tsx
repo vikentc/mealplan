@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Save, ChevronLeft, AlertCircle, ChefHat, GripVertical, Sparkles, Link2, Image as ImageIcon, Loader2, Check, FileText } from 'lucide-react';
+import { Plus, Trash2, Save, ChevronLeft, AlertCircle, ChefHat, GripVertical, Sparkles, Link2, Image as ImageIcon, Loader2, Check, FileText, Camera } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { createRecipe, updateRecipe, autofillFromUrl } from '@/app/actions/recipes';
@@ -711,34 +711,61 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
 
           {/* Tab Content: OCR Image */}
           {autofillTab === 'image' && (
-            <div className="space-y-3">
-              <label 
-                className="relative flex flex-col items-center justify-center p-8 border-3 border-dashed border-foreground/50 hover:border-foreground rounded-2xl bg-white hover:bg-yellow-50/10 transition-all cursor-pointer group shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const file = e.dataTransfer.files?.[0];
-                  if (file) handleImageAutofill(file);
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Gallery Select */}
+                <label 
+                  className="relative flex flex-col items-center justify-center p-6 border-3 border-dashed border-foreground/50 hover:border-foreground rounded-2xl bg-white hover:bg-yellow-50/10 transition-all cursor-pointer group shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files?.[0];
                     if (file) handleImageAutofill(file);
                   }}
-                  className="hidden"
-                  disabled={autofillLoading}
-                />
-                <ImageIcon className="h-10 w-10 text-foreground/45 group-hover:text-foreground transition-colors mb-2" />
-                <span className="text-xs font-black uppercase tracking-wider text-foreground text-center px-4">
-                  {texts[lang].imageZone}
-                </span>
-                <span className="text-[10px] text-foreground/60 text-center mt-1.5 px-4">
-                  {texts[lang].imageZoneSub}
-                </span>
-              </label>
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageAutofill(file);
+                    }}
+                    className="hidden"
+                    disabled={autofillLoading}
+                  />
+                  <ImageIcon className="h-8 w-8 text-foreground/45 group-hover:text-foreground transition-colors mb-2" />
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">
+                    {lang === 'sv' ? 'Välj från galleri' : 'Choose from Gallery'}
+                  </span>
+                  <span className="text-[9px] text-foreground/60 mt-1">
+                    {texts[lang].imageZoneSub}
+                  </span>
+                </label>
+
+                {/* Camera Capture */}
+                <label 
+                  className="relative flex flex-col items-center justify-center p-6 border-3 border-dashed border-foreground/50 hover:border-foreground rounded-2xl bg-white hover:bg-yellow-50/10 transition-all cursor-pointer group shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center"
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageAutofill(file);
+                    }}
+                    className="hidden"
+                    disabled={autofillLoading}
+                  />
+                  <Camera className="h-8 w-8 text-foreground/45 group-hover:text-foreground transition-colors mb-2" />
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">
+                    {lang === 'sv' ? 'Ta ett foto' : 'Take a Photo'}
+                  </span>
+                  <span className="text-[9px] text-foreground/60 mt-1">
+                    {lang === 'sv' ? 'Använd kameran direkt för att fota receptet' : 'Use the camera directly to photograph the recipe'}
+                  </span>
+                </label>
+              </div>
             </div>
           )}
 

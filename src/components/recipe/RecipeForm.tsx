@@ -735,7 +735,7 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
                   />
                   <ImageIcon className="h-8 w-8 text-foreground/45 group-hover:text-foreground transition-colors mb-2" />
                   <span className="text-xs font-black uppercase tracking-wider text-foreground">
-                    {lang === 'sv' ? 'Välj från galleri' : 'Choose from Gallery'}
+                    {lang === 'sv' ? 'Ladda upp en bild' : 'Upload an Image'}
                   </span>
                   <span className="text-[9px] text-foreground/60 mt-1">
                     {texts[lang].imageZoneSub}
@@ -762,7 +762,7 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
                     {lang === 'sv' ? 'Ta ett foto' : 'Take a Photo'}
                   </span>
                   <span className="text-[9px] text-foreground/60 mt-1">
-                    {lang === 'sv' ? 'Använd kameran direkt för att fota receptet' : 'Use the camera directly to photograph the recipe'}
+                    {lang === 'sv' ? 'Fota receptet direkt med din kamera' : 'Take a photo of the recipe with your camera'}
                   </span>
                 </label>
               </div>

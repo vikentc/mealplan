@@ -10,8 +10,6 @@ export async function GET(request: Request) {
     const flavor = searchParams.get('flavor') || undefined;
     const mood = searchParams.get('mood') || undefined;
     const occasion = searchParams.get('occasion') || undefined;
-    const spiceLevelStr = searchParams.get('spiceLevel');
-    const spiceLevel = spiceLevelStr !== null ? Number(spiceLevelStr) : undefined;
     const nutritionGoal = searchParams.get('nutritionGoal') || undefined;
     const mealType = searchParams.get('mealType') || undefined;
 
@@ -21,7 +19,6 @@ export async function GET(request: Request) {
       flavor,
       mood,
       occasion,
-      spiceLevel,
       nutritionGoal,
       mealType
     });

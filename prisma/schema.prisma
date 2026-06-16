@@ -19,13 +19,10 @@ model Recipe {
   servings        Int          @default(4)
   difficulty      String       @default("Medium")
   cuisine         String       @default("International")
-  countryOfOrigin String?
-  region          String?
-  mealType        String       @default("dinner")
+  mealTypes       String[]
   occasions       String[]
   flavorProfile   String[]
   moodTags        String[]
-  spiceLevel      Int          @default(0)
   ingredients     Json         // List of { name: string, quantity: number | null, unit: string | null, optional: boolean }
   instructions    String[]     // List of cooking steps
   nutrition       Json         // Object of { calories, protein, carbohydrates, fat, fiber, sugar, sodium, iron, calcium, potassium, magnesium, vitaminA, vitaminC, vitaminD, vitaminB12 }

@@ -30,6 +30,7 @@ export default async function PlannerPage({ searchParams }: PlannerPageProps) {
     image: r.image,
     cuisine: r.cuisine,
     mealType: r.mealType,
+    mealTypes: r.mealTypes,
     nutrition: {
       calories: r.nutrition?.calories || 0,
       protein: r.nutrition?.protein || 0,

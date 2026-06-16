@@ -223,14 +223,17 @@ function filterRecipesList(recipes: any[], query: string, filters: any) {
     if (filters.cuisine) {
       results = results.filter((r) => (r.cuisine || '').toLowerCase() === filters.cuisine.toLowerCase());
     }
-    if (filters.spiceLevel !== undefined) {
-      results = results.filter((r) => r.spiceLevel === filters.spiceLevel);
-    }
     if (filters.occasion) {
       results = results.filter((r) => Array.isArray(r.occasions) && r.occasions.map((o: string) => o.toLowerCase()).includes(filters.occasion.toLowerCase()));
     }
     if (filters.mealType) {
-      results = results.filter((r) => (r.mealType || '').toLowerCase() === filters.mealType.toLowerCase());
+      const mt = filters.mealType.toLowerCase();
+      results = results.filter((r) => {
+        const mealTypes = Array.isArray(r.mealTypes)
+          ? r.mealTypes
+          : (typeof r.mealType === 'string' && r.mealType ? [r.mealType] : []);
+        return mealTypes.map((m: string) => m.toLowerCase()).includes(mt);
+      });
     }
     if (filters.craving) {
       const c = filters.craving.toLowerCase();
@@ -249,7 +252,6 @@ function filterRecipesList(recipes: any[], query: string, filters: any) {
           break;
         case 'spicy':
           results = results.filter((r) => 
-            (r.spiceLevel || 0) > 0 || 
             (r.flavorProfile || []).map((t: string) => t.toLowerCase()).includes('spicy')
           );
           break;
@@ -333,7 +335,6 @@ export async function getRecipes(filters?: {
   flavor?: string;
   mood?: string;
   occasion?: string;
-  spiceLevel?: number;
   nutritionGoal?: string;
   mealType?: string;
   craving?: string;
@@ -462,13 +463,10 @@ export async function createRecipe(data: any) {
           servings: Number(data.servings) || 4,
           difficulty: data.difficulty || 'Medium',
           cuisine: data.cuisine || 'International',
-          countryOfOrigin: data.countryOfOrigin || 'Unknown',
-          region: data.region || 'Unknown',
-          mealType: data.mealType || 'dinner',
+          mealTypes: Array.isArray(data.mealTypes) ? data.mealTypes : (data.mealType ? [data.mealType] : ['dinner']),
           occasions: data.occasions || [],
           flavorProfile: data.flavorProfile || [],
           moodTags: data.moodTags || [],
-          spiceLevel: Number(data.spiceLevel) || 0,
           ingredients: data.ingredients || [],
           instructions: data.instructions || [],
           nutrition: data.nutrition || {}
@@ -490,13 +488,10 @@ export async function createRecipe(data: any) {
         servings: Number(data.servings) || 4,
         difficulty: data.difficulty || 'Medium',
         cuisine: data.cuisine || 'International',
-        countryOfOrigin: data.countryOfOrigin || 'Unknown',
-        region: data.region || 'Unknown',
-        mealType: data.mealType || 'dinner',
+        mealTypes: Array.isArray(data.mealTypes) ? data.mealTypes : (data.mealType ? [data.mealType] : ['dinner']),
         occasions: data.occasions || [],
         flavorProfile: data.flavorProfile || [],
         moodTags: data.moodTags || [],
-        spiceLevel: Number(data.spiceLevel) || 0,
         ingredients: data.ingredients || [],
         instructions: data.instructions || [],
         nutrition: data.nutrition || {},
@@ -528,13 +523,10 @@ export async function updateRecipe(id: string, data: any) {
           servings: Number(data.servings) || 4,
           difficulty: data.difficulty || 'Medium',
           cuisine: data.cuisine || 'International',
-          countryOfOrigin: data.countryOfOrigin || 'Unknown',
-          region: data.region || 'Unknown',
-          mealType: data.mealType || 'dinner',
+          mealTypes: Array.isArray(data.mealTypes) ? data.mealTypes : (data.mealType ? [data.mealType] : ['dinner']),
           occasions: data.occasions || [],
           flavorProfile: data.flavorProfile || [],
           moodTags: data.moodTags || [],
-          spiceLevel: Number(data.spiceLevel) || 0,
           ingredients: data.ingredients || [],
           instructions: data.instructions || [],
           nutrition: data.nutrition || {}
@@ -559,13 +551,10 @@ export async function updateRecipe(id: string, data: any) {
         servings: Number(data.servings) || 4,
         difficulty: data.difficulty || 'Medium',
         cuisine: data.cuisine || 'International',
-        countryOfOrigin: data.countryOfOrigin || 'Unknown',
-        region: data.region || 'Unknown',
-        mealType: data.mealType || 'dinner',
+        mealTypes: Array.isArray(data.mealTypes) ? data.mealTypes : (data.mealType ? [data.mealType] : ['dinner']),
         occasions: data.occasions || [],
         flavorProfile: data.flavorProfile || [],
         moodTags: data.moodTags || [],
-        spiceLevel: Number(data.spiceLevel) || 0,
         ingredients: data.ingredients || [],
         instructions: data.instructions || [],
         nutrition: data.nutrition || {},
@@ -780,11 +769,14 @@ export async function getRecommendationsByCraving(criteria: {
     const mt = criteria.mealType.toLowerCase();
     
     available = available.filter((r: any) => {
-      const rMealType = (r.mealType || '').toLowerCase();
-      // Match exactly, or if user requests 'dessert' and recipe contains dessert keywords
+      const mealTypes = Array.isArray(r.mealTypes)
+        ? r.mealTypes
+        : (typeof r.mealType === 'string' && r.mealType ? [r.mealType] : []);
+      const lowerMealTypes = mealTypes.map((m: string) => m.toLowerCase());
+      
       if (mt === 'dessert') {
         return (
-          rMealType === 'dessert' ||
+          lowerMealTypes.includes('dessert') ||
           r.name.toLowerCase().includes('dessert') ||
           r.name.toLowerCase().includes('efterrätt') ||
           r.name.toLowerCase().includes('kaka') ||
@@ -792,7 +784,7 @@ export async function getRecommendationsByCraving(criteria: {
           r.name.toLowerCase().includes('paj') && r.flavorProfile?.includes('sweet')
         );
       }
-      return rMealType === mt;
+      return lowerMealTypes.includes(mt);
     });
   }
 
@@ -814,7 +806,6 @@ export async function getRecommendationsByCraving(criteria: {
         break;
       case 'spicy':
         available = available.filter((r: any) => 
-          r.spiceLevel > 0 || 
           r.flavorProfile?.map((t: string) => t.toLowerCase()).includes('spicy')
         );
         break;

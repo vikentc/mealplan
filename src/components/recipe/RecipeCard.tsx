@@ -14,7 +14,7 @@ interface RecipeCardProps {
     totalTime: number;
     difficulty: string;
     cuisine: string;
-    spiceLevel: number;
+    spiceLevel?: number;
     nutrition: any;
     moodTags?: string[];
   };

@@ -46,13 +46,14 @@ interface Recipe {
   servings: number;
   difficulty: string;
   cuisine: string;
-  countryOfOrigin: string | null;
-  region: string | null;
-  mealType: string;
+  countryOfOrigin?: string | null;
+  region?: string | null;
+  mealType?: string;
+  mealTypes?: string[];
   occasions: string[];
   flavorProfile: string[];
   moodTags: string[];
-  spiceLevel: number;
+  spiceLevel?: number;
   ingredients: Ingredient[];
   instructions: string[];
   nutrition: Nutrition;
@@ -138,6 +139,8 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
     cookingTime?: number;
     servings?: number;
     cuisine?: string;
+    mealType?: string;
+    mealTypes?: string[];
     ingredients: Ingredient[];
     instructions: string[];
     nutrition?: Nutrition;
@@ -322,6 +325,11 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
     if (previewData.cookingTime !== undefined) setCookingTime(previewData.cookingTime);
     if (previewData.servings !== undefined) setServings(previewData.servings);
     if (previewData.cuisine) setCuisine(previewData.cuisine);
+    if (previewData.mealTypes && previewData.mealTypes.length > 0) {
+      setMealTypes(previewData.mealTypes);
+    } else if (previewData.mealType) {
+      setMealTypes([previewData.mealType]);
+    }
 
     if (previewData.ingredients && previewData.ingredients.length > 0) {
       setIngredients(previewData.ingredients);
@@ -369,10 +377,9 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
   const [servings, setServings] = useState(recipe?.servings || 4);
   const [difficulty, setDifficulty] = useState(recipe?.difficulty || 'Medium');
   const [cuisine, setCuisine] = useState(recipe?.cuisine || 'International');
-  const [countryOfOrigin, setCountryOfOrigin] = useState(recipe?.countryOfOrigin || 'Unknown');
-  const [region, setRegion] = useState(recipe?.region || 'Unknown');
-  const [mealType, setMealType] = useState(recipe?.mealType || 'dinner');
-  const [spiceLevel, setSpiceLevel] = useState(recipe?.spiceLevel || 0);
+  const [mealTypes, setMealTypes] = useState<string[]>(
+    recipe?.mealTypes || (recipe?.mealType ? [recipe.mealType] : ['dinner'])
+  );
 
   // Arrays
   const [ingredients, setIngredients] = useState<Ingredient[]>(
@@ -504,10 +511,8 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
     if (servings !== (recipe?.servings || 4)) return true;
     if (difficulty !== (recipe?.difficulty || 'Medium')) return true;
     if (cuisine !== (recipe?.cuisine || 'International')) return true;
-    if (countryOfOrigin !== (recipe?.countryOfOrigin || 'Unknown')) return true;
-    if (region !== (recipe?.region || 'Unknown')) return true;
-    if (mealType !== (recipe?.mealType || 'dinner')) return true;
-    if (spiceLevel !== (recipe?.spiceLevel || 0)) return true;
+    const initialMealTypes = recipe?.mealTypes || (recipe?.mealType ? [recipe.mealType] : ['dinner']);
+    if (mealTypes.length !== initialMealTypes.length || !mealTypes.every(mt => initialMealTypes.includes(mt))) return true;
 
     // Check ingredients
     const initialIngs = recipe?.ingredients || [{ name: '', quantity: null, unit: '', optional: false }];
@@ -601,13 +606,10 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
       servings,
       difficulty,
       cuisine,
-      countryOfOrigin: countryOfOrigin.trim() || null,
-      region: region.trim() || null,
-      mealType,
+      mealTypes,
       occasions,
       flavorProfile,
       moodTags,
-      spiceLevel,
       ingredients: filteredIngredients,
       instructions: filteredInstructions,
       nutrition
@@ -987,15 +989,38 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
               </select>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.meal_type')}</label>
-              <select
-                value={mealType}
-                onChange={(e) => setMealType(e.target.value)}
-                className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-black uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
-              >
-                {MEAL_TYPES.map(mt => <option key={mt} value={mt}>{t(`meal.${mt}`)}</option>)}
-              </select>
+            <div className="space-y-1.5 col-span-1 md:col-span-2">
+              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.meal_type')} *</label>
+              <div className="flex flex-wrap gap-2.5 pt-1.5">
+                {MEAL_TYPES.map(mt => {
+                  const isChecked = mealTypes.includes(mt);
+                  return (
+                    <label
+                      key={mt}
+                      className={cn(
+                        "flex items-center gap-2 px-3.5 py-2.5 border-2 border-foreground rounded-xl text-xs font-black uppercase cursor-pointer select-none transition-all",
+                        isChecked 
+                          ? "bg-amber-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-y-[-1px]" 
+                          : "bg-white hover:bg-amber-50/30"
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => {
+                          if (isChecked) {
+                            setMealTypes(mealTypes.filter(x => x !== mt));
+                          } else {
+                            setMealTypes([...mealTypes, mt]);
+                          }
+                        }}
+                        className="sr-only"
+                      />
+                      <span>{t(`meal.${mt}`)}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="space-y-1.5">
@@ -1022,18 +1047,6 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.spice_level')}</label>
-              <input
-                type="number"
-                min="0"
-                max="5"
-                value={spiceLevel}
-                onChange={(e) => setSpiceLevel(Number(e.target.value))}
-                className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
               <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.prep_time')}</label>
               <input
                 type="number"
@@ -1052,28 +1065,6 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
                 value={cookingTime}
                 onChange={(e) => setCookingTime(Number(e.target.value))}
                 className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest block mb-1.5">{t('form.country')}</label>
-              <input
-                type="text"
-                value={countryOfOrigin}
-                onChange={(e) => setCountryOfOrigin(e.target.value)}
-                placeholder="t.ex. Vietnam"
-                className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-semibold placeholder:text-foreground/50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest block mb-1.5">{t('form.region')}</label>
-              <input
-                type="text"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                placeholder="t.ex. Sydostasien"
-                className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-semibold placeholder:text-foreground/50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
               />
             </div>
           </div>

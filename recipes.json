@@ -7521,7 +7521,7 @@
     "totalTime": 35,
     "servings": 4,
     "difficulty": "Medium",
-    "cuisine": "International",
+    "cuisine": "Italian",
     "countryOfOrigin": "Unknown",
     "region": "Unknown",
     "mealType": "dinner",
@@ -7611,6 +7611,6 @@
       "vitaminB12": 0
     },
     "createdAt": "2026-06-16T09:56:03.529Z",
-    "updatedAt": "2026-06-16T09:58:35.009Z"
+    "updatedAt": "2026-06-16T10:08:46.471Z"
   }
 ]

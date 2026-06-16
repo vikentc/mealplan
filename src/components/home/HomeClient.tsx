@@ -232,18 +232,23 @@ export default function HomeClient({
       {recipes.length > 0 ? (
         isRecommendationActive ? (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {recipes.map((recipe: any) => (
-              <RecommendationCard
-                key={recipe.id}
-                recipe={recipe}
-                category={t(`category.${recipe.mealType}`) || t(`meal.${recipe.mealType}`) || (language === 'sv' ? 'Förslag' : 'Suggestion')}
-                description={
-                  craving
-                    ? t('card.reco_desc_craving', { craving: t(`craving.${craving}`).includes(' ') ? t(`craving.${craving}`).split(' ').slice(1).join(' ') : t(`craving.${craving}`) })
-                    : t('card.reco_desc_default', { type: (t(`meal.${recipe.mealType}`) || t('card.reco_desc_default_generic')).toLowerCase() })
-                }
-              />
-            ))}
+            {recipes.map((recipe: any) => {
+              const primaryMealType = Array.isArray(recipe.mealTypes) && recipe.mealTypes.length > 0 
+                ? recipe.mealTypes[0] 
+                : (recipe.mealType || 'dinner');
+              return (
+                <RecommendationCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  category={t(`category.${primaryMealType}`) || t(`meal.${primaryMealType}`) || (language === 'sv' ? 'Förslag' : 'Suggestion')}
+                  description={
+                    craving
+                      ? t('card.reco_desc_craving', { craving: t(`craving.${craving}`).includes(' ') ? t(`craving.${craving}`).split(' ').slice(1).join(' ') : t(`craving.${craving}`) })
+                      : t('card.reco_desc_default', { type: (t(`meal.${primaryMealType}`) || t('card.reco_desc_default_generic')).toLowerCase() })
+                  }
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

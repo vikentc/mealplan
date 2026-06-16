@@ -23,6 +23,7 @@ interface Recipe {
   image: string | null;
   cuisine: string;
   mealType?: string;
+  mealTypes?: string[];
   nutrition: {
     calories: number;
     protein: number;
@@ -221,9 +222,13 @@ export default function WeeklyCalendar({
   };
 
   const handleAutofill = () => {
-    const breakfastPool = recipes.filter(r => r.mealType?.toLowerCase() === 'breakfast');
-    const lunchPool = recipes.filter(r => r.mealType?.toLowerCase() === 'lunch');
-    const dinnerPool = recipes.filter(r => r.mealType?.toLowerCase() === 'dinner' || r.mealType?.toLowerCase() === 'main-course' || r.mealType?.toLowerCase() === 'main');
+    const getTypes = (r: Recipe) => Array.isArray(r.mealTypes) ? r.mealTypes : (r.mealType ? [r.mealType] : []);
+    const breakfastPool = recipes.filter(r => getTypes(r).map(t => t.toLowerCase()).includes('breakfast'));
+    const lunchPool = recipes.filter(r => getTypes(r).map(t => t.toLowerCase()).includes('lunch'));
+    const dinnerPool = recipes.filter(r => {
+      const lowerTypes = getTypes(r).map(t => t.toLowerCase());
+      return lowerTypes.includes('dinner') || lowerTypes.includes('main-course') || lowerTypes.includes('main');
+    });
     
     const bPool = breakfastPool.length > 0 ? breakfastPool : recipes;
     const lPool = lunchPool.length > 0 ? lunchPool : recipes;

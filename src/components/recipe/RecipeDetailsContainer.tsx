@@ -45,13 +45,14 @@ interface Recipe {
   servings: number;
   difficulty: string;
   cuisine: string;
-  countryOfOrigin: string | null;
-  region: string | null;
-  mealType: string;
+  countryOfOrigin?: string | null;
+  region?: string | null;
+  mealType?: string;
+  mealTypes?: string[];
   occasions: string[];
   flavorProfile: string[];
   moodTags: string[];
-  spiceLevel: number;
+  spiceLevel?: number;
   ingredients: Ingredient[];
   instructions: string[];
   nutrition: any;
@@ -286,8 +287,6 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
             ingredients={recipe.ingredients}
             servings={servings}
             originalServings={recipe.servings}
-            spiceLevel={recipe.spiceLevel}
-            originalSpiceLevel={recipe.spiceLevel}
             checkedIngredients={checkedIngredients}
             onToggleIngredient={toggleIngredient}
             onClearIngredients={clearIngredients}

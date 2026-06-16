@@ -67,17 +67,45 @@ export default function ShoppingListClient({
   
   // Custom dialog states
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+  const [isAddCustomOpen, setIsAddCustomOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
+  // Helper to save changes automatically to backend
+  const autoSave = async (updatedRecipes: RecipeInstance[], updatedItems: ShoppingItem[]) => {
+    setIsSaving(true);
+    setSaveFeedback(null);
+    try {
+      await saveShoppingList(updatedRecipes, updatedItems);
+      setSaveFeedback({
+        type: 'success',
+        message: language === 'sv' ? 'Inköpslistan har sparats!' : 'Shopping list saved successfully!'
+      });
+      router.refresh();
+    } catch (error: any) {
+      console.error(error);
+      setSaveFeedback({
+        type: 'error',
+        message: language === 'sv' 
+          ? `Kunde inte spara: ${error.message || error}` 
+          : `Failed to save: ${error.message || error}`
+      });
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSaveFeedback(null), 3000);
+    }
+  };
+
   // 1. Toggle checked status
-  const handleToggleChecked = (index: number) => {
-    setItems(prev => prev.map((item, idx) => 
+  const handleToggleChecked = async (index: number) => {
+    const updatedItems = items.map((item, idx) => 
       idx === index ? { ...item, checked: !item.checked } : item
-    ));
+    );
+    setItems(updatedItems);
+    await autoSave(recipes, updatedItems);
   };
 
   // 2. Add custom item
-  const handleAddCustomItem = (e: React.FormEvent) => {
+  const handleAddCustomItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customName.trim()) return;
 
@@ -96,18 +124,22 @@ export default function ShoppingListClient({
       recipeAmounts: []
     };
 
-    setItems(prev => [...prev, newItem]);
+    const updatedItems = [...items, newItem];
+    setItems(updatedItems);
+    setIsAddCustomOpen(false);
     
     // Reset inputs
     setCustomName('');
     setCustomQty('');
     setCustomUnit('');
+
+    await autoSave(recipes, updatedItems);
   };
 
   // 3. Remove a recipe instance and its ingredient contributions
-  const handleRemoveRecipe = (instanceId: string) => {
-    setRecipes(prev => prev.filter(r => r.instanceId !== instanceId));
-    setItems(prev => prev.map(item => {
+  const handleRemoveRecipe = async (instanceId: string) => {
+    const updatedRecipes = recipes.filter(r => r.instanceId !== instanceId);
+    const updatedItems = items.map(item => {
       if (item.isCustom) return item;
       
       const remaining = (item.recipeAmounts || []).filter(ra => ra.instanceId !== instanceId);
@@ -126,12 +158,18 @@ export default function ShoppingListClient({
         recipeAmounts: remaining,
         quantity: hasNull ? null : (newQty !== null ? Math.round(newQty * 100) / 100 : null)
       };
-    }).filter(Boolean) as ShoppingItem[]);
+    }).filter(Boolean) as ShoppingItem[];
+
+    setRecipes(updatedRecipes);
+    setItems(updatedItems);
+    await autoSave(updatedRecipes, updatedItems);
   };
 
   // 4. Remove a custom item
-  const handleRemoveCustomItem = (indexToRemove: number) => {
-    setItems(prev => prev.filter((_, idx) => idx !== indexToRemove));
+  const handleRemoveCustomItem = async (indexToRemove: number) => {
+    const updatedItems = items.filter((_, idx) => idx !== indexToRemove);
+    setItems(updatedItems);
+    await autoSave(recipes, updatedItems);
   };
 
   // 5. Clear all items and recipes (and save immediately)
@@ -166,32 +204,6 @@ export default function ShoppingListClient({
     }
   };
 
-  // 6. Save shopping list to backend
-  const handleSave = async () => {
-    setIsSaving(true);
-    setSaveFeedback(null);
-    try {
-      await saveShoppingList(recipes, items);
-      setSaveFeedback({
-        type: 'success',
-        message: language === 'sv' ? 'Inköpslistan har sparats!' : 'Shopping list saved successfully!'
-      });
-      router.refresh();
-    } catch (error: any) {
-      console.error(error);
-      setSaveFeedback({
-        type: 'error',
-        message: language === 'sv' 
-          ? `Kunde inte spara: ${error.message || error}` 
-          : `Failed to save: ${error.message || error}`
-      });
-    } finally {
-      setIsSaving(false);
-      // Fade out feedback after 4 seconds
-      setTimeout(() => setSaveFeedback(null), 4000);
-    }
-  };
-
   // Separate checked and unchecked items
   const uncheckedItems = items.filter(item => !item.checked);
   const checkedItems = items.filter(item => item.checked);
@@ -200,7 +212,7 @@ export default function ShoppingListClient({
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       
       {/* LEFT COLUMN: Recipes in list & Actions */}
-      <div className="lg:col-span-1 space-y-6">
+      <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
         
         {/* Recipes Block */}
         <section className="bg-card border-3 border-foreground p-6 rounded-[2rem] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] space-y-4">
@@ -242,36 +254,14 @@ export default function ShoppingListClient({
 
         {/* Global Save/Clear Actions */}
         <section className="space-y-3">
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="w-full py-3 bg-emerald-100 hover:bg-emerald-200 disabled:opacity-50 text-emerald-900 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="h-4.5 w-4.5 animate-spin" />
-                <span>{language === 'sv' ? 'Sparar...' : 'Saving...'}</span>
-              </>
-            ) : (
-              <>
-                <Save className="h-4.5 w-4.5" />
-                <span>{language === 'sv' ? 'Spara inköpslista' : 'Save Shopping List'}</span>
-              </>
-            )}
-          </button>
+          {isSaving && (
+            <div className="p-3 bg-cyan-50 border-2 border-cyan-500 text-cyan-900 rounded-xl flex items-center gap-2.5 text-xs font-semibold shadow-[2px_2px_0px_0px_rgba(6,182,212,0.2)] animate-pulse">
+              <Loader2 className="h-4.5 w-4.5 animate-spin shrink-0 text-cyan-700" />
+              <span>{language === 'sv' ? 'Sparar ändringar...' : 'Saving changes...'}</span>
+            </div>
+          )}
 
-          {recipes.length > 0 || items.length > 0 ? (
-            <button
-              onClick={handleClearAll}
-              className="w-full py-3 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Trash2 className="h-4.5 w-4.5" />
-              <span>{language === 'sv' ? 'Rensa allt' : 'Clear All'}</span>
-            </button>
-          ) : null}
-
-          {/* Feedback message */}
-          {saveFeedback && (
+          {!isSaving && saveFeedback && (
             <div className={cn(
               "p-3.5 border-2 rounded-xl flex items-start gap-2.5 text-xs font-semibold shadow-[3px_3px_0px_0px_rgba(0,0,0,0.1)]",
               saveFeedback.type === 'success' 
@@ -286,24 +276,45 @@ export default function ShoppingListClient({
               <span>{saveFeedback.message}</span>
             </div>
           )}
+
+          {recipes.length > 0 || items.length > 0 ? (
+            <button
+              onClick={handleClearAll}
+              className="w-full py-3 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Trash2 className="h-4.5 w-4.5" />
+              <span>{language === 'sv' ? 'Rensa allt' : 'Clear All'}</span>
+            </button>
+          ) : null}
         </section>
 
       </div>
 
       {/* RIGHT COLUMN: Items checklist & Add custom items */}
-      <div className="lg:col-span-2 space-y-6">
+      <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
         
         {/* Checklist */}
         <section className="bg-card border-3 border-foreground p-6 md:p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-6">
           
-          <div className="flex justify-between items-center gap-2 border-b-2 border-foreground/15 pb-2">
-            <h3 className="font-black text-sm uppercase tracking-wider text-foreground flex items-center gap-1.5">
-              <ShoppingCart className="h-4.5 w-4.5" />
-              <span>{language === 'sv' ? 'Varor att handla' : 'Items Checklist'}</span>
-            </h3>
-            <span className="text-[10px] font-black uppercase text-foreground bg-cyan-100 border-2 border-foreground px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-              {uncheckedItems.length} {language === 'sv' ? 'kvar' : 'left'}
-            </span>
+          <div className="flex justify-between items-center gap-3 border-b-2 border-foreground/15 pb-2 flex-wrap">
+            <div className="flex items-center gap-2">
+              <h3 className="font-black text-sm uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <ShoppingCart className="h-4.5 w-4.5" />
+                <span>{language === 'sv' ? 'Varor att handla' : 'Items Checklist'}</span>
+              </h3>
+              <span className="text-[10px] font-black uppercase text-foreground bg-cyan-100 border-2 border-foreground px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] animate-pulse">
+                {uncheckedItems.length} {language === 'sv' ? 'kvar' : 'left'}
+              </span>
+            </div>
+            
+            <button
+              type="button"
+              onClick={() => setIsAddCustomOpen(true)}
+              className="px-3 py-1.5 bg-cyan-100 hover:bg-cyan-200 text-cyan-950 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>{language === 'sv' ? 'Egen vara' : 'Custom Item'}</span>
+            </button>
           </div>
 
           {items.length === 0 ? (
@@ -426,60 +437,6 @@ export default function ShoppingListClient({
 
         </section>
 
-        {/* Add custom item form */}
-        <section className="bg-card border-3 border-foreground p-6 rounded-[2rem] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] space-y-4">
-          <h4 className="font-black text-xs uppercase tracking-wider text-foreground flex items-center gap-1.5 pb-1">
-            <Plus className="h-4 w-4" />
-            <span>{language === 'sv' ? 'Lägg till egen vara' : 'Add Custom Item'}</span>
-          </h4>
-
-          <form onSubmit={handleAddCustomItem} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-            <div className="sm:col-span-6 space-y-1">
-              <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">{language === 'sv' ? 'Artikelnamn' : 'Item Name'} *</label>
-              <input
-                type="text"
-                required
-                placeholder={language === 'sv' ? 't.ex. Mjölk' : 'e.g. Milk'}
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-                className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
-              />
-            </div>
-
-            <div className="sm:col-span-3 space-y-1">
-              <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">{language === 'sv' ? 'Mängd' : 'Quantity'}</label>
-              <input
-                type="text"
-                placeholder="1.5"
-                value={customQty}
-                onChange={(e) => setCustomQty(e.target.value)}
-                className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
-              />
-            </div>
-
-            <div className="sm:col-span-3 space-y-1">
-              <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">{language === 'sv' ? 'Enhet' : 'Unit'}</label>
-              <input
-                type="text"
-                placeholder="st, dl, g"
-                value={customUnit}
-                onChange={(e) => setCustomUnit(e.target.value)}
-                className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
-              />
-            </div>
-
-            <div className="sm:col-span-12">
-              <button
-                type="submit"
-                className="w-full py-2.5 bg-cyan-100 hover:bg-cyan-200 text-foreground border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center justify-center gap-1"
-              >
-                <Plus className="h-4.5 w-4.5" />
-                <span>{language === 'sv' ? 'Lägg till vara' : 'Add to List'}</span>
-              </button>
-            </div>
-          </form>
-        </section>
-
       </div>
 
       {/* Confirmation Modal */}
@@ -550,6 +507,87 @@ export default function ShoppingListClient({
                 {language === 'sv' ? 'Stäng' : 'Close'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Custom Item Modal */}
+      {isAddCustomOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white border-3 border-foreground rounded-[2rem] p-6 max-w-sm w-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center border-b-2 border-foreground/15 pb-2">
+              <h4 className="font-black text-sm uppercase tracking-wider text-foreground">
+                {language === 'sv' ? 'Lägg till egen vara' : 'Add Custom Item'}
+              </h4>
+              <button
+                type="button"
+                onClick={() => setIsAddCustomOpen(false)}
+                className="text-foreground hover:text-red-600 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddCustomItem} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">
+                  {language === 'sv' ? 'Artikelnamn' : 'Item Name'} *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder={language === 'sv' ? 't.ex. Mjölk' : 'e.g. Milk'}
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">
+                    {language === 'sv' ? 'Mängd' : 'Quantity'}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="1.5"
+                    value={customQty}
+                    onChange={(e) => setCustomQty(e.target.value)}
+                    className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">
+                    {language === 'sv' ? 'Enhet' : 'Unit'}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="st, dl, g"
+                    value={customUnit}
+                    onChange={(e) => setCustomUnit(e.target.value)}
+                    className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddCustomOpen(false)}
+                  className="px-4 py-2 bg-secondary hover:bg-secondary/80 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                >
+                  {language === 'sv' ? 'Avbryt' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-cyan-100 hover:bg-cyan-200 text-foreground border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>{language === 'sv' ? 'Lägg till' : 'Add'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

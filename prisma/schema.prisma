@@ -42,3 +42,10 @@ model WeeklyPlan {
 
   @@unique([weekOffset, dayOfWeek, mealSlot])
 }
+
+model ShoppingList {
+  id        String   @id @default("current")
+  recipes   Json     // Array of { id: string, name: string, servings: number }
+  items     Json     // Array of { name: string, quantity: number | null, unit: string | null, checked: boolean, recipeAmounts: Array<{ recipeId: string, recipeName: string, quantity: number | null }>, isCustom: boolean }
+  updatedAt DateTime @updatedAt
+}

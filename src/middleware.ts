@@ -11,6 +11,8 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/planner/') ||
     pathname === '/recipes/add' || 
     pathname.startsWith('/recipes/add/') ||
+    pathname === '/shopping-list' ||
+    pathname.startsWith('/shopping-list/') ||
     (pathname.startsWith('/recipes/') && pathname.endsWith('/edit'));
 
   if (isProtected && !sessionUser) {
@@ -34,6 +36,7 @@ export const config = {
     '/planner/:path*',
     '/recipes/add/:path*',
     '/recipes/:id/edit',
+    '/shopping-list/:path*',
     '/login',
   ],
 };

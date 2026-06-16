@@ -69,6 +69,29 @@ async function getAllRecipesInternal(): Promise<any[]> {
 // Local paths for fallback files
 const RECIPES_FILE = path.join(process.cwd(), 'recipes.json');
 const PLANS_FILE = path.join(process.cwd(), 'plans.json');
+const SHOPPING_LIST_FILE = path.join(process.cwd(), 'shopping-list.json');
+
+// Helper to get fallback shopping list
+function getFallbackShoppingList(): any {
+  try {
+    if (fs.existsSync(SHOPPING_LIST_FILE)) {
+      const data = fs.readFileSync(SHOPPING_LIST_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('Error reading fallback shopping list:', error);
+  }
+  return { recipes: [], items: [] };
+}
+
+// Helper to save fallback shopping list
+function saveFallbackShoppingList(list: any) {
+  try {
+    fs.writeFileSync(SHOPPING_LIST_FILE, JSON.stringify(list, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error saving fallback shopping list:', error);
+  }
+}
 
 // Helper to get fallback recipes
 function getFallbackRecipes(): any[] {
@@ -1220,6 +1243,165 @@ Viktigt:
   } catch (error: any) {
     console.error('estimateNutritionAction error:', error);
     return { error: 'INTERNAL_ERROR', message: error.message || 'Ett oväntat fel inträffade vid AI-beräkning.' };
+  }
+}
+
+export async function getShoppingList() {
+  const result = await runWithFallback(
+    async () => {
+      const row = await db.shoppingList.findUnique({
+        where: { id: 'current' }
+      });
+      if (!row) {
+        return { recipes: [], items: [] };
+      }
+      return {
+        recipes: typeof row.recipes === 'string' ? JSON.parse(row.recipes) : (row.recipes || []),
+        items: typeof row.items === 'string' ? JSON.parse(row.items) : (row.items || [])
+      };
+    },
+    () => getFallbackShoppingList()
+  );
+  return result;
+}
+
+export async function saveShoppingList(recipes: any[], items: any[]) {
+  return await runWithFallback(
+    async () => {
+      await db.shoppingList.upsert({
+        where: { id: 'current' },
+        update: {
+          recipes: recipes as any,
+          items: items as any
+        },
+        create: {
+          id: 'current',
+          recipes: recipes as any,
+          items: items as any
+        }
+      });
+      return { success: true };
+    },
+    () => {
+      saveFallbackShoppingList({ recipes, items });
+      return { success: true };
+    }
+  );
+}
+
+export async function addRecipeToShoppingList(recipeId: string, servings: number) {
+  try {
+    const allRecipes = await getAllRecipesInternal();
+    const recipe = allRecipes.find((r: any) => r.id === recipeId);
+    if (!recipe) {
+      return { error: 'RECIPE_NOT_FOUND', message: 'Receptet hittades inte.' };
+    }
+
+    const list = await getShoppingList();
+    const recipes = Array.isArray(list.recipes) ? list.recipes : [];
+    const items = Array.isArray(list.items) ? list.items : [];
+
+    const instanceId = Math.random().toString(36).substring(2, 9);
+    recipes.push({
+      id: recipe.id,
+      name: recipe.name,
+      servings: servings,
+      instanceId: instanceId
+    });
+
+    const ratio = servings / recipe.servings;
+    if (Array.isArray(recipe.ingredients)) {
+      recipe.ingredients.forEach((ing: any) => {
+        if (!ing.name || ing.name.trim() === '') return;
+        
+        const scaledQty = ing.quantity !== null ? ing.quantity * ratio : null;
+        const ingName = ing.name.trim();
+        const ingUnit = ing.unit ? ing.unit.trim() : null;
+
+        const existingItem = items.find((item: any) => 
+          item.name.toLowerCase() === ingName.toLowerCase() && 
+          (item.unit || '').toLowerCase() === (ingUnit || '').toLowerCase() &&
+          !item.isCustom
+        );
+
+        if (existingItem) {
+          existingItem.recipeAmounts = existingItem.recipeAmounts || [];
+          existingItem.recipeAmounts.push({
+            recipeId: recipe.id,
+            recipeName: recipe.name,
+            instanceId: instanceId,
+            quantity: scaledQty,
+            unit: ingUnit
+          });
+          if (existingItem.quantity !== null && scaledQty !== null) {
+            existingItem.quantity = Math.round((existingItem.quantity + scaledQty) * 100) / 100;
+          } else {
+            existingItem.quantity = null;
+          }
+        } else {
+          items.push({
+            name: ingName,
+            quantity: scaledQty,
+            unit: ingUnit,
+            checked: false,
+            isCustom: false,
+            recipeAmounts: [{
+              recipeId: recipe.id,
+              recipeName: recipe.name,
+              instanceId: instanceId,
+              quantity: scaledQty,
+              unit: ingUnit
+            }]
+          });
+        }
+      });
+    }
+
+    await saveShoppingList(recipes, items);
+    return { success: true };
+  } catch (error: any) {
+    console.error('addRecipeToShoppingList error:', error);
+    return { error: 'SAVE_FAILED', message: error.message || 'Kunde inte lägga till i inköpslistan.' };
+  }
+}
+
+export async function removeRecipeFromShoppingList(instanceId: string) {
+  try {
+    const list = await getShoppingList();
+    const recipes = Array.isArray(list.recipes) ? list.recipes : [];
+    const items = Array.isArray(list.items) ? list.items : [];
+
+    const updatedRecipes = recipes.filter((r: any) => r.instanceId !== instanceId);
+
+    const updatedItems = items
+      .map((item: any) => {
+        if (item.isCustom) return item;
+
+        const remainingAmounts = (item.recipeAmounts || []).filter((ra: any) => ra.instanceId !== instanceId);
+        if (remainingAmounts.length === 0) {
+          return null;
+        }
+
+        let newQty: number | null = 0;
+        let hasNull = false;
+        remainingAmounts.forEach((ra: any) => {
+          if (ra.quantity === null) hasNull = true;
+          else if (newQty !== null) newQty += ra.quantity;
+        });
+
+        return {
+          ...item,
+          recipeAmounts: remainingAmounts,
+          quantity: hasNull ? null : (newQty !== null ? Math.round(newQty * 100) / 100 : null)
+        };
+      })
+      .filter(Boolean);
+
+    await saveShoppingList(updatedRecipes, updatedItems);
+    return { success: true };
+  } catch (error: any) {
+    console.error('removeRecipeFromShoppingList error:', error);
+    return { error: 'DELETE_FAILED', message: error.message || 'Kunde inte ta bort receptet.' };
   }
 }
 

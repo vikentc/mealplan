@@ -20,12 +20,14 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Översikt', href: '/' },
   { label: 'Veckoplanering', href: '/planner' },
+  { label: 'Inköpslista', href: '/shopping-list' },
   { label: 'Skapa recept', href: '/recipes/add' },
 ];
 
 const ITEM_COLORS: Record<string, { bg: string; text: string }> = {
   '/': { bg: 'bg-cyan-100', text: 'text-cyan-950' },
   '/planner': { bg: 'bg-emerald-100', text: 'text-emerald-950' },
+  '/shopping-list': { bg: 'bg-amber-100', text: 'text-amber-950' },
   '/recipes/add': { bg: 'bg-red-100', text: 'text-red-950' },
 };
 
@@ -126,7 +128,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
                 href={item.href}
                 className={getNavItemStyle(item.href)}
               >
-                {item.href === '/' ? t('nav.overview') : item.href === '/planner' ? t('nav.planner') : t('nav.create')}
+                {item.href === '/' ? t('nav.overview') : item.href === '/planner' ? t('nav.planner') : item.href === '/shopping-list' ? t('nav.shopping_list') : t('nav.create')}
               </Link>
             ))}
           </nav>
@@ -199,7 +201,7 @@ export default function NavbarLayout({ children }: { children: React.ReactNode }
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={getMobileItemStyle(item.href)}
               >
-                {item.href === '/' ? t('nav.overview') : item.href === '/planner' ? t('nav.planner') : t('nav.create')}
+                {item.href === '/' ? t('nav.overview') : item.href === '/planner' ? t('nav.planner') : item.href === '/shopping-list' ? t('nav.shopping_list') : t('nav.create')}
               </Link>
             ))}
           </nav>

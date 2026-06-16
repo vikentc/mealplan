@@ -16,9 +16,10 @@ import {
   RotateCcw,
   Loader2,
   Check,
-  AlertCircle
+  AlertCircle,
+  ShoppingCart
 } from 'lucide-react';
-import { deleteRecipe } from '@/app/actions/recipes';
+import { deleteRecipe, addRecipeToShoppingList } from '@/app/actions/recipes';
 import { cn, getDifficultyColor, formatTime } from '@/lib/utils';
 import PortionScaler from './PortionScaler';
 import IngredientList from './IngredientList';
@@ -71,6 +72,36 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
   const [deleteStatus, setDeleteStatus] = useState<'idle' | 'confirming' | 'deleting' | 'success' | 'error'>('idle');
   const [deleteStatusMsg, setDeleteStatusMsg] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAddingToShoppingList, setIsAddingToShoppingList] = useState(false);
+  const [shoppingListFeedback, setShoppingListFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const handleAddToShoppingList = async () => {
+    setIsAddingToShoppingList(true);
+    setShoppingListFeedback(null);
+    try {
+      const res = await addRecipeToShoppingList(recipe.id, servings);
+      if (res.error) {
+        setShoppingListFeedback({
+          type: 'error',
+          message: language === 'sv' ? `Kunde inte spara: ${res.message}` : `Save error: ${res.message}`
+        });
+      } else {
+        setShoppingListFeedback({
+          type: 'success',
+          message: language === 'sv' ? 'Receptet och ingredienserna har lagts till i din inköpslista!' : 'Recipe and ingredients added to your shopping list!'
+        });
+      }
+    } catch (err: any) {
+      console.error(err);
+      setShoppingListFeedback({
+        type: 'error',
+        message: language === 'sv' ? 'Ett oväntat fel inträffade.' : 'An unexpected error occurred.'
+      });
+    } finally {
+      setIsAddingToShoppingList(false);
+      setTimeout(() => setShoppingListFeedback(null), 4000);
+    }
+  };
 
   const [checkedIngredients, setCheckedIngredients] = useState<Record<number, boolean>>({});
   const [checkedInstructions, setCheckedInstructions] = useState<Record<number, boolean>>({});
@@ -281,6 +312,49 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
             originalServings={recipe.servings}
             onChange={setServings}
           />
+
+          {/* Shopping List Action */}
+          {isLoggedIn ? (
+            <div className="space-y-3.5">
+              <button
+                type="button"
+                onClick={handleAddToShoppingList}
+                disabled={isAddingToShoppingList}
+                className="w-full py-3 bg-amber-100 hover:bg-amber-200 disabled:opacity-50 disabled:cursor-not-allowed text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isAddingToShoppingList ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>{language === 'sv' ? 'Lägger till...' : 'Adding...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4 w-4 text-foreground" />
+                    <span>{language === 'sv' ? 'Lägg till i inköpslista' : 'Add to shopping list'}</span>
+                  </>
+                )}
+              </button>
+              {shoppingListFeedback && (
+                <div className={cn(
+                  "p-3 border-2 rounded-xl flex items-start gap-2.5 text-xs font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)]",
+                  shoppingListFeedback.type === 'success' 
+                    ? "bg-emerald-50 border-emerald-500 text-emerald-800 shadow-[2px_2px_0px_0px_rgba(16,185,129,0.2)]" 
+                    : "bg-red-50 border-red-500 text-red-850 shadow-[2px_2px_0px_0px_rgba(239,68,68,0.2)]"
+                )}>
+                  {shoppingListFeedback.type === 'success' ? (
+                    <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
+                  )}
+                  <span>{shoppingListFeedback.message}</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="w-full p-3 bg-secondary/35 border-2 border-dashed border-foreground/30 rounded-xl text-center text-[10px] font-black uppercase text-foreground/50 tracking-wider">
+              🔒 {language === 'sv' ? 'Logga in för att använda inköpslistan' : 'Log in to use the shopping list'}
+            </div>
+          )}
 
           {/* Ingredients list */}
           <IngredientList

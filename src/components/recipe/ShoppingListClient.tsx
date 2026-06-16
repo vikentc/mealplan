@@ -64,6 +64,10 @@ export default function ShoppingListClient({
   // Status & Feedback states
   const [isSaving, setIsSaving] = useState(false);
   const [saveFeedback, setSaveFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  
+  // Custom dialog states
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   // 1. Toggle checked status
   const handleToggleChecked = (index: number) => {
@@ -79,7 +83,7 @@ export default function ShoppingListClient({
 
     const qty = customQty.trim() !== '' ? Number(customQty.replace(',', '.')) : null;
     if (qty !== null && isNaN(qty)) {
-      alert(language === 'sv' ? 'Mängd måste vara en siffra.' : 'Quantity must be a number.');
+      setAlertMessage(language === 'sv' ? 'Mängd måste vara en siffra.' : 'Quantity must be a number.');
       return;
     }
 
@@ -130,11 +134,35 @@ export default function ShoppingListClient({
     setItems(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
-  // 5. Clear all items and recipes
+  // 5. Clear all items and recipes (and save immediately)
   const handleClearAll = () => {
-    if (confirm(language === 'sv' ? 'Är du säker på att du vill rensa hela listan?' : 'Are you sure you want to clear the entire list?')) {
-      setRecipes([]);
-      setItems([]);
+    setIsClearConfirmOpen(true);
+  };
+
+  const executeClearAll = async () => {
+    setRecipes([]);
+    setItems([]);
+    
+    setIsSaving(true);
+    setSaveFeedback(null);
+    try {
+      await saveShoppingList([], []);
+      setSaveFeedback({
+        type: 'success',
+        message: language === 'sv' ? 'Inköpslistan har rensats och sparats!' : 'Shopping list has been cleared and saved!'
+      });
+      router.refresh();
+    } catch (error: any) {
+      console.error(error);
+      setSaveFeedback({
+        type: 'error',
+        message: language === 'sv' 
+          ? `Kunde inte spara rensningen: ${error.message || error}` 
+          : `Failed to save clear: ${error.message || error}`
+      });
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSaveFeedback(null), 4000);
     }
   };
 
@@ -453,6 +481,78 @@ export default function ShoppingListClient({
         </section>
 
       </div>
+
+      {/* Confirmation Modal */}
+      {isClearConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white border-3 border-foreground rounded-[2rem] p-6 max-w-sm w-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5">
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-red-100 border-2 border-foreground flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <Trash2 className="h-5 w-5 text-red-800" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-black text-sm uppercase tracking-wider text-foreground">
+                  {language === 'sv' ? 'Rensa inköpslista?' : 'Clear Shopping List?'}
+                </h4>
+                <p className="text-xs text-foreground/80 font-semibold mt-1">
+                  {language === 'sv' 
+                    ? 'Är du säker på att du vill rensa hela listan? Detta kan inte ångras och sparar listan direkt.' 
+                    : 'Are you sure you want to clear the entire list? This cannot be undone and saves the list immediately.'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsClearConfirmOpen(false)}
+                className="px-4 py-2 bg-secondary hover:bg-secondary/80 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+              >
+                {language === 'sv' ? 'Avbryt' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsClearConfirmOpen(false);
+                  executeClearAll();
+                }}
+                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+              >
+                {language === 'sv' ? 'Ja, rensa' : 'Yes, clear'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Alert Modal */}
+      {alertMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white border-3 border-foreground rounded-[2rem] p-6 max-w-sm w-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5">
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-amber-100 border-2 border-foreground flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <AlertCircle className="h-5 w-5 text-amber-850" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-black text-sm uppercase tracking-wider text-foreground">
+                  {language === 'sv' ? 'Uppmärksamhet' : 'Attention'}
+                </h4>
+                <p className="text-xs text-foreground/80 font-semibold mt-1">
+                  {alertMessage}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setAlertMessage(null)}
+                className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-foreground border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+              >
+                {language === 'sv' ? 'Stäng' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

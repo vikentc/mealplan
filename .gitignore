@@ -36,3 +36,4 @@ yarn-error.log*
 
 # Local application state files
 /plans.json
+/shopping-list.json

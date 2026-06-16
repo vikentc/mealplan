@@ -102,6 +102,7 @@ export default function WeeklyCalendar({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [activeSelectCell, setActiveSelectCell] = useState<{ day: string; slot: string } | null>(null);
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   
   const { t, language } = useLanguage();
   const dayNames = language === 'sv' ? dayNamesSv : dayNamesEn;
@@ -322,17 +323,19 @@ export default function WeeklyCalendar({
   };
 
   const handleClearAll = () => {
-    if (confirm(t('planner.confirm_clear'))) {
-      const clearedPlans: Record<string, Record<string, Recipe | null>> = {};
-      DAYS.forEach(day => {
-        clearedPlans[day] = {};
-        const slots = getSlotsForDay(day);
-        slots.forEach(slot => {
-          clearedPlans[day][slot] = null;
-        });
+    setIsClearConfirmOpen(true);
+  };
+
+  const executeClearAll = () => {
+    const clearedPlans: Record<string, Record<string, Recipe | null>> = {};
+    DAYS.forEach(day => {
+      clearedPlans[day] = {};
+      const slots = getSlotsForDay(day);
+      slots.forEach(slot => {
+        clearedPlans[day][slot] = null;
       });
-      setPlans(clearedPlans);
-    }
+    });
+    setPlans(clearedPlans);
   };
 
   // Filter recipes for dialog picker
@@ -635,6 +638,47 @@ export default function WeeklyCalendar({
                   {t('planner.no_matches')}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Confirmation Clear All Modal */}
+      {isClearConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white border-3 border-foreground rounded-[2rem] p-6 max-w-sm w-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5">
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-red-100 border-2 border-foreground flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <Trash2 className="h-5 w-5 text-red-800" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-black text-sm uppercase tracking-wider text-foreground">
+                  {language === 'sv' ? 'Rensa kalendern?' : 'Clear Weekly Planner?'}
+                </h4>
+                <p className="text-xs text-foreground/80 font-semibold mt-1">
+                  {t('planner.confirm_clear') || (language === 'sv' 
+                    ? 'Är du säker på att du vill rensa alla måltider från kalendern?' 
+                    : 'Are you sure you want to clear all scheduled meals?')}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsClearConfirmOpen(false)}
+                className="px-4 py-2 bg-secondary hover:bg-secondary/80 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+              >
+                {language === 'sv' ? 'Avbryt' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsClearConfirmOpen(false);
+                  executeClearAll();
+                }}
+                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+              >
+                {language === 'sv' ? 'Ja, rensa' : 'Yes, clear'}
+              </button>
             </div>
           </div>
         </div>

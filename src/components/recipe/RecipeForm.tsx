@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Trash2, Save, ChevronLeft, AlertCircle, ChefHat, GripVertical, Sparkles, Link2, Image as ImageIcon, Loader2, Check, FileText, Camera } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { createRecipe, updateRecipe, autofillFromUrl } from '@/app/actions/recipes';
+import { createRecipe, updateRecipe, autofillFromUrl, parseRecipeImageAction } from '@/app/actions/recipes';
 import { useLanguage } from '@/lib/i18n';
 import Tesseract from 'tesseract.js';
 import { classifyOcrText } from '@/lib/recipeParser';
@@ -152,7 +152,7 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
       urlPlaceholder: 'Klistra in länk till receptet (t.ex. köket.se, etc.)',
       btnFetch: 'Hämta',
       imageZone: 'Dra och släpp en receptbild här, eller klicka för att bläddra',
-      imageZoneSub: 'Stöder JPG, PNG. Textavläsning sker säkert i din webbläsare.',
+      imageZoneSub: 'Stöder JPG, PNG. Använder AI-avläsning (kräver GEMINI_API_KEY i .env) med lokal fallback.',
       applying: 'Applicerar...',
       appliedSuccess: 'Receptdata har hämtats! Kontrollera och redigera informationen nedan.',
       previewTitle: 'Identifierad receptinformation',
@@ -173,7 +173,7 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
       urlPlaceholder: 'Paste recipe link (e.g. foodnetwork.com, etc.)',
       btnFetch: 'Fetch',
       imageZone: 'Drag and drop a recipe image here, or click to browse',
-      imageZoneSub: 'Supports JPG, PNG. Text recognition runs securely in your browser.',
+      imageZoneSub: 'Supports JPG, PNG. Uses AI scanning (requires GEMINI_API_KEY in .env) with local fallback.',
       applying: 'Applying...',
       appliedSuccess: 'Recipe data extracted! Review and edit the details below.',
       previewTitle: 'Identified Recipe Information',
@@ -233,9 +233,29 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
     setAutofillError(null);
     setPreviewData(null);
     setAutofillProgress(0);
-    setAutofillStatus(lang === 'sv' ? 'Laddar OCR-motor...' : 'Loading OCR engine...');
+    setAutofillStatus(lang === 'sv' ? 'Läser av bild med AI...' : 'Analyzing image with AI...');
 
     try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const res = await parseRecipeImageAction(formData);
+
+      if (res.success && res.recipe) {
+        setPreviewData(res.recipe);
+        setAutofillStatus(lang === 'sv' ? 'Bilden har lästs med AI!' : 'Image read successfully with AI!');
+        return;
+      }
+
+      // Check if it's an API key missing error
+      if (res.error === 'API_KEY_MISSING') {
+        console.warn('Gemini API key missing, falling back to local OCR.');
+      } else {
+        console.error('AI OCR error:', res.message);
+      }
+
+      // Fallback to local Tesseract OCR
+      setAutofillStatus(lang === 'sv' ? 'Laddar lokal OCR-motor...' : 'Loading local OCR engine...');
       const imageUrl = URL.createObjectURL(file);
 
       const { data: { text } } = await Tesseract.recognize(
@@ -244,12 +264,12 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
         {
           logger: (m) => {
             if (m.status === 'recognizing text') {
-              setAutofillStatus(lang === 'sv' ? `Läser av text...` : `Recognizing text...`);
+              setAutofillStatus(lang === 'sv' ? `Läser av text lokalt... (${Math.round(m.progress * 100)}%)` : `Recognizing text locally... (${Math.round(m.progress * 100)}%)`);
               setAutofillProgress(m.progress);
             } else if (m.status === 'loading tesseract core') {
-              setAutofillStatus(lang === 'sv' ? 'Laddar core...' : 'Loading core...');
+              setAutofillStatus(lang === 'sv' ? 'Laddar lokal core...' : 'Loading local core...');
             } else if (m.status === 'initializing api') {
-              setAutofillStatus(lang === 'sv' ? 'Initierar api...' : 'Initializing api...');
+              setAutofillStatus(lang === 'sv' ? 'Initierar lokal api...' : 'Initializing local api...');
             }
           }
         }
@@ -277,7 +297,11 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
         ingredients: classified.ingredients as Ingredient[],
         instructions: classified.instructions
       });
-      setAutofillStatus(lang === 'sv' ? 'Texten har lästs och klassificerats!' : 'Text read and classified successfully!');
+      setAutofillStatus(
+        lang === 'sv' 
+          ? 'Texten har lästs lokalt! Tips: Lägg till GEMINI_API_KEY i .env för bättre resultat.' 
+          : 'Text read locally! Tip: Add GEMINI_API_KEY in .env for better results.'
+      );
     } catch (err: any) {
       console.error(err);
       setAutofillError(err.message || (lang === 'sv' ? 'Misslyckades med att läsa bilden.' : 'Failed to read the image.'));

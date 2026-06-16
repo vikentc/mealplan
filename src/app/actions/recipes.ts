@@ -6,6 +6,7 @@ import path from 'path';
 import { cookies } from 'next/headers';
 import { getTranslatedRecipe } from '@/lib/recipeTranslations';
 import { 
+  Ingredient,
   capitalizeWord, 
   decodeHtmlEntities, 
   parseIngredientLineHeuristic, 
@@ -1053,3 +1054,91 @@ function parseJsonLdRecipe(data: any, originalUrl: string) {
     }
   };
 }
+
+export async function parseRecipeImageAction(formData: FormData) {
+  try {
+    const file = formData.get('image') as File | null;
+    if (!file) {
+      return { error: 'NO_FILE', message: 'Ingen bild skickades.' };
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      return { 
+        error: 'API_KEY_MISSING',
+        message: 'GEMINI_API_KEY saknas i .env-filen. Lägg till din API-nyckel för exakt AI-avläsning.' 
+      };
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const base64Image = buffer.toString('base64');
+    const mimeType = file.type || 'image/jpeg';
+
+    const prompt = `Du är en expert på matlagning och recepttolkning. Läs den här bilden och extrahera receptet.
+Extrahera namnet på receptet, ingredienserna (med namn, mängd, enhet, samt om de är valfria) och tillagningsstegen.
+Receptets text ska extraheras på originalspråket (svenska om texten är på svenska).
+Säkerställ att mängder är siffror där det är möjligt (t.ex. 0.5 eller 1.5 istället för bråk som 1/2), och enheter är korrekta förkortningar (t.ex. "dl", "g", "st", "msk", "tsk").
+Om en ingrediens inte har någon mängd, sätt quantity till null.
+Om en ingrediens är valfri (t.ex. "valfritt" eller "till servering" under ingredienslistan), sätt optional till true.
+
+Returnera resultatet som en JSON-struktur med exakt detta format:
+{
+  "name": "Receptets namn",
+  "ingredients": [
+    { "name": "ingrediensens namn", "quantity": 3, "unit": "dl", "optional": false }
+  ],
+  "instructions": [
+    "Steg 1...",
+    "Steg 2..."
+  ]
+}`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: prompt },
+                {
+                  inlineData: {
+                    mimeType: mimeType,
+                    data: base64Image,
+                  },
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: 'application/json',
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Gemini API error:', errorText);
+      return { error: 'GEMINI_API_ERROR', message: `Fel vid anrop till Gemini API: ${response.statusText}` };
+    }
+
+    const data = await response.json();
+    const textResult = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!textResult) {
+      return { error: 'NO_TEXT_RETURNED', message: 'Inget svar returnerades från AI-modellen.' };
+    }
+
+    const parsedRecipe = JSON.parse(textResult.trim());
+    return { success: true, recipe: parsedRecipe };
+  } catch (error: any) {
+    console.error('parseRecipeImageAction error:', error);
+    return { error: 'INTERNAL_ERROR', message: error.message || 'Ett oväntat fel inträffade vid AI-avläsning.' };
+  }
+}
+

@@ -7509,5 +7509,108 @@
     },
     "createdAt": "2026-06-16T09:08:47.447Z",
     "updatedAt": "2026-06-16T09:08:47.447Z"
+  },
+  {
+    "id": "recipe_1781603763529",
+    "name": "Klassisk pizzadeg",
+    "url": "https://photos.app.goo.gl/2RnEhr5yhqZTxXSS8",
+    "description": null,
+    "image": "https://images.arla.com/recordid/7CEBD784-61E8-4D71-AF6988DC4A66439B/pizzadeg.jpg?width=1269&height=715&mode=crop&format=webp",
+    "preparationTime": 15,
+    "cookingTime": 20,
+    "totalTime": 35,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "International",
+    "countryOfOrigin": "Unknown",
+    "region": "Unknown",
+    "mealType": "dinner",
+    "occasions": [],
+    "flavorProfile": [],
+    "moodTags": [],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "Färsk jäst",
+        "quantity": 5,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "Kallt vatten",
+        "quantity": 3,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Strösocker",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "Salt",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "Olivolja",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "Vetemjöl",
+        "quantity": 6,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Vetemjöl (till utbakning)",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Bakplåtspapper",
+        "quantity": null,
+        "unit": null,
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Använd gärna köksmaskin monterad med degkrok.",
+      "Rör ihop jäst och vatten tills jästen löser sig.",
+      "Blanda i socker, salt och olja.",
+      "Arbeta in mjölet i 2-3 omgångar och blanda till en smidig deg, ca 10 minuter.",
+      "Täck bunken med plastfilm och låt pizzadegen jäsa 1.5 timme.",
+      "Ta upp degen på mjölat bakbord och dela den i 3 lika stora bitar.",
+      "Degbitarna kan frysas in och håller ca 1 månad.",
+      "Utbakning för 1 portionsstor rund pizza (25-30 cm i diameter) eller 1 rektangulär pizza (23 x 32 cm): Ta upp 1 bit deg på mjölat bakbord. Forma den till en bulle och låt jäsa under bakduk ca 20 minuter. Kavla eller dra ut degen till 1 rund pizza eller 1 rektangulär. Lägg pizzan på bakplåtspapper.",
+      "Utbakning för 2 runda mellanstora pizzor (17-20 cm i diameter) eller 2 avlånga pizzor (15 x 30 cm): Ta upp 1 bit deg på mjölat bakbord. Dela den i 2 delar och forma dem till bullar. Låt bullarna jäsa under bakduk ca 20 minuter. Kavla eller dra ut till 2 runda pizzor eller 2 avlånga pizzor. Lägg pizzorna på bakplåtspapper.",
+      "Utbakning för 4 små avlånga pizzor (ca 6 x 15 cm): Ta upp 1 bit deg på mjölat bakbord. Dela den i 4 delar och forma dem till bullar. Låt bullarna jäsa under bakduk ca 20 minuter. Kavla ut till 4 avlånga pizzor. Lägg pizzorna på bakplåtspapper.",
+      "Utbakning för 10 minipizzor (ca 9 cm i diameter): Ta upp 1 bit deg på mjölat bakbord. Forma den till en bulle och låt den jäsa ca 20 minuter. Kavla ut degen till 1 rektangulär botten, 23 x 32 cm. Ta ut 10 rundlar med kakmått, ca 9 cm i diameter. Lägg pizzorna på bakplåtspapper.",
+      "Utbakning för 1 familjepizza (ca 35 x 42 cm): Använd 2 bitar deg. Ta upp degen på mjölat bakbord och låt den jäsa ca 20 minuter. Kavla ut degen till 1 rektangulär pizza och lägg den på en ugnsplåt med bakplåtspapper."
+    ],
+    "nutrition": {
+      "calories": 0,
+      "protein": 0,
+      "carbohydrates": 0,
+      "fat": 0,
+      "fiber": 0,
+      "sugar": 0,
+      "sodium": 0,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "createdAt": "2026-06-16T09:56:03.529Z",
+    "updatedAt": "2026-06-16T09:58:35.009Z"
   }
 ]

@@ -1,6 +1,7 @@
 import React from 'react';
-import { getRecipes, getRecommendationsByCraving, getWeeklyPlan } from '@/app/actions/recipes';
+import { getRecipes, getRecommendationsByCraving, getWeeklyPlan, getShoppingList } from '@/app/actions/recipes';
 import HomeClient from '@/components/home/HomeClient';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +44,18 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const isSearchActive = !!filters.query;
   const isRecommendationActive = !isSearchActive && !!(mealType || craving || filters.cuisine || filters.flavor || filters.mood || filters.nutritionGoal);
 
+  // Fetch shopping list count if logged in
+  const cookieStore = await cookies();
+  const sessionUser = cookieStore.get('user_session')?.value;
+  let shoppingItemCount = 0;
+  if (sessionUser) {
+    const shoppingList = await getShoppingList();
+    if (shoppingList && Array.isArray(shoppingList.items)) {
+      // count unchecked items
+      shoppingItemCount = shoppingList.items.filter((item: any) => !item.checked).length;
+    }
+  }
+
   return (
     <HomeClient
       mealType={mealType}
@@ -51,6 +64,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       recipes={recipes}
       isSearchActive={isSearchActive}
       isRecommendationActive={isRecommendationActive}
+      shoppingItemCount={shoppingItemCount}
     />
   );
 }

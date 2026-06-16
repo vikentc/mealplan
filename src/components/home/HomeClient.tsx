@@ -29,6 +29,7 @@ interface HomeClientProps {
   recipes: any[];
   isSearchActive: boolean;
   isRecommendationActive: boolean;
+  shoppingItemCount?: number;
 }
 
 const mealTypeLabels: Record<string, string> = {
@@ -73,7 +74,8 @@ export default function HomeClient({
   filters,
   recipes,
   isSearchActive,
-  isRecommendationActive
+  isRecommendationActive,
+  shoppingItemCount = 0
 }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showRules, setShowRules] = useState(false);
@@ -135,6 +137,27 @@ export default function HomeClient({
 
   return (
     <div ref={containerRef} className="relative overflow-hidden px-3 -mx-3 space-y-10 pb-12">
+      
+      {/* Shopping List Quick Link Indicator */}
+      {shoppingItemCount > 0 && (
+        <div className="flex justify-center -mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+          <Link
+            href="/shopping-list"
+            className="flex items-center gap-2.5 px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-950 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600"></span>
+            </span>
+            <span>
+              {language === 'sv' 
+                ? `Du har ${shoppingItemCount} ${shoppingItemCount === 1 ? 'vara' : 'varor'} att handla i inköpslistan!` 
+                : `You have ${shoppingItemCount} ${shoppingItemCount === 1 ? 'item' : 'items'} in your shopping list!`}
+            </span>
+            <ChevronRight className="h-4.5 w-4.5 text-foreground group-hover:translate-x-1 transition-transform duration-200" />
+          </Link>
+        </div>
+      )}
       
       {/* Scroll-Parallax Floating Hipster Decors */}
       <motion.div 

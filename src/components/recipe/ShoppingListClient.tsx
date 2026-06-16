@@ -10,7 +10,8 @@ import {
   Loader2, 
   Utensils, 
   ShoppingCart,
-  FileText
+  FileText,
+  Pencil
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { saveShoppingList } from '@/app/actions/recipes';
@@ -69,6 +70,48 @@ export default function ShoppingListClient({
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const [isAddCustomOpen, setIsAddCustomOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
+  // Edit item states
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editQty, setEditQty] = useState('');
+  const [editUnit, setEditUnit] = useState('');
+
+  const handleStartEdit = (index: number) => {
+    const item = items[index];
+    setEditingIndex(index);
+    setEditName(item.name);
+    setEditQty(item.quantity !== null ? String(item.quantity) : '');
+    setEditUnit(item.unit || '');
+  };
+
+  const handleSaveEditItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingIndex === null) return;
+    if (!editName.trim()) return;
+
+    const qty = editQty.trim() !== '' ? Number(editQty.replace(',', '.')) : null;
+    if (qty !== null && isNaN(qty)) {
+      setAlertMessage(language === 'sv' ? 'Mängd måste vara en siffra.' : 'Quantity must be a number.');
+      return;
+    }
+
+    const updatedItems = items.map((item, idx) => {
+      if (idx === editingIndex) {
+        return {
+          ...item,
+          name: editName.trim(),
+          quantity: qty,
+          unit: editUnit.trim() || null,
+        };
+      }
+      return item;
+    });
+
+    setItems(updatedItems);
+    setEditingIndex(null);
+    await autoSave(recipes, updatedItems);
+  };
 
   // Helper to save changes automatically to backend
   const autoSave = async (updatedRecipes: RecipeInstance[], updatedItems: ShoppingItem[]) => {
@@ -355,6 +398,14 @@ export default function ShoppingListClient({
                             {item.quantity} {item.unit || ''}
                           </span>
                         )}
+                        <button
+                          onClick={() => handleStartEdit(globalIndex)}
+                          type="button"
+                          className="p-1 bg-amber-50 hover:bg-amber-200 border-2 border-foreground text-amber-900 rounded-md active:translate-y-[1px] cursor-pointer"
+                          title={language === 'sv' ? 'Redigera vara' : 'Edit item'}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
                         {item.isCustom && (
                           <button
                             onClick={() => handleRemoveCustomItem(globalIndex)}
@@ -417,6 +468,14 @@ export default function ShoppingListClient({
                           {item.quantity} {item.unit || ''}
                         </span>
                       )}
+                      <button
+                        onClick={() => handleStartEdit(globalIndex)}
+                        type="button"
+                        className="p-1 bg-amber-50 hover:bg-amber-200 border-2 border-foreground text-amber-900 rounded-md cursor-pointer"
+                        title={language === 'sv' ? 'Redigera vara' : 'Edit item'}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
                       {item.isCustom && (
                         <button
                           onClick={() => handleRemoveCustomItem(globalIndex)}
@@ -585,6 +644,86 @@ export default function ShoppingListClient({
                 >
                   <Plus className="h-4 w-4" />
                   <span>{language === 'sv' ? 'Lägg till' : 'Add'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Item Modal */}
+      {editingIndex !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white border-3 border-foreground rounded-[2rem] p-6 max-w-sm w-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center border-b-2 border-foreground/15 pb-2">
+              <h4 className="font-black text-sm uppercase tracking-wider text-foreground">
+                {language === 'sv' ? 'Redigera vara' : 'Edit Item'}
+              </h4>
+              <button
+                type="button"
+                onClick={() => setEditingIndex(null)}
+                className="text-foreground hover:text-red-600 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveEditItem} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">
+                  {language === 'sv' ? 'Artikelnamn' : 'Item Name'} *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">
+                    {language === 'sv' ? 'Mängd' : 'Quantity'}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="1.5"
+                    value={editQty}
+                    onChange={(e) => setEditQty(e.target.value)}
+                    className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-foreground/80 uppercase tracking-wider block">
+                    {language === 'sv' ? 'Enhet' : 'Unit'}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="st, dl, g"
+                    value={editUnit}
+                    onChange={(e) => setEditUnit(e.target.value)}
+                    className="w-full p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingIndex(null)}
+                  className="px-4 py-2 bg-secondary hover:bg-secondary/80 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                >
+                  {language === 'sv' ? 'Avbryt' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-amber-400 hover:bg-amber-500 text-foreground border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1"
+                >
+                  <Check className="h-4 w-4" />
+                  <span>{language === 'sv' ? 'Spara' : 'Save'}</span>
                 </button>
               </div>
             </form>

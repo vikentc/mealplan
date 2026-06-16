@@ -1133,3 +1133,93 @@ Returnera resultatet som en JSON-struktur med exakt detta format:
   }
 }
 
+export async function estimateNutritionAction(ingredients: Array<{ name: string; quantity: number | null; unit: string | null }>, servings: number) {
+  try {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      return { 
+        error: 'API_KEY_MISSING',
+        message: 'GEMINI_API_KEY saknas i .env-filen. Lägg till din API-nyckel för AI-beräkning.' 
+      };
+    }
+
+    if (!ingredients || ingredients.length === 0) {
+      return { error: 'NO_INGREDIENTS', message: 'Inga ingredienser angivna.' };
+    }
+
+    const ingredientLines = ingredients
+      .map(i => `${i.quantity !== null ? i.quantity : ''} ${i.unit || ''} ${i.name || ''}`.trim())
+      .filter(Boolean)
+      .join('\n');
+
+    const prompt = `Du är en expert på näringslära och dietetik. Beräkna ett uppskattat näringsvärde per portion för följande ingredienslista för ett recept som ger ${servings || 4} portioner.
+Ingredienser:
+${ingredientLines}
+
+Beräkna följande värden PER PORTION (per serving). Värdena ska vara realistiska, vetenskapligt rimliga uppskattningar baserade på ingredienserna.
+Returnera svaret i följande JSON-format med enbart siffror (inga enheter som "g" eller "mg" i värdena):
+{
+  "calories": 0,
+  "protein": 0,
+  "carbohydrates": 0,
+  "fat": 0,
+  "fiber": 0,
+  "sugar": 0,
+  "sodium": 0,
+  "iron": 0,
+  "calcium": 0,
+  "potassium": 0,
+  "magnesium": 0,
+  "vitaminA": 0,
+  "vitaminC": 0,
+  "vitaminD": 0,
+  "vitaminB12": 0
+}
+
+Viktigt:
+- Returnera ENBART JSON-objektet. Inga förklarande texter.
+- Alla värden ska vara för en (1) portion.
+- Använd 0 om näringsämnet inte finns i receptet.`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: prompt }
+              ],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: 'application/json',
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Gemini API error in estimateNutritionAction:', errorText);
+      return { error: 'GEMINI_API_ERROR', message: `Fel vid anrop till Gemini API: ${response.statusText}` };
+    }
+
+    const data = await response.json();
+    const textResult = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!textResult) {
+      return { error: 'NO_TEXT_RETURNED', message: 'Inget svar returnerades från AI-modellen.' };
+    }
+
+    const nutrition = JSON.parse(textResult.trim());
+    return { success: true, nutrition };
+  } catch (error: any) {
+    console.error('estimateNutritionAction error:', error);
+    return { error: 'INTERNAL_ERROR', message: error.message || 'Ett oväntat fel inträffade vid AI-beräkning.' };
+  }
+}
+

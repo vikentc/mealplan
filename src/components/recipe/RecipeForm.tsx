@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Trash2, Save, ChevronLeft, AlertCircle, ChefHat, GripVertical, Sparkles, Link2, Image as ImageIcon, Loader2, Check, FileText, Camera } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { createRecipe, updateRecipe, autofillFromUrl, parseRecipeImageAction } from '@/app/actions/recipes';
+import { createRecipe, updateRecipe, autofillFromUrl, parseRecipeImageAction, estimateNutritionAction } from '@/app/actions/recipes';
 import { useLanguage } from '@/lib/i18n';
 import Tesseract from 'tesseract.js';
 import { classifyOcrText } from '@/lib/recipeParser';
@@ -411,6 +411,71 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
     vitaminD: recipe?.nutrition?.vitaminD || 0,
     vitaminB12: recipe?.nutrition?.vitaminB12 || 0,
   });
+
+  const [isEstimatingNutrition, setIsEstimatingNutrition] = useState(false);
+  const [nutritionError, setNutritionError] = useState<string | null>(null);
+
+  const handleEstimateNutrition = async () => {
+    setIsEstimatingNutrition(true);
+    setNutritionError(null);
+    try {
+      const cleanIngredients = ingredients.filter(i => i.name && i.name.trim() !== '');
+      if (cleanIngredients.length === 0) {
+        setNutritionError(language === 'sv' ? 'Lägg till minst en ingrediens först.' : 'Please add at least one ingredient first.');
+        setIsEstimatingNutrition(false);
+        return;
+      }
+
+      const res = await estimateNutritionAction(cleanIngredients, servings);
+      if (res.error) {
+        setNutritionError(res.message || 'Error calculating nutrition');
+      } else if (res.success && res.nutrition) {
+        setNutrition({
+          calories: Number(res.nutrition.calories) || 0,
+          protein: Number(res.nutrition.protein) || 0,
+          carbohydrates: Number(res.nutrition.carbohydrates) || 0,
+          fat: Number(res.nutrition.fat) || 0,
+          fiber: Number(res.nutrition.fiber) || 0,
+          sugar: Number(res.nutrition.sugar) || 0,
+          sodium: Number(res.nutrition.sodium) || 0,
+          iron: Number(res.nutrition.iron) || 0,
+          calcium: Number(res.nutrition.calcium) || 0,
+          potassium: Number(res.nutrition.potassium) || 0,
+          magnesium: Number(res.nutrition.magnesium) || 0,
+          vitaminA: Number(res.nutrition.vitaminA) || 0,
+          vitaminC: Number(res.nutrition.vitaminC) || 0,
+          vitaminD: Number(res.nutrition.vitaminD) || 0,
+          vitaminB12: Number(res.nutrition.vitaminB12) || 0,
+        });
+      }
+    } catch (err: any) {
+      console.error(err);
+      setNutritionError(err.message || 'An error occurred during nutrition calculation.');
+    } finally {
+      setIsEstimatingNutrition(false);
+    }
+  };
+
+  const handleClearNutrition = () => {
+    setNutrition({
+      calories: 0,
+      protein: 0,
+      carbohydrates: 0,
+      fat: 0,
+      fiber: 0,
+      sugar: 0,
+      sodium: 0,
+      iron: 0,
+      calcium: 0,
+      potassium: 0,
+      magnesium: 0,
+      vitaminA: 0,
+      vitaminC: 0,
+      vitaminD: 0,
+      vitaminB12: 0,
+    });
+    setNutritionError(null);
+  };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1211,7 +1276,44 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
 
         {/* Section 5: Nutrition Information */}
         <section className="bg-card border-3 border-foreground p-6 md:p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5 bg-[radial-gradient(rgba(0,0,0,0.02)_1.5px,transparent_1.5px)] [background-size:16px_16px]">
-          <h3 className="font-black text-lg text-foreground uppercase tracking-tight">{t('form.nutrition')}</h3>
+          <div className="flex justify-between items-center gap-2 flex-wrap">
+            <h3 className="font-black text-lg text-foreground uppercase tracking-tight">{t('form.nutrition')}</h3>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={handleEstimateNutrition}
+                disabled={isEstimatingNutrition}
+                className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-foreground border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isEstimatingNutrition ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>{language === 'sv' ? 'Beräknar...' : 'Estimating...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 fill-current" />
+                    <span>{language === 'sv' ? 'Beräkna med AI' : 'Estimate with AI'}</span>
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={handleClearNutrition}
+                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>{language === 'sv' ? 'Rensa alla' : 'Clear all'}</span>
+              </button>
+            </div>
+          </div>
+
+          {nutritionError && (
+            <div className="p-3.5 bg-red-50 border-2 border-red-500 rounded-xl flex items-start gap-2.5 text-xs text-red-850 font-semibold shadow-[2px_2px_0px_0px_rgba(239,68,68,0.2)]">
+              <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
+              <span>{nutritionError}</span>
+            </div>
+          )}
           
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4">
             <div className="space-y-1.5">

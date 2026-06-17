@@ -157,7 +157,10 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
     setDeleteStatus('deleting');
     setDeleteStatusMsg(language === 'sv' ? 'Tar bort receptet...' : 'Deleting recipe...');
     try {
-      await deleteRecipe(recipe.id);
+      const result = await deleteRecipe(recipe.id);
+      if (result && (result as any).error) {
+        throw new Error((result as any).message || (result as any).error);
+      }
       setDeleteStatus('success');
       setDeleteStatusMsg(language === 'sv' ? 'Receptet har tagits bort framgångsrikt! Omdirigerar...' : 'Recipe has been deleted successfully! Redirecting...');
       

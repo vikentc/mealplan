@@ -683,7 +683,10 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
     try {
       if (isEdit && recipe?.id) {
         setSubmitStatusMsg(lang === 'sv' ? 'Sparar uppdateringar i databasen...' : 'Saving updates to database...');
-        await updateRecipe(recipe.id, formData);
+        const res = await updateRecipe(recipe.id, formData);
+        if (res && (res as any).error) {
+          throw new Error((res as any).message || (res as any).error);
+        }
         setSubmitStatus('success');
         setSubmitStatusMsg(lang === 'sv' ? 'Receptet uppdaterat! Omdirigerar...' : 'Recipe updated! Redirecting...');
         setTimeout(() => {
@@ -693,6 +696,9 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
       } else {
         setSubmitStatusMsg(lang === 'sv' ? 'Skapar och sparar receptet...' : 'Creating and saving recipe...');
         const newRecipe = await createRecipe(formData);
+        if (newRecipe && (newRecipe as any).error) {
+          throw new Error((newRecipe as any).message || (newRecipe as any).error);
+        }
         setSubmitStatus('success');
         setSubmitStatusMsg(lang === 'sv' ? 'Receptet skapat! Omdirigerar...' : 'Recipe created! Redirecting...');
         setTimeout(() => {

@@ -149,7 +149,10 @@ async function runWithFallback<T>(
   } catch (error: any) {
     if (isWrite && process.env.NODE_ENV === 'production') {
       console.error('Database mutation failed in production:', error.message || error);
-      throw error;
+      return {
+        error: 'DATABASE_MUTATION_FAILED',
+        message: error.message || String(error)
+      } as any;
     }
     // Fall back to local file state if DB fails
     console.warn('Database access failed, falling back to local file state:', error.message || error);

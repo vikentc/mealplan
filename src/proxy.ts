@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const sessionUser = request.cookies.get('user_session')?.value;
   const { pathname } = request.nextUrl;
 
@@ -30,7 +30,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Optimization: limit the middleware execution scope
+// Optimization: limit the execution scope
 export const config = {
   matcher: [
     '/planner/:path*',

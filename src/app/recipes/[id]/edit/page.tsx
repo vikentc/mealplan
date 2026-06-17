@@ -16,17 +16,13 @@ export default async function EditRecipePage({ params }: EditRecipePageProps) {
   const id = resolvedParams.id;
   const recipe = await getRecipeById(id);
 
-  if (!recipe) {
-    notFound();
-  }
-
-  // Cast Json properties for TS compatibility in Form
-  const formattedRecipe = {
+  // Cast Json properties for TS compatibility in Form if recipe exists
+  const formattedRecipe = recipe ? {
     ...recipe,
     ingredients: recipe.ingredients as any[],
     instructions: recipe.instructions as string[],
     nutrition: recipe.nutrition as any
-  };
+  } : null;
 
-  return <RecipeForm recipe={formattedRecipe} />;
+  return <RecipeForm recipe={formattedRecipe} fallbackId={id} />;
 }

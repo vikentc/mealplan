@@ -87,6 +87,7 @@ export default function HomeClient({
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [itemCount, setItemCount] = useState(shoppingItemCount);
+  const [displayRecipes, setDisplayRecipes] = useState<any[]>(recipes);
   const { t, language } = useLanguage();
 
   useEffect(() => {
@@ -112,6 +113,83 @@ export default function HomeClient({
       }
     }
   }, [shoppingItemCount]);
+
+  useEffect(() => {
+    let localRecipes: any[] = [];
+    if (typeof window !== 'undefined') {
+      const localRecipesStore = localStorage.getItem('local-recipes');
+      if (localRecipesStore) {
+        try {
+          const parsed = JSON.parse(localRecipesStore);
+          if (Array.isArray(parsed)) {
+            localRecipes = parsed;
+          }
+        } catch (e) {
+          console.error('Failed to parse local recipes in HomeClient:', e);
+        }
+      }
+    }
+
+    // Filter local recipes based on active query & tags
+    const filteredLocal = localRecipes.filter(recipe => {
+      // 1. Filter by mealType
+      if (mealType && !(recipe.mealTypes || []).some((m: string) => m.toLowerCase() === mealType.toLowerCase())) {
+        return false;
+      }
+      
+      // 2. Filter by craving/mood
+      if (craving) {
+        const cravingMatch = (recipe.moodTags || []).some((m: string) => m.toLowerCase() === craving.toLowerCase()) ||
+                             (recipe.flavorProfile || []).some((f: string) => f.toLowerCase() === craving.toLowerCase());
+        if (!cravingMatch) return false;
+      }
+
+      // 3. Filter by cuisine
+      if (filters.cuisine && recipe.cuisine?.toLowerCase() !== filters.cuisine.toLowerCase()) {
+        return false;
+      }
+
+      // 4. Filter by query
+      if (filters.query) {
+        const q = filters.query.toLowerCase();
+        const nameMatch = recipe.name?.toLowerCase().includes(q);
+        const descMatch = recipe.description?.toLowerCase().includes(q);
+        const ingMatch = (recipe.ingredients || []).some((ing: any) => ing.name?.toLowerCase().includes(q));
+        if (!nameMatch && !descMatch && !ingMatch) return false;
+      }
+
+      // 5. Filter by flavor
+      if (filters.flavor && !(recipe.flavorProfile || []).some((f: string) => f.toLowerCase() === filters.flavor.toLowerCase())) {
+        return false;
+      }
+
+      // 6. Filter by mood
+      if (filters.mood && !(recipe.moodTags || []).some((m: string) => m.toLowerCase() === filters.mood.toLowerCase())) {
+        return false;
+      }
+
+      // 7. Filter by nutritionGoal
+      if (filters.nutritionGoal) {
+        const goal = filters.nutritionGoal.toLowerCase();
+        const calories = recipe.nutrition?.calories || 0;
+        const protein = recipe.nutrition?.protein || 0;
+        const carbs = recipe.nutrition?.carbohydrates || 0;
+        
+        if (goal === 'high protein' && protein < 20) return false;
+        if (goal === 'low carb' && carbs > 15) return false;
+        if (goal === 'low calorie' && calories > 400) return false;
+      }
+
+      return true;
+    });
+
+    // Merge and remove duplicates by ID
+    const merged = [...filteredLocal, ...recipes];
+    const uniqueMap = new Map();
+    merged.forEach(r => uniqueMap.set(r.id, r));
+    
+    setDisplayRecipes(Array.from(uniqueMap.values()));
+  }, [recipes, mealType, craving, filters]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -265,15 +343,15 @@ export default function HomeClient({
       <div className="border-b-3 border-foreground pb-2 pt-2">
         <h3 className="font-black text-lg text-foreground uppercase tracking-tight flex items-center gap-2.5">
           <ChefHat className="h-5.5 w-5.5 text-foreground animate-pulse" />
-          <span>{sectionTitle} ({recipes.length} {language === 'sv' ? 'st' : 'pcs'})</span>
+          <span>{sectionTitle} ({displayRecipes.length} {language === 'sv' ? 'st' : 'pcs'})</span>
         </h3>
       </div>
 
       {/* Grid displaying matching results */}
-      {recipes.length > 0 ? (
+      {displayRecipes.length > 0 ? (
         isRecommendationActive ? (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {recipes.map((recipe: any) => {
+            {displayRecipes.map((recipe: any) => {
               const primaryMealType = Array.isArray(recipe.mealTypes) && recipe.mealTypes.length > 0 
                 ? recipe.mealTypes[0] 
                 : (recipe.mealType || 'dinner');
@@ -293,7 +371,7 @@ export default function HomeClient({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {recipes.map((recipe: any) => (
+            {displayRecipes.map((recipe: any) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
           </div>

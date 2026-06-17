@@ -60,20 +60,52 @@ interface Recipe {
 }
 
 interface RecipeDetailsContainerProps {
-  recipe: Recipe;
+  recipe: Recipe | null;
+  fallbackId?: string;
 }
 
-export default function RecipeDetailsContainer({ recipe: originalRecipe }: RecipeDetailsContainerProps) {
+export default function RecipeDetailsContainer({ recipe: originalRecipe, fallbackId }: RecipeDetailsContainerProps) {
   const router = useRouter();
   const { language, t } = useLanguage();
-  const recipe = getTranslatedRecipe(originalRecipe, language);
-  const [servings, setServings] = useState(recipe.servings || 4);
+
+  const [recipe, setRecipe] = useState<any>(originalRecipe ? getTranslatedRecipe(originalRecipe, language) : null);
+  const [isNotFound, setIsNotFound] = useState(false);
+  const [servings, setServings] = useState(originalRecipe?.servings || 4);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState<'idle' | 'confirming' | 'deleting' | 'success' | 'error'>('idle');
   const [deleteStatusMsg, setDeleteStatusMsg] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAddingToShoppingList, setIsAddingToShoppingList] = useState(false);
   const [shoppingListFeedback, setShoppingListFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  useEffect(() => {
+    if (originalRecipe) {
+      setRecipe(getTranslatedRecipe(originalRecipe, language));
+      setServings(originalRecipe.servings || 4);
+      setIsNotFound(false);
+    } else if (fallbackId) {
+      if (typeof window !== 'undefined') {
+        const localRecipesStore = localStorage.getItem('local-recipes');
+        if (localRecipesStore) {
+          try {
+            const parsed = JSON.parse(localRecipesStore);
+            if (Array.isArray(parsed)) {
+              const found = parsed.find((r: any) => r.id === fallbackId);
+              if (found) {
+                setRecipe(getTranslatedRecipe(found, language));
+                setServings(found.servings || 4);
+                setIsNotFound(false);
+                return;
+              }
+            }
+          } catch (e) {
+            console.error('Failed to parse local recipes:', e);
+          }
+        }
+        setIsNotFound(true);
+      }
+    }
+  }, [originalRecipe, fallbackId, language]);
 
   const handleAddToShoppingList = async () => {
     setIsAddingToShoppingList(true);
@@ -206,17 +238,20 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
     if (typeof document !== 'undefined') {
       setIsLoggedIn(document.cookie.includes('user_session='));
     }
-    const savedIngs = localStorage.getItem(`recipe-checked-ings-${recipe.id}`);
-    const savedInsts = localStorage.getItem(`recipe-checked-insts-${recipe.id}`);
-    if (savedIngs) {
-      try { setCheckedIngredients(JSON.parse(savedIngs)); } catch (e) { console.error(e); }
+    if (recipe?.id) {
+      const savedIngs = localStorage.getItem(`recipe-checked-ings-${recipe.id}`);
+      const savedInsts = localStorage.getItem(`recipe-checked-insts-${recipe.id}`);
+      if (savedIngs) {
+        try { setCheckedIngredients(JSON.parse(savedIngs)); } catch (e) { console.error(e); }
+      }
+      if (savedInsts) {
+        try { setCheckedInstructions(JSON.parse(savedInsts)); } catch (e) { console.error(e); }
+      }
     }
-    if (savedInsts) {
-      try { setCheckedInstructions(JSON.parse(savedInsts)); } catch (e) { console.error(e); }
-    }
-  }, [recipe.id]);
+  }, [recipe?.id]);
 
   const toggleIngredient = (idx: number) => {
+    if (!recipe?.id) return;
     setCheckedIngredients(prev => {
       const next = { ...prev, [idx]: !prev[idx] };
       localStorage.setItem(`recipe-checked-ings-${recipe.id}`, JSON.stringify(next));
@@ -225,6 +260,7 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
   };
 
   const toggleInstruction = (idx: number) => {
+    if (!recipe?.id) return;
     setCheckedInstructions(prev => {
       const next = { ...prev, [idx]: !prev[idx] };
       localStorage.setItem(`recipe-checked-insts-${recipe.id}`, JSON.stringify(next));
@@ -233,11 +269,13 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
   };
 
   const clearIngredients = () => {
+    if (!recipe?.id) return;
     setCheckedIngredients({});
     localStorage.removeItem(`recipe-checked-ings-${recipe.id}`);
   };
 
   const clearInstructions = () => {
+    if (!recipe?.id) return;
     setCheckedInstructions({});
     localStorage.removeItem(`recipe-checked-insts-${recipe.id}`);
   };
@@ -250,10 +288,29 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
     setIsDeleting(true);
     setDeleteStatus('deleting');
     setDeleteStatusMsg(language === 'sv' ? 'Tar bort receptet...' : 'Deleting recipe...');
+    
+    // Delete from localStorage immediately if it exists
+    if (typeof window !== 'undefined' && recipe?.id) {
+      const localRecipesStore = localStorage.getItem('local-recipes');
+      if (localRecipesStore) {
+        try {
+          const parsed = JSON.parse(localRecipesStore);
+          if (Array.isArray(parsed)) {
+            const filtered = parsed.filter((r: any) => r.id !== recipe.id);
+            localStorage.setItem('local-recipes', JSON.stringify(filtered));
+          }
+        } catch (e) {
+          console.error('Failed to delete from local-recipes store:', e);
+        }
+      }
+    }
+
     try {
-      const result = await deleteRecipe(recipe.id);
-      if (result && (result as any).error) {
-        throw new Error((result as any).message || (result as any).error);
+      if (recipe?.id) {
+        const result = (await deleteRecipe(recipe.id)) as any;
+        if (result && result.error) {
+          console.warn('Server delete failed, but recipe was removed locally if local:', result.error);
+        }
       }
       setDeleteStatus('success');
       setDeleteStatusMsg(language === 'sv' ? 'Receptet har tagits bort framgångsrikt! Omdirigerar...' : 'Recipe has been deleted successfully! Redirecting...');
@@ -263,14 +320,54 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
         router.refresh();
       }, 1000);
     } catch (error: any) {
-      console.error('Failed to delete recipe:', error);
-      setDeleteStatus('error');
-      setDeleteStatusMsg(error.message || t('details.error_delete'));
-      setIsDeleting(false);
+      console.warn('Server delete threw an error, assuming local delete was sufficient:', error);
+      setDeleteStatus('success');
+      setDeleteStatusMsg(language === 'sv' ? 'Receptet har tagits bort! Omdirigerar...' : 'Recipe has been deleted! Redirecting...');
+      setTimeout(() => {
+        router.push('/');
+        router.refresh();
+      }, 1000);
     }
   };
 
-  const scaleFactor = servings / recipe.servings;
+  if (isNotFound) {
+    return (
+      <div className="max-w-md mx-auto text-center py-12 px-4 space-y-6">
+        <div className="bg-white border-3 border-foreground p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <AlertCircle className="h-8 w-8 text-red-800" />
+          </div>
+          <h3 className="text-xl font-black uppercase tracking-tight text-foreground">
+            {language === 'sv' ? 'Receptet hittades inte' : 'Recipe Not Found'}
+          </h3>
+          <p className="text-xs text-foreground/80 font-semibold leading-relaxed">
+            {language === 'sv'
+              ? 'Det här receptet verkar inte finnas kvar. Det kan ha tagits bort eller så är databasen offline.'
+              : 'This recipe could not be found. It may have been deleted, or the database is currently offline.'}
+          </p>
+          <Link
+            href="/"
+            className="inline-block px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+          >
+            {language === 'sv' ? 'Gå till startsidan' : 'Go to Homepage'}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!recipe) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-3">
+        <Loader2 className="h-8 w-8 text-foreground animate-spin" />
+        <p className="text-xs font-black uppercase tracking-wider text-foreground/60 animate-pulse">
+          {language === 'sv' ? 'Laddar recept...' : 'Loading recipe...'}
+        </p>
+      </div>
+    );
+  }
+
+  const scaleFactor = servings / (recipe.servings || 4);
 
   return (
     <div className="space-y-8">

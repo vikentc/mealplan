@@ -16,9 +16,5 @@ export default async function RecipeDetailsPage({ params }: RecipePageProps) {
   const id = resolvedParams.id;
   const recipe = await getRecipeById(id);
 
-  if (!recipe) {
-    notFound();
-  }
-
-  return <RecipeDetailsContainer recipe={recipe} />;
+  return <RecipeDetailsContainer recipe={recipe} fallbackId={id} />;
 }

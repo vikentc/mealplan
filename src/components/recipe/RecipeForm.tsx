@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Trash2, Save, ChevronLeft, AlertCircle, ChefHat, GripVertical, Sparkles, Link2, Image as ImageIcon, Loader2, Check, FileText, Camera } from 'lucide-react';
 import Link from 'next/link';
@@ -60,7 +60,8 @@ interface Recipe {
 }
 
 interface RecipeFormProps {
-  recipe?: Recipe; // If provided, we are in Edit mode
+  recipe?: Recipe | null; // If provided, we are in Edit mode
+  fallbackId?: string;
 }
 
 const CUISINES = ['Vietnamese', 'Thai', 'Japanese', 'Swedish', 'Italian', 'Mexican', 'American', 'French', 'Indian', 'Greek', 'Spanish', 'Chinese', 'International'];
@@ -99,11 +100,11 @@ const mealTypeLabels: Record<string, string> = {
   'snack': 'Mellanmål'
 };
 
-export default function RecipeForm({ recipe }: RecipeFormProps) {
+export default function RecipeForm({ recipe: initialRecipe, fallbackId }: RecipeFormProps) {
   const router = useRouter();
   const { t, language } = useLanguage();
   const lang = language === 'en' ? 'en' : 'sv';
-  const isEdit = !!recipe;
+  const isEdit = !!initialRecipe || !!fallbackId;
 
   const [backUrl, setBackUrl] = useState<string | null>(null);
 
@@ -368,49 +369,111 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
   };
 
   // Form State
-  const [name, setName] = useState(recipe?.name || '');
-  const [description, setDescription] = useState(recipe?.description || '');
-  const [image, setImage] = useState(recipe?.image || '');
-  const [url, setUrl] = useState(recipe?.url || '');
-  const [preparationTime, setPreparationTime] = useState(recipe?.preparationTime || 15);
-  const [cookingTime, setCookingTime] = useState(recipe?.cookingTime || 20);
-  const [servings, setServings] = useState(recipe?.servings || 4);
-  const [difficulty, setDifficulty] = useState(recipe?.difficulty || 'Medium');
-  const [cuisine, setCuisine] = useState(recipe?.cuisine || 'International');
+  const [recipeState, setRecipeState] = useState<any>(initialRecipe);
+  const recipe = recipeState || initialRecipe;
+
+  const [name, setName] = useState(initialRecipe?.name || '');
+  const [description, setDescription] = useState(initialRecipe?.description || '');
+  const [image, setImage] = useState(initialRecipe?.image || '');
+  const [url, setUrl] = useState(initialRecipe?.url || '');
+  const [preparationTime, setPreparationTime] = useState(initialRecipe?.preparationTime || 15);
+  const [cookingTime, setCookingTime] = useState(initialRecipe?.cookingTime || 20);
+  const [servings, setServings] = useState(initialRecipe?.servings || 4);
+  const [difficulty, setDifficulty] = useState(initialRecipe?.difficulty || 'Medium');
+  const [cuisine, setCuisine] = useState(initialRecipe?.cuisine || 'International');
   const [mealTypes, setMealTypes] = useState<string[]>(
-    recipe?.mealTypes || (recipe?.mealType ? [recipe.mealType] : ['dinner'])
+    initialRecipe?.mealTypes || (initialRecipe?.mealType ? [initialRecipe.mealType] : ['dinner'])
   );
 
   // Arrays
   const [ingredients, setIngredients] = useState<Ingredient[]>(
-    recipe?.ingredients || [{ name: '', quantity: null, unit: '', optional: false }]
+    initialRecipe?.ingredients || [{ name: '', quantity: null, unit: '', optional: false }]
   );
   const [instructions, setInstructions] = useState<string[]>(
-    recipe?.instructions || ['']
+    initialRecipe?.instructions || ['']
   );
   
-  const [occasions, setOccasions] = useState<string[]>(recipe?.occasions || []);
-  const [flavorProfile, setFlavorProfile] = useState<string[]>(recipe?.flavorProfile || []);
-  const [moodTags, setMoodTags] = useState<string[]>(recipe?.moodTags || []);
+  const [occasions, setOccasions] = useState<string[]>(initialRecipe?.occasions || []);
+  const [flavorProfile, setFlavorProfile] = useState<string[]>(initialRecipe?.flavorProfile || []);
+  const [moodTags, setMoodTags] = useState<string[]>(initialRecipe?.moodTags || []);
 
   // Nutrition
   const [nutrition, setNutrition] = useState<Nutrition>({
-    calories: recipe?.nutrition?.calories || 0,
-    protein: recipe?.nutrition?.protein || 0,
-    carbohydrates: recipe?.nutrition?.carbohydrates || 0,
-    fat: recipe?.nutrition?.fat || 0,
-    fiber: recipe?.nutrition?.fiber || 0,
-    sugar: recipe?.nutrition?.sugar || 0,
-    sodium: recipe?.nutrition?.sodium || 0,
-    iron: recipe?.nutrition?.iron || 0,
-    calcium: recipe?.nutrition?.calcium || 0,
-    potassium: recipe?.nutrition?.potassium || 0,
-    magnesium: recipe?.nutrition?.magnesium || 0,
-    vitaminA: recipe?.nutrition?.vitaminA || 0,
-    vitaminC: recipe?.nutrition?.vitaminC || 0,
-    vitaminD: recipe?.nutrition?.vitaminD || 0,
-    vitaminB12: recipe?.nutrition?.vitaminB12 || 0,
+    calories: initialRecipe?.nutrition?.calories || 0,
+    protein: initialRecipe?.nutrition?.protein || 0,
+    carbohydrates: initialRecipe?.nutrition?.carbohydrates || 0,
+    fat: initialRecipe?.nutrition?.fat || 0,
+    fiber: initialRecipe?.nutrition?.fiber || 0,
+    sugar: initialRecipe?.nutrition?.sugar || 0,
+    sodium: initialRecipe?.nutrition?.sodium || 0,
+    iron: initialRecipe?.nutrition?.iron || 0,
+    calcium: initialRecipe?.nutrition?.calcium || 0,
+    potassium: initialRecipe?.nutrition?.potassium || 0,
+    magnesium: initialRecipe?.nutrition?.magnesium || 0,
+    vitaminA: initialRecipe?.nutrition?.vitaminA || 0,
+    vitaminC: initialRecipe?.nutrition?.vitaminC || 0,
+    vitaminD: initialRecipe?.nutrition?.vitaminD || 0,
+    vitaminB12: initialRecipe?.nutrition?.vitaminB12 || 0,
   });
+
+  // Load from local-recipes if fallbackId is provided and initialRecipe is null
+  useEffect(() => {
+    if (initialRecipe) {
+      setName(initialRecipe.name || '');
+      setDescription(initialRecipe.description || '');
+      setImage(initialRecipe.image || '');
+      setUrl(initialRecipe.url || '');
+      setPreparationTime(initialRecipe.preparationTime || 15);
+      setCookingTime(initialRecipe.cookingTime || 20);
+      setServings(initialRecipe.servings || 4);
+      setDifficulty(initialRecipe.difficulty || 'Medium');
+      setCuisine(initialRecipe.cuisine || 'International');
+      setMealTypes(initialRecipe.mealTypes || (initialRecipe.mealType ? [initialRecipe.mealType] : ['dinner']));
+      setOccasions(initialRecipe.occasions || []);
+      setFlavorProfile(initialRecipe.flavorProfile || []);
+      setMoodTags(initialRecipe.moodTags || []);
+      setIngredients(initialRecipe.ingredients || [{ name: '', quantity: null, unit: '', optional: false }]);
+      setInstructions(initialRecipe.instructions || ['']);
+      if (initialRecipe.nutrition) {
+        setNutrition(initialRecipe.nutrition);
+      }
+    } else if (fallbackId) {
+      if (typeof window !== 'undefined') {
+        const localRecipesStore = localStorage.getItem('local-recipes');
+        if (localRecipesStore) {
+          try {
+            const parsed = JSON.parse(localRecipesStore);
+            if (Array.isArray(parsed)) {
+              const found = parsed.find((r: any) => r.id === fallbackId);
+              if (found) {
+                setRecipeState(found);
+                setName(found.name || '');
+                setDescription(found.description || '');
+                setImage(found.image || '');
+                setUrl(found.url || '');
+                setPreparationTime(found.preparationTime || 15);
+                setCookingTime(found.cookingTime || 20);
+                setServings(found.servings || 4);
+                setDifficulty(found.difficulty || 'Medium');
+                setCuisine(found.cuisine || 'International');
+                setMealTypes(found.mealTypes || (found.mealType ? [found.mealType] : ['dinner']));
+                setOccasions(found.occasions || []);
+                setFlavorProfile(found.flavorProfile || []);
+                setMoodTags(found.moodTags || []);
+                setIngredients(found.ingredients || [{ name: '', quantity: null, unit: '', optional: false }]);
+                setInstructions(found.instructions || ['']);
+                if (found.nutrition) {
+                  setNutrition(found.nutrition);
+                }
+              }
+            }
+          } catch (e) {
+            console.error('Failed to parse local recipes for editing in RecipeForm:', e);
+          }
+        }
+      }
+    }
+  }, [initialRecipe, fallbackId]);
 
   const [isEstimatingNutrition, setIsEstimatingNutrition] = useState(false);
   const [nutritionError, setNutritionError] = useState<string | null>(null);
@@ -680,31 +743,110 @@ export default function RecipeForm({ recipe }: RecipeFormProps) {
       nutrition
     };
 
-    try {
-      if (isEdit && recipe?.id) {
-        setSubmitStatusMsg(lang === 'sv' ? 'Sparar uppdateringar i databasen...' : 'Saving updates to database...');
-        const res = await updateRecipe(recipe.id, formData);
-        if (res && (res as any).error) {
-          throw new Error((res as any).message || (res as any).error);
+    // Helper to save recipe locally
+    const saveLocalRecipe = (recipeObj: any) => {
+      if (typeof window !== 'undefined') {
+        const localRecipesStore = localStorage.getItem('local-recipes');
+        let localRecipes: any[] = [];
+        if (localRecipesStore) {
+          try {
+            localRecipes = JSON.parse(localRecipesStore) || [];
+          } catch (e) {
+            console.error(e);
+          }
         }
-        setSubmitStatus('success');
-        setSubmitStatusMsg(lang === 'sv' ? 'Receptet uppdaterat! Omdirigerar...' : 'Recipe updated! Redirecting...');
+        localRecipes = localRecipes.filter((r: any) => r.id !== recipeObj.id);
+        localRecipes.push(recipeObj);
+        localStorage.setItem('local-recipes', JSON.stringify(localRecipes));
+      }
+    };
+
+    try {
+      const targetId = initialRecipe?.id || fallbackId;
+      
+      if (isEdit && targetId) {
+        setSubmitStatusMsg(lang === 'sv' ? 'Sparar uppdateringar...' : 'Saving updates...');
+        
+        try {
+          const res = await updateRecipe(targetId, formData);
+          if (res && !(res as any).error) {
+            saveLocalRecipe(res);
+            setSubmitStatus('success');
+            setSubmitStatusMsg(lang === 'sv' ? 'Receptet uppdaterat! Omdirigerar...' : 'Recipe updated! Redirecting...');
+          } else {
+            // Server error fallback
+            const fallbackUpdated = {
+              id: targetId,
+              ...formData,
+              updatedAt: new Date().toISOString()
+            };
+            saveLocalRecipe(fallbackUpdated);
+            setSubmitStatus('success');
+            setSubmitStatusMsg(lang === 'sv' ? 'Receptet uppdaterat lokalt! Omdirigerar...' : 'Recipe updated locally! Redirecting...');
+          }
+        } catch (serverErr) {
+          console.warn('Server update failed, falling back to local update:', serverErr);
+          const fallbackUpdated = {
+            id: targetId,
+            ...formData,
+            updatedAt: new Date().toISOString()
+          };
+          saveLocalRecipe(fallbackUpdated);
+          setSubmitStatus('success');
+          setSubmitStatusMsg(lang === 'sv' ? 'Receptet uppdaterat lokalt! Omdirigerar...' : 'Recipe updated locally! Redirecting...');
+        }
+
         setTimeout(() => {
-          router.push(backUrl || `/recipes/${recipe.id}`);
+          router.push(backUrl || `/recipes/${targetId}`);
           router.refresh();
         }, 1000);
       } else {
         setSubmitStatusMsg(lang === 'sv' ? 'Skapar och sparar receptet...' : 'Creating and saving recipe...');
-        const newRecipe = await createRecipe(formData);
-        if (newRecipe && (newRecipe as any).error) {
-          throw new Error((newRecipe as any).message || (newRecipe as any).error);
+        
+        try {
+          const newRecipe = await createRecipe(formData);
+          if (newRecipe && !(newRecipe as any).error) {
+            saveLocalRecipe(newRecipe);
+            setSubmitStatus('success');
+            setSubmitStatusMsg(lang === 'sv' ? 'Receptet skapat! Omdirigerar...' : 'Recipe created! Redirecting...');
+            setTimeout(() => {
+              router.push(backUrl || `/recipes/${newRecipe.id}`);
+              router.refresh();
+            }, 1000);
+          } else {
+            // Server error fallback
+            const localId = `recipe_${Date.now()}`;
+            const fallbackNew = {
+              id: localId,
+              ...formData,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            saveLocalRecipe(fallbackNew);
+            setSubmitStatus('success');
+            setSubmitStatusMsg(lang === 'sv' ? 'Receptet skapat lokalt! Omdirigerar...' : 'Recipe created locally! Redirecting...');
+            setTimeout(() => {
+              router.push(backUrl || `/recipes/${localId}`);
+              router.refresh();
+            }, 1000);
+          }
+        } catch (serverErr) {
+          console.warn('Server create failed, falling back to local create:', serverErr);
+          const localId = `recipe_${Date.now()}`;
+          const fallbackNew = {
+            id: localId,
+            ...formData,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          saveLocalRecipe(fallbackNew);
+          setSubmitStatus('success');
+          setSubmitStatusMsg(lang === 'sv' ? 'Receptet skapat lokalt! Omdirigerar...' : 'Recipe created locally! Redirecting...');
+          setTimeout(() => {
+            router.push(backUrl || `/recipes/${localId}`);
+            router.refresh();
+          }, 1000);
         }
-        setSubmitStatus('success');
-        setSubmitStatusMsg(lang === 'sv' ? 'Receptet skapat! Omdirigerar...' : 'Recipe created! Redirecting...');
-        setTimeout(() => {
-          router.push(backUrl || `/recipes/${newRecipe.id}`);
-          router.refresh();
-        }, 1000);
       }
     } catch (err: any) {
       setError(err.message || t('form.error_save_generic'));

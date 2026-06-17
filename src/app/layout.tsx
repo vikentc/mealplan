@@ -6,6 +6,11 @@ import { LanguageProvider } from '@/lib/i18n';
 export const metadata: Metadata = {
   title: 'Maja & Kents Matpalats - Familjens recept & veckoplanering',
   description: 'Planera dina veckomåltider, optimera näringsintaget, skala recept och upptäck nya familjefavoriter.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Matpalats',
+  },
 };
 
 export default function RootLayout({

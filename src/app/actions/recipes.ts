@@ -143,6 +143,10 @@ async function runWithFallback<T>(dbQuery: () => Promise<T>, fallbackQuery: () =
     // Attempt database call
     return await dbQuery();
   } catch (error: any) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Database query failed in production:', error.message || error);
+      throw error;
+    }
     // Fall back to local file state if DB fails
     console.warn('Database access failed, falling back to local file state:', error.message || error);
     return await fallbackQuery();

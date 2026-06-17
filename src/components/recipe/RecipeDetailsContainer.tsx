@@ -79,7 +79,7 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
     setIsAddingToShoppingList(true);
     setShoppingListFeedback(null);
     try {
-      const res = await addRecipeToShoppingList(recipe.id, servings);
+      const res = await addRecipeToShoppingList(recipe.id, servings) as any;
       if (res.error) {
         setShoppingListFeedback({
           type: 'error',

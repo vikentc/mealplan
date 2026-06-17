@@ -1373,7 +1373,10 @@ export async function addRecipeToShoppingList(recipeId: string, servings: number
       });
     }
 
-    await saveShoppingList(recipes, items);
+    const saveResult = await saveShoppingList(recipes, items);
+    if (saveResult && (saveResult as any).error) {
+      return saveResult;
+    }
     return { success: true };
   } catch (error: any) {
     console.error('addRecipeToShoppingList error:', error);
@@ -1413,7 +1416,10 @@ export async function removeRecipeFromShoppingList(instanceId: string) {
       })
       .filter(Boolean);
 
-    await saveShoppingList(updatedRecipes, updatedItems);
+    const saveResult = await saveShoppingList(updatedRecipes, updatedItems);
+    if (saveResult && (saveResult as any).error) {
+      return saveResult;
+    }
     return { success: true };
   } catch (error: any) {
     console.error('removeRecipeFromShoppingList error:', error);

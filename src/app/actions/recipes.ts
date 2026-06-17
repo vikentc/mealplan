@@ -1261,9 +1261,30 @@ Viktigt:
   }
 }
 
+let isTableChecked = false;
+
+async function ensureShoppingListTableExists() {
+  if (isTableChecked) return;
+  try {
+    await db.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "ShoppingList" (
+        "id" TEXT NOT NULL,
+        "recipes" JSONB NOT NULL,
+        "items" JSONB NOT NULL,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "ShoppingList_pkey" PRIMARY KEY ("id")
+      );
+    `);
+    isTableChecked = true;
+  } catch (error) {
+    console.error('Failed to auto-create ShoppingList table:', error);
+  }
+}
+
 export async function getShoppingList() {
   const result = await runWithFallback(
     async () => {
+      await ensureShoppingListTableExists();
       const row = await db.shoppingList.findUnique({
         where: { id: 'current' }
       });
@@ -1283,6 +1304,7 @@ export async function getShoppingList() {
 export async function saveShoppingList(recipes: any[], items: any[]) {
   return await runWithFallback(
     async () => {
+      await ensureShoppingListTableExists();
       await db.shoppingList.upsert({
         where: { id: 'current' },
         update: {

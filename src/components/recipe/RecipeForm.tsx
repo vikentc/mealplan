@@ -951,59 +951,59 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
           {/* Tab Content: OCR Image */}
           {autofillTab === 'image' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Gallery Select */}
-                <label 
-                  className="relative flex flex-col items-center justify-center p-6 border-3 border-dashed border-foreground/50 hover:border-foreground rounded-2xl bg-white hover:bg-yellow-50/10 transition-all cursor-pointer group shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files?.[0];
-                    if (file) handleImageAutofill(file);
-                  }}
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleImageAutofill(file);
-                    }}
-                    className="hidden"
-                    disabled={autofillLoading}
-                  />
-                  <ImageIcon className="h-8 w-8 text-foreground/45 group-hover:text-foreground transition-colors mb-2" />
-                  <span className="text-xs font-black uppercase tracking-wider text-foreground">
-                    {lang === 'sv' ? 'Ladda upp en bild' : 'Upload an Image'}
-                  </span>
-                  <span className="text-[9px] text-foreground/60 mt-1">
-                    {texts[lang].imageZoneSub}
-                  </span>
-                </label>
+              <div className="border-3 border-dashed border-foreground/30 hover:border-foreground/80 rounded-2xl p-5 md:p-8 bg-white transition-all text-center space-y-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                <div className="mx-auto w-12 h-12 rounded-full bg-yellow-100 border-2 border-foreground flex items-center justify-center text-foreground mb-1">
+                  <ImageIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="font-black text-xs uppercase tracking-wider text-foreground">
+                    {lang === 'sv' ? 'Läs in receptet från en bild' : 'Read recipe from image'}
+                  </h4>
+                  <p className="text-[10px] text-foreground/65 max-w-xs mx-auto mt-1 leading-normal font-semibold">
+                    {lang === 'sv' 
+                      ? 'Ladda upp en skärmavbild eller fota din kokbok för att läsa av texten med AI.' 
+                      : 'Upload a screenshot or take a photo of your cookbook to parse it with AI.'}
+                  </p>
+                </div>
 
-                {/* Camera Capture */}
-                <label 
-                  className="relative flex flex-col items-center justify-center p-6 border-3 border-dashed border-foreground/50 hover:border-foreground rounded-2xl bg-white hover:bg-yellow-50/10 transition-all cursor-pointer group shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center"
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleImageAutofill(file);
-                    }}
-                    className="hidden"
-                    disabled={autofillLoading}
-                  />
-                  <Camera className="h-8 w-8 text-foreground/45 group-hover:text-foreground transition-colors mb-2" />
-                  <span className="text-xs font-black uppercase tracking-wider text-foreground">
-                    {lang === 'sv' ? 'Ta ett foto' : 'Take a Photo'}
-                  </span>
-                  <span className="text-[9px] text-foreground/60 mt-1">
-                    {lang === 'sv' ? 'Fota receptet direkt med din kamera' : 'Take a photo of the recipe with your camera'}
-                  </span>
-                </label>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                  {/* Gallery Select Button */}
+                  <label className="flex items-center justify-center gap-2 px-5 py-3 bg-cyan-100 hover:bg-cyan-200 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageAutofill(file);
+                      }}
+                      className="hidden"
+                      disabled={autofillLoading}
+                    />
+                    <ImageIcon className="h-4.5 w-4.5" />
+                    <span>{lang === 'sv' ? 'Välj bildfil' : 'Choose Image File'}</span>
+                  </label>
+
+                  {/* Camera Capture Button */}
+                  <label className="flex items-center justify-center gap-2 px-5 py-3 bg-yellow-300 hover:bg-yellow-400 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageAutofill(file);
+                      }}
+                      className="hidden"
+                      disabled={autofillLoading}
+                    />
+                    <Camera className="h-4.5 w-4.5" />
+                    <span>{lang === 'sv' ? 'Ta ett foto' : 'Take a Photo'}</span>
+                  </label>
+                </div>
+                
+                <p className="text-[9px] text-foreground/45 font-semibold pt-1 uppercase tracking-wider">
+                  {lang === 'sv' ? 'Stöder JPG, PNG • Lokalt OCR fallbacks' : 'Supports JPG, PNG • Local OCR fallback'}
+                </p>
               </div>
             </div>
           )}
@@ -1284,20 +1284,12 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
         </section>
 
         {/* Section 3: Ingredients */}
-        <section className="bg-card border-3 border-foreground p-6 md:p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5 bg-[radial-gradient(rgba(0,0,0,0.02)_1.5px,transparent_1.5px)] [background-size:16px_16px]">
-          <div className="flex justify-between items-center gap-2">
+        <section className="bg-card border-3 border-foreground p-5 md:p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5 bg-[radial-gradient(rgba(0,0,0,0.02)_1.5px,transparent_1.5px)] [background-size:16px_16px]">
+          <div className="border-b-2 border-foreground/15 pb-2">
             <h3 className="font-black text-lg text-foreground uppercase tracking-tight">{t('form.ingredients')}</h3>
-            <button
-              type="button"
-              onClick={handleAddIngredient}
-              className="px-4 py-2 bg-cyan-100 hover:bg-cyan-200 text-foreground border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1"
-            >
-              <Plus className="h-4 w-4" />
-              <span>{t('form.add_ingredient')}</span>
-            </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {ingredients.map((ing, index) => (
               <div 
                 key={index} 
@@ -1306,55 +1298,77 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                 onDragOver={(e) => handleIngredientDragOver(e, index)}
                 onDragEnd={handleIngredientDragEnd}
                 className={cn(
-                  "flex gap-2 items-center flex-wrap sm:flex-nowrap p-1 rounded-xl transition-all duration-200",
+                  "flex flex-col sm:flex-row gap-3 sm:gap-2 items-center p-3 sm:p-1 border-2 border-foreground/15 sm:border-none rounded-2xl sm:rounded-none bg-[#faf8f5]/40 sm:bg-transparent shadow-[2px_2px_0px_0px_rgba(0,0,0,0.03)] sm:shadow-none transition-all duration-200",
                   draggedIngredientIndex === index ? "opacity-45 bg-secondary border-2 border-dashed border-muted-foreground/30" : ""
                 )}
               >
-                {/* Drag Handle */}
-                <div className="cursor-grab active:cursor-grabbing text-foreground shrink-0 p-1">
-                  <GripVertical className="h-4.5 w-4.5" />
+                {/* Row 1 on Mobile: Drag Handle + Name + Delete button */}
+                <div className="flex items-center gap-2 w-full">
+                  {/* Drag Handle */}
+                  <div className="cursor-grab active:cursor-grabbing text-foreground/50 hover:text-foreground shrink-0 p-1">
+                    <GripVertical className="h-4.5 w-4.5" />
+                  </div>
+
+                  <input
+                    type="text"
+                    placeholder={t('form.ingredient_placeholder')}
+                    value={ing.name}
+                    onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
+                    className="flex-1 p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-semibold placeholder:text-foreground/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                  />
+
+                  {/* Delete button (only visible in row 1 on mobile) */}
+                  {ingredients.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveIngredient(index)}
+                      className="sm:hidden p-2.5 bg-red-100 hover:bg-red-200 border-2 border-foreground text-red-800 rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] cursor-pointer"
+                    >
+                      <Trash2 className="h-4.5 w-4.5" />
+                    </button>
+                  )}
                 </div>
 
-                <input
-                  type="text"
-                  placeholder={t('form.ingredient_placeholder')}
-                  value={ing.name}
-                  onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                  className="flex-1 p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-semibold placeholder:text-foreground/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
-                />
-                
-                <input
-                  type="number"
-                  step="any"
-                  placeholder={t('form.quantity_placeholder')}
-                  value={ing.quantity !== null ? ing.quantity : ''}
-                  onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
-                  className="w-24 p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-mono shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
-                />
+                {/* Row 2 on Mobile: Quantity + Unit + Optional toggle grid */}
+                <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto shrink-0">
+                  <div className="col-span-1">
+                    <input
+                      type="number"
+                      step="any"
+                      placeholder={t('form.quantity_placeholder')}
+                      value={ing.quantity !== null ? ing.quantity : ''}
+                      onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
+                      className="w-full sm:w-20 p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-mono text-center placeholder:text-foreground/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                    />
+                  </div>
 
-                <input
-                  type="text"
-                  placeholder={t('form.unit_placeholder')}
-                  value={ing.unit || ''}
-                  onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
-                  className="w-20 p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-bold uppercase placeholder:text-foreground/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
-                />
+                  <div className="col-span-1">
+                    <input
+                      type="text"
+                      placeholder={t('form.unit_placeholder')}
+                      value={ing.unit || ''}
+                      onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
+                      className="w-full sm:w-16 p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-bold uppercase text-center placeholder:text-foreground/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                    />
+                  </div>
 
-                <label className="flex items-center gap-1.5 cursor-pointer select-none text-[10px] font-black uppercase text-foreground shrink-0 border-2 border-foreground rounded-xl p-2.5 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-secondary/10 active:translate-y-[1px] active:shadow-none transition-all">
-                  <input
-                    type="checkbox"
-                    checked={ing.optional}
-                    onChange={(e) => handleIngredientChange(index, 'optional', e.target.checked)}
-                    className="h-4.5 w-4.5 accent-foreground border-2 border-foreground rounded cursor-pointer"
-                  />
-                  <span>{t('form.optional')}</span>
-                </label>
+                  <label className="col-span-1 flex items-center justify-center gap-1 cursor-pointer select-none text-[9px] font-black uppercase text-foreground border-2 border-foreground rounded-xl p-2.5 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-secondary/10 active:translate-y-[1px] transition-all h-full text-center">
+                    <input
+                      type="checkbox"
+                      checked={ing.optional}
+                      onChange={(e) => handleIngredientChange(index, 'optional', e.target.checked)}
+                      className="h-4 w-4 accent-foreground border-2 border-foreground rounded cursor-pointer"
+                    />
+                    <span className="truncate">{t('form.optional')}</span>
+                  </label>
+                </div>
 
+                {/* Delete button (only visible on desktop, far right) */}
                 {ingredients.length > 1 && (
                   <button
                     type="button"
                     onClick={() => handleRemoveIngredient(index)}
-                    className="p-2.5 bg-red-100 hover:bg-red-200 border-2 border-foreground text-red-800 rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+                    className="hidden sm:block p-2.5 bg-red-100 hover:bg-red-200 border-2 border-foreground text-red-800 rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] cursor-pointer"
                   >
                     <Trash2 className="h-4.5 w-4.5" />
                   </button>
@@ -1362,23 +1376,24 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
               </div>
             ))}
           </div>
+
+          <button
+            type="button"
+            onClick={handleAddIngredient}
+            className="w-full py-3 bg-cyan-100 hover:bg-cyan-200 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+          >
+            <Plus className="h-4.5 w-4.5" />
+            <span>{t('form.add_ingredient')}</span>
+          </button>
         </section>
 
         {/* Section 4: Instructions */}
-        <section className="bg-card border-3 border-foreground p-6 md:p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5 bg-[radial-gradient(rgba(0,0,0,0.02)_1.5px,transparent_1.5px)] [background-size:16px_16px]">
-          <div className="flex justify-between items-center gap-2">
+        <section className="bg-card border-3 border-foreground p-5 md:p-8 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-5 bg-[radial-gradient(rgba(0,0,0,0.02)_1.5px,transparent_1.5px)] [background-size:16px_16px]">
+          <div className="border-b-2 border-foreground/15 pb-2">
             <h3 className="font-black text-lg text-foreground uppercase tracking-tight">{t('form.instructions')}</h3>
-            <button
-              type="button"
-              onClick={handleAddInstruction}
-              className="px-4 py-2 bg-cyan-100 hover:bg-cyan-200 text-foreground border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer flex items-center gap-1"
-            >
-              <Plus className="h-4 w-4" />
-              <span>{t('form.add_step')}</span>
-            </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {instructions.map((step, index) => (
               <div 
                 key={index} 
@@ -1387,32 +1402,51 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                 onDragOver={(e) => handleInstructionDragOver(e, index)}
                 onDragEnd={handleInstructionDragEnd}
                 className={cn(
-                  "flex gap-3 items-start p-1.5 rounded-xl transition-all duration-200",
+                  "flex flex-col sm:flex-row gap-2.5 sm:gap-3 p-3 sm:p-1.5 border-2 border-foreground/15 sm:border-none rounded-2xl sm:rounded-none bg-[#faf8f5]/40 sm:bg-transparent transition-all duration-200",
                   draggedInstructionIndex === index ? "opacity-45 bg-secondary border-2 border-dashed border-muted-foreground/30" : ""
                 )}
               >
-                {/* Drag Handle */}
-                <div className="cursor-grab active:cursor-grabbing text-foreground shrink-0 p-1.5 mt-1">
-                  <GripVertical className="h-4.5 w-4.5" />
-                </div>
+                {/* Row 1 on Mobile: Drag Handle + Step badge + Delete Button */}
+                <div className="flex items-center justify-between w-full sm:w-auto gap-2 shrink-0">
+                  <div className="flex items-center gap-2">
+                    {/* Drag Handle */}
+                    <div className="cursor-grab active:cursor-grabbing text-foreground/50 hover:text-foreground shrink-0 p-1">
+                      <GripVertical className="h-4.5 w-4.5" />
+                    </div>
+                    
+                    {/* Step badge */}
+                    <span className="h-6 px-2.5 sm:px-0 sm:w-6 rounded-full bg-foreground text-background text-[10px] sm:text-xs font-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase sm:normal-case shrink-0">
+                      <span className="sm:hidden mr-1">Steg</span>{index + 1}
+                    </span>
+                  </div>
 
-                <span className="h-6 w-6 rounded-full bg-foreground text-background text-xs font-black flex items-center justify-center shrink-0 mt-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                  {index + 1}
-                </span>
+                  {/* Delete button (only visible in row 1 on mobile) */}
+                  {instructions.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveInstruction(index)}
+                      className="sm:hidden p-2.5 bg-red-100 hover:bg-red-200 border-2 border-foreground text-red-800 rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
                 
+                {/* Textarea (takes full width on mobile) */}
                 <textarea
                   placeholder={t('form.step_placeholder')}
                   value={step}
                   onChange={(e) => handleInstructionChange(index, e.target.value)}
                   rows={2}
-                  className="flex-1 p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-semibold placeholder:text-foreground/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                  className="w-full flex-1 p-2.5 bg-white border-2 border-foreground rounded-xl text-xs font-semibold placeholder:text-foreground/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
                 />
 
+                {/* Delete button (only visible on desktop, far right) */}
                 {instructions.length > 1 && (
                   <button
                     type="button"
                     onClick={() => handleRemoveInstruction(index)}
-                    className="p-2.5 bg-red-100 hover:bg-red-200 border-2 border-foreground text-red-800 rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer mt-1"
+                    className="hidden sm:block p-2.5 bg-red-100 hover:bg-red-200 border-2 border-foreground text-red-800 rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] cursor-pointer mt-1"
                   >
                     <Trash2 className="h-4.5 w-4.5" />
                   </button>
@@ -1420,6 +1454,15 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
               </div>
             ))}
           </div>
+
+          <button
+            type="button"
+            onClick={handleAddInstruction}
+            className="w-full py-3 bg-cyan-100 hover:bg-cyan-200 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+          >
+            <Plus className="h-4.5 w-4.5" />
+            <span>{t('form.add_step')}</span>
+          </button>
         </section>
 
         {/* Section 5: Nutrition Information */}

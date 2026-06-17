@@ -138,13 +138,17 @@ function saveFallbackRecipes(recipes: any[]) {
 }
 
 // Try-catch wrappers for db queries
-async function runWithFallback<T>(dbQuery: () => Promise<T>, fallbackQuery: () => T | Promise<T>): Promise<T> {
+async function runWithFallback<T>(
+  dbQuery: () => Promise<T>, 
+  fallbackQuery: () => T | Promise<T>,
+  isWrite: boolean = false
+): Promise<T> {
   try {
     // Attempt database call
     return await dbQuery();
   } catch (error: any) {
-    if (process.env.NODE_ENV === 'production') {
-      console.error('Database query failed in production:', error.message || error);
+    if (isWrite && process.env.NODE_ENV === 'production') {
+      console.error('Database mutation failed in production:', error.message || error);
       throw error;
     }
     // Fall back to local file state if DB fails
@@ -528,7 +532,8 @@ export async function createRecipe(data: any) {
       recipes.push(newRecipe);
       saveFallbackRecipes(recipes);
       return newRecipe;
-    }
+    },
+    true
   );
 }
 
@@ -590,7 +595,8 @@ export async function updateRecipe(id: string, data: any) {
       recipes[index] = updatedRecipe;
       saveFallbackRecipes(recipes);
       return updatedRecipe;
-    }
+    },
+    true
   );
 }
 
@@ -609,7 +615,8 @@ export async function deleteRecipe(id: string) {
       recipes = recipes.filter((r) => r.id !== id);
       saveFallbackRecipes(recipes);
       return { success: true };
-    }
+    },
+    true
   );
 }
 
@@ -703,7 +710,8 @@ export async function saveWeeklyPlan(plans: Array<{
       
       saveFallbackPlans(allPlans);
       return { success: true };
-    }
+    },
+    true
   );
 }
 
@@ -1289,7 +1297,8 @@ export async function saveShoppingList(recipes: any[], items: any[]) {
     () => {
       saveFallbackShoppingList({ recipes, items });
       return { success: true };
-    }
+    },
+    true
   );
 }
 

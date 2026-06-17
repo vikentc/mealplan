@@ -78,28 +78,122 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe }: Recip
   const handleAddToShoppingList = async () => {
     setIsAddingToShoppingList(true);
     setShoppingListFeedback(null);
+
+    const saveToLocalStorageFallback = () => {
+      const localStore = localStorage.getItem('shopping-list-store');
+      let currentRecipes: any[] = [];
+      let currentItems: any[] = [];
+      if (localStore) {
+        try {
+          const parsed = JSON.parse(localStore);
+          currentRecipes = parsed.recipes || [];
+          currentItems = parsed.items || [];
+        } catch (e) {
+          console.error('Failed to parse shopping list from localStorage in fallback:', e);
+        }
+      }
+
+      const instanceId = Math.random().toString(36).substring(2, 9);
+      const updatedRecipes = [...currentRecipes, {
+        id: recipe.id,
+        name: recipe.name,
+        servings: servings,
+        instanceId: instanceId
+      }];
+
+      const ratio = servings / (recipe.servings || 4);
+      const updatedItems = [...currentItems];
+
+      if (Array.isArray(recipe.ingredients)) {
+        recipe.ingredients.forEach((ing: any) => {
+          if (!ing.name || ing.name.trim() === '') return;
+          const scaledQty = ing.quantity !== null ? ing.quantity * ratio : null;
+          const ingName = ing.name.trim();
+          const ingUnit = ing.unit ? ing.unit.trim() : null;
+
+          const existingItem = updatedItems.find((item: any) => 
+            item.name.toLowerCase() === ingName.toLowerCase() && 
+            (item.unit || '').toLowerCase() === (ingUnit || '').toLowerCase() &&
+            !item.isCustom
+          );
+
+          if (existingItem) {
+            existingItem.recipeAmounts = existingItem.recipeAmounts || [];
+            existingItem.recipeAmounts.push({
+              recipeId: recipe.id,
+              recipeName: recipe.name,
+              instanceId: instanceId,
+              quantity: scaledQty,
+              unit: ingUnit
+            });
+            if (existingItem.quantity !== null && scaledQty !== null) {
+              existingItem.quantity = Math.round((existingItem.quantity + scaledQty) * 100) / 100;
+            } else {
+              existingItem.quantity = null;
+            }
+          } else {
+            updatedItems.push({
+              name: ingName,
+              quantity: scaledQty,
+              unit: ingUnit,
+              checked: false,
+              isCustom: false,
+              recipeAmounts: [{
+                recipeId: recipe.id,
+                recipeName: recipe.name,
+                instanceId: instanceId,
+                quantity: scaledQty,
+                unit: ingUnit
+              }]
+            });
+          }
+        });
+      }
+
+      localStorage.setItem('shopping-list-store', JSON.stringify({
+        recipes: updatedRecipes,
+        items: updatedItems,
+        updatedAt: Date.now()
+      }));
+    };
+
     try {
       const res = await addRecipeToShoppingList(recipe.id, servings) as any;
-      if (res.error) {
-        setShoppingListFeedback({
-          type: 'error',
-          message: language === 'sv' ? `Kunde inte spara: ${res.message}` : `Save error: ${res.message}`
-        });
-      } else {
+      if (res && !res.error && res.recipes && res.items) {
+        // Sync to client-side localStorage
+        localStorage.setItem('shopping-list-store', JSON.stringify({
+          recipes: res.recipes,
+          items: res.items,
+          updatedAt: Date.now()
+        }));
         setShoppingListFeedback({
           type: 'success',
           message: language === 'sv' ? 'Receptet och ingredienserna har lagts till i din inköpslista!' : 'Recipe and ingredients added to your shopping list!'
         });
+      } else {
+        // Fallback to client-side calculation
+        saveToLocalStorageFallback();
+        setShoppingListFeedback({
+          type: 'success',
+          message: language === 'sv' 
+            ? 'Receptet har lagts till i din inköpslista (sparad lokalt)!' 
+            : 'Recipe added to your shopping list (saved locally)!'
+        });
       }
     } catch (err: any) {
-      console.error(err);
+      console.error('Failed to add to shopping list via server, falling back to client save:', err);
+      // Fallback to client-side calculation
+      saveToLocalStorageFallback();
       setShoppingListFeedback({
-        type: 'error',
-        message: language === 'sv' ? 'Ett oväntat fel inträffade.' : 'An unexpected error occurred.'
+        type: 'success',
+        message: language === 'sv' 
+          ? 'Receptet har lagts till i din inköpslista (sparad lokalt)!' 
+          : 'Recipe added to your shopping list (saved locally)!'
       });
     } finally {
       setIsAddingToShoppingList(false);
       setTimeout(() => setShoppingListFeedback(null), 4000);
+      router.refresh();
     }
   };
 

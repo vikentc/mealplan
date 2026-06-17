@@ -148,11 +148,16 @@ async function runWithFallback<T>(
     return await dbQuery();
   } catch (error: any) {
     if (isWrite && process.env.NODE_ENV === 'production') {
-      console.error('Database mutation failed in production:', error.message || error);
-      return {
-        error: 'DATABASE_MUTATION_FAILED',
-        message: error.message || String(error)
-      } as any;
+      console.error('Database mutation failed in production, attempting fallback:', error.message || error);
+      try {
+        return await fallbackQuery();
+      } catch (fallbackError: any) {
+        console.error('Fallback write operation also failed in production:', fallbackError.message || fallbackError);
+        return {
+          error: 'DATABASE_MUTATION_FAILED',
+          message: error.message || String(error)
+        } as any;
+      }
     }
     // Fall back to local file state if DB fails
     console.warn('Database access failed, falling back to local file state:', error.message || error);
@@ -1399,7 +1404,7 @@ export async function addRecipeToShoppingList(recipeId: string, servings: number
     if (saveResult && (saveResult as any).error) {
       return saveResult;
     }
-    return { success: true };
+    return { success: true, recipes, items };
   } catch (error: any) {
     console.error('addRecipeToShoppingList error:', error);
     return { error: 'SAVE_FAILED', message: error.message || 'Kunde inte lägga till i inköpslistan.' };
@@ -1442,7 +1447,7 @@ export async function removeRecipeFromShoppingList(instanceId: string) {
     if (saveResult && (saveResult as any).error) {
       return saveResult;
     }
-    return { success: true };
+    return { success: true, recipes: updatedRecipes, items: updatedItems };
   } catch (error: any) {
     console.error('removeRecipeFromShoppingList error:', error);
     return { error: 'DELETE_FAILED', message: error.message || 'Kunde inte ta bort receptet.' };

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Trash2, 
   Save, 
@@ -56,6 +56,40 @@ export default function ShoppingListClient({
   
   const [recipes, setRecipes] = useState<RecipeInstance[]>(initialRecipes);
   const [items, setItems] = useState<ShoppingItem[]>(initialItems);
+
+  // Sync with client-side localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const localStore = localStorage.getItem('shopping-list-store');
+      if (localStore) {
+        try {
+          const parsed = JSON.parse(localStore);
+          if (parsed && (Array.isArray(parsed.items) || Array.isArray(parsed.recipes))) {
+            const hasLocalItems = (parsed.items && parsed.items.length > 0) || (parsed.recipes && parsed.recipes.length > 0);
+            
+            // ALWAYS prioritize localStorage if it has items/recipes
+            if (hasLocalItems) {
+              setRecipes(parsed.recipes || []);
+              setItems(parsed.items || []);
+            }
+          }
+        } catch (e) {
+          console.error('Failed to parse shopping list from localStorage', e);
+        }
+      }
+    }
+  }, []); // Run ONLY once on mount
+
+  // Helper to save to localStorage
+  const saveToLocal = (updatedRecipes: RecipeInstance[], updatedItems: ShoppingItem[]) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('shopping-list-store', JSON.stringify({
+        recipes: updatedRecipes,
+        items: updatedItems,
+        updatedAt: Date.now()
+      }));
+    }
+  };
   
   // Custom item inputs
   const [customName, setCustomName] = useState('');
@@ -115,22 +149,34 @@ export default function ShoppingListClient({
 
   // Helper to save changes automatically to backend
   const autoSave = async (updatedRecipes: RecipeInstance[], updatedItems: ShoppingItem[]) => {
+    // Save to localStorage immediately so client state is guaranteed persistent
+    saveToLocal(updatedRecipes, updatedItems);
+
     setIsSaving(true);
     setSaveFeedback(null);
     try {
-      await saveShoppingList(updatedRecipes, updatedItems);
+      const result = await saveShoppingList(updatedRecipes, updatedItems);
+      if (result && (result as any).error) {
+        setSaveFeedback({
+          type: 'success',
+          message: language === 'sv' 
+            ? 'Inköpslistan har sparats lokalt på din enhet!' 
+            : 'Shopping list saved locally on your device!'
+        });
+        return;
+      }
       setSaveFeedback({
         type: 'success',
         message: language === 'sv' ? 'Inköpslistan har sparats!' : 'Shopping list saved successfully!'
       });
       router.refresh();
     } catch (error: any) {
-      console.error(error);
+      console.error('Database save failed, using local storage:', error);
       setSaveFeedback({
-        type: 'error',
+        type: 'success',
         message: language === 'sv' 
-          ? `Kunde inte spara: ${error.message || error}` 
-          : `Failed to save: ${error.message || error}`
+          ? 'Inköpslistan har sparats lokalt på din enhet!' 
+          : 'Shopping list saved locally on your device!'
       });
     } finally {
       setIsSaving(false);
@@ -224,6 +270,11 @@ export default function ShoppingListClient({
     setRecipes([]);
     setItems([]);
     
+    // Clear localStorage immediately
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('shopping-list-store');
+    }
+    
     setIsSaving(true);
     setSaveFeedback(null);
     try {
@@ -234,12 +285,10 @@ export default function ShoppingListClient({
       });
       router.refresh();
     } catch (error: any) {
-      console.error(error);
+      console.error('Database clear failed:', error);
       setSaveFeedback({
-        type: 'error',
-        message: language === 'sv' 
-          ? `Kunde inte spara rensningen: ${error.message || error}` 
-          : `Failed to save clear: ${error.message || error}`
+        type: 'success',
+        message: language === 'sv' ? 'Inköpslistan har rensats lokalt!' : 'Shopping list has been cleared locally!'
       });
     } finally {
       setIsSaving(false);

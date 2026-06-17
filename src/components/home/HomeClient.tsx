@@ -86,6 +86,7 @@ export default function HomeClient({
   const [queryText, setQueryText] = useState(activeQuery);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [itemCount, setItemCount] = useState(shoppingItemCount);
   const { t, language } = useLanguage();
 
   useEffect(() => {
@@ -94,6 +95,23 @@ export default function HomeClient({
       setIsLoggedIn(document.cookie.includes('user_session='));
     }
   }, [activeQuery]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const localStore = localStorage.getItem('shopping-list-store');
+      if (localStore) {
+        try {
+          const parsed = JSON.parse(localStore);
+          if (parsed && Array.isArray(parsed.items)) {
+            const uncheckedCount = parsed.items.filter((item: any) => !item.checked).length;
+            setItemCount(uncheckedCount);
+          }
+        } catch (e) {
+          console.error('Failed to parse shopping list from localStorage in HomeClient:', e);
+        }
+      }
+    }
+  }, [shoppingItemCount]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +157,7 @@ export default function HomeClient({
     <div ref={containerRef} className="relative overflow-hidden px-3 -mx-3 space-y-10 pb-12">
       
       {/* Shopping List Quick Link Indicator */}
-      {shoppingItemCount > 0 && (
+      {itemCount > 0 && (
         <div className="flex justify-center -mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
           <Link
             href="/shopping-list"
@@ -151,8 +169,8 @@ export default function HomeClient({
             </span>
             <span>
               {language === 'sv' 
-                ? `Du har ${shoppingItemCount} ${shoppingItemCount === 1 ? 'vara' : 'varor'} att handla i inköpslistan!` 
-                : `You have ${shoppingItemCount} ${shoppingItemCount === 1 ? 'item' : 'items'} in your shopping list!`}
+                ? `Du har ${itemCount} ${itemCount === 1 ? 'vara' : 'varor'} att handla i inköpslistan!` 
+                : `You have ${itemCount} ${itemCount === 1 ? 'item' : 'items'} in your shopping list!`}
             </span>
             <ChevronRight className="h-4.5 w-4.5 text-foreground group-hover:translate-x-1 transition-transform duration-200" />
           </Link>

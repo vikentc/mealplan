@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Trash2, Save, ChevronLeft, AlertCircle, ChefHat, GripVertical, Sparkles, Link2, Image as ImageIcon, Loader2, Check, FileText, Camera } from 'lucide-react';
 import Link from 'next/link';
@@ -376,6 +376,70 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
   const [description, setDescription] = useState(initialRecipe?.description || '');
   const [image, setImage] = useState(initialRecipe?.image || '');
   const [url, setUrl] = useState(initialRecipe?.url || '');
+
+  // Drag and Drop States & Ref
+  const [isDraggingAutofill, setIsDraggingAutofill] = useState(false);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Drag & Drop for Autofill
+  const handleDragOverAutofill = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!autofillLoading) {
+      setIsDraggingAutofill(true);
+    }
+  };
+
+  const handleDragLeaveAutofill = () => {
+    setIsDraggingAutofill(false);
+  };
+
+  const handleDropAutofill = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingAutofill(false);
+    if (autofillLoading) return;
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      handleImageAutofill(file);
+    }
+  };
+
+  // Drag & Drop for Main Recipe Image
+  const handleDragOverImage = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingImage(true);
+  };
+
+  const handleDragLeaveImage = () => {
+    setIsDraggingImage(false);
+  };
+
+  const processImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setImage(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDropImage = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingImage(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processImageFile(file);
+    }
+  };
+
+  const handleImageUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processImageFile(file);
+    }
+  };
   const [preparationTime, setPreparationTime] = useState(initialRecipe?.preparationTime || 15);
   const [cookingTime, setCookingTime] = useState(initialRecipe?.cookingTime || 20);
   const [servings, setServings] = useState(initialRecipe?.servings || 4);
@@ -955,7 +1019,17 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
           {/* Tab Content: OCR Image */}
           {autofillTab === 'image' && (
             <div className="space-y-4">
-              <div className="border-3 border-dashed border-foreground/30 hover:border-foreground/80 rounded-2xl p-5 md:p-8 bg-white transition-all text-center space-y-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div 
+                className={cn(
+                  "border-3 border-dashed rounded-2xl p-5 md:p-8 transition-all text-center space-y-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
+                  isDraggingAutofill 
+                    ? "border-primary bg-primary/5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" 
+                    : "border-foreground/30 hover:border-foreground/80 bg-white"
+                )}
+                onDragOver={handleDragOverAutofill}
+                onDragLeave={handleDragLeaveAutofill}
+                onDrop={handleDropAutofill}
+              >
                 <div className="mx-auto w-12 h-12 rounded-full bg-yellow-100 border-2 border-foreground flex items-center justify-center text-foreground mb-1">
                   <ImageIcon className="h-6 w-6" />
                 </div>
@@ -1167,25 +1241,84 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.image_url')}</label>
-              <input
-                type="url"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-medium placeholder:text-foreground/50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
-              />
+              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">
+                {lang === 'sv' ? 'Receptbild' : 'Recipe Image'}
+              </label>
+              <div 
+                className={cn(
+                  "border-3 border-dashed rounded-xl p-4 bg-white transition-all text-center flex flex-col items-center justify-center min-h-[140px] cursor-pointer shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
+                  isDraggingImage 
+                    ? "border-primary bg-primary/5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" 
+                    : "border-foreground/30 hover:border-foreground/80"
+                )}
+                onDragOver={handleDragOverImage}
+                onDragLeave={handleDragLeaveImage}
+                onDrop={handleDropImage}
+                onClick={() => imageFileInputRef.current?.click()}
+              >
+                <input
+                  type="file"
+                  ref={imageFileInputRef}
+                  accept="image/*"
+                  onChange={handleImageUploadChange}
+                  className="hidden"
+                />
+                
+                {image ? (
+                  <div className="relative w-full max-w-xs h-[100px] flex items-center justify-center">
+                    <img 
+                      src={image} 
+                      alt="Recipe Preview" 
+                      className="max-h-[100px] rounded-lg border-2 border-foreground object-cover" 
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setImage('');
+                      }}
+                      className="absolute -top-2 -right-2 p-1 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-foreground rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="mx-auto w-8 h-8 rounded-full bg-cyan-50 border-2 border-foreground flex items-center justify-center text-foreground">
+                      <ImageIcon className="h-4 w-4" />
+                    </div>
+                    <div className="text-[10px] font-bold text-foreground/75 leading-normal max-w-[200px] mx-auto">
+                      {lang === 'sv' 
+                        ? 'Släpp bildfil här, klicka för att välja fil eller klistra in en länk till höger' 
+                        : 'Drop image here, click to browse, or paste URL to the right'}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.original_url')}</label>
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://example.com/recipe"
-                className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-medium placeholder:text-foreground/50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
-              />
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.image_url')}</label>
+                <input
+                  type="url"
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-medium placeholder:text-foreground/50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.original_url')}</label>
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://example.com/recipe"
+                  className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-medium placeholder:text-foreground/50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
+                />
+              </div>
             </div>
           </div>
         </section>

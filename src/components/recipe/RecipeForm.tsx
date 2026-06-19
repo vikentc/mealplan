@@ -152,7 +152,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       autofillTitle: 'Autofyll Recept (Smart)',
       autofillDesc: 'Hämta information automatiskt från en receptlänk eller läs av ingredienser och instruktioner direkt från en bild.',
       tabLink: 'Klistra in länk',
-      tabImage: 'Läs från bild (OCR)',
+      tabImage: 'Läs från bild',
       urlPlaceholder: 'Klistra in länk till receptet (t.ex. köket.se, etc.)',
       btnFetch: 'Hämta',
       imageZone: 'Dra och släpp en receptbild här, eller klicka för att bläddra',
@@ -173,7 +173,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       autofillTitle: 'Autofill Recipe (Smart)',
       autofillDesc: 'Automatically fetch information from a recipe link, or extract ingredients and instructions directly from an image.',
       tabLink: 'Paste link',
-      tabImage: 'Read from image (OCR)',
+      tabImage: 'Read from image',
       urlPlaceholder: 'Paste recipe link (e.g. foodnetwork.com, etc.)',
       btnFetch: 'Fetch',
       imageZone: 'Drag and drop a recipe image here, or click to browse',
@@ -897,13 +897,15 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
           </div>
 
           {/* Tabs */}
-          <div className="flex border-3 border-foreground rounded-2xl overflow-hidden shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <button
               type="button"
               onClick={() => { setAutofillTab('url'); setAutofillError(null); setPreviewData(null); }}
               className={cn(
-                "flex-1 py-3 text-xs font-black uppercase tracking-wider transition-all border-r-3 border-foreground cursor-pointer flex items-center justify-center gap-2",
-                autofillTab === 'url' ? "bg-yellow-300 text-foreground" : "bg-white text-foreground/60 hover:text-foreground hover:bg-yellow-50/50"
+                "w-full py-3.5 px-5 text-xs font-black uppercase tracking-wider transition-all border-3 border-foreground rounded-2xl cursor-pointer flex items-center justify-center gap-2.5",
+                autofillTab === 'url' 
+                  ? "bg-yellow-300 text-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] translate-y-[-1px]" 
+                  : "bg-white text-foreground/60 hover:text-foreground hover:bg-yellow-50/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
               )}
             >
               <Link2 className="h-4.5 w-4.5" />
@@ -913,8 +915,10 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
               type="button"
               onClick={() => { setAutofillTab('image'); setAutofillError(null); setPreviewData(null); }}
               className={cn(
-                "flex-1 py-3 text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2",
-                autofillTab === 'image' ? "bg-yellow-300 text-foreground" : "bg-white text-foreground/60 hover:text-foreground hover:bg-yellow-50/50"
+                "w-full py-3.5 px-5 text-xs font-black uppercase tracking-wider transition-all border-3 border-foreground rounded-2xl cursor-pointer flex items-center justify-center gap-2.5",
+                autofillTab === 'image' 
+                  ? "bg-yellow-300 text-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] translate-y-[-1px]" 
+                  : "bg-white text-foreground/60 hover:text-foreground hover:bg-yellow-50/50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
               )}
             >
               <ImageIcon className="h-4.5 w-4.5" />

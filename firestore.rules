@@ -1,0 +1,111 @@
+// Force redeploy comment to ensure compilation - 2
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: recipes
+// Document ID: recipe ID (string)
+// Fields:
+//   - name: string (required, size < 100)
+//   - url: string (optional, URL format)
+//   - description: string (optional, size < 1000)
+//   - image: string (optional, URL format)
+//   - preparationTime: number (required, > 0)
+//   - cookingTime: number (required, >= 0)
+//   - totalTime: number (required, > 0)
+//   - servings: number (required, > 0)
+//   - difficulty: string (required, 'Easy' | 'Medium' | 'Hard')
+//   - cuisine: string (required)
+//   - mealTypes: list (required)
+//   - occasions: list (required)
+//   - flavorProfile: list (required)
+//   - moodTags: list (required)
+//   - ingredients: list (required)
+//   - instructions: list (required)
+//   - nutrition: map (required)
+//
+// Collection: plans
+// Document ID: {weekOffset}_{dayOfWeek}_{mealSlot} (string)
+// Fields:
+//   - weekOffset: number (required)
+//   - dayOfWeek: string (required)
+//   - mealSlot: string (required)
+//   - recipeId: string (required)
+//   - createdAt: string (required)
+//
+// Collection: shopping_lists
+// Document ID: current (string)
+// Fields:
+//   - recipes: list (required)
+//   - items: list (required)
+//   - updatedAt: string (required)
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidRecipe(data) {
+      return hasRequiredFields(['name', 'preparationTime', 'cookingTime', 'totalTime', 'servings', 'difficulty', 'cuisine', 'mealTypes', 'occasions', 'flavorProfile', 'moodTags', 'ingredients', 'instructions', 'nutrition']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.preparationTime is number && data.preparationTime > 0 &&
+             data.cookingTime is number && data.cookingTime >= 0 &&
+             data.servings is number && data.servings > 0 &&
+             data.difficulty in ['Easy', 'Medium', 'Hard'] &&
+             data.cuisine is string &&
+             data.mealTypes is list &&
+             data.occasions is list &&
+             data.flavorProfile is list &&
+             data.moodTags is list &&
+             data.ingredients is list &&
+             data.instructions is list &&
+             data.nutrition is map;
+    }
+
+    function isValidPlan(data) {
+      return hasRequiredFields(['weekOffset', 'dayOfWeek', 'mealSlot', 'recipeId', 'createdAt']) &&
+             data.weekOffset is number &&
+             data.dayOfWeek is string &&
+             data.mealSlot is string &&
+             data.recipeId is string;
+    }
+
+    function isValidShoppingList(data) {
+      return hasRequiredFields(['recipes', 'items']) &&
+             data.recipes is list &&
+             data.items is list;
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+    match /recipes/{recipeId} {
+      allow read: if true;
+      allow create, update: if isValidRecipe(request.resource.data);
+      allow delete: if true;
+    }
+
+    match /plans/{planId} {
+      allow read: if true;
+      allow create, update: if isValidPlan(request.resource.data);
+      allow delete: if true;
+    }
+
+    match /shopping_lists/{listId} {
+      allow read: if true;
+      allow create, update: if isValidShoppingList(request.resource.data);
+      allow delete: if true;
+    }
+  }
+}

@@ -12,6 +12,17 @@ import {
   parseIngredientLineHeuristic, 
   scrapeHtmlFallback 
 } from '@/lib/recipeParser';
+import { 
+  collection, 
+  doc, 
+  getDoc, 
+  getDocs, 
+  setDoc, 
+  deleteDoc, 
+  query, 
+  where 
+} from 'firebase/firestore';
+import { db as firestoreDb, isFirebaseConfigured } from '@/lib/firebase';
 
 async function checkAuth() {
   const cookieStore = await cookies();
@@ -72,42 +83,42 @@ const PLANS_FILE = path.join(process.cwd(), 'plans.json');
 const SHOPPING_LIST_FILE = path.join(process.cwd(), 'shopping-list.json');
 
 // Helper to get fallback shopping list
-function getFallbackShoppingList(): any {
+function getLocalJSONShoppingList(): any {
   try {
     if (fs.existsSync(SHOPPING_LIST_FILE)) {
       const data = fs.readFileSync(SHOPPING_LIST_FILE, 'utf8');
       return JSON.parse(data);
     }
   } catch (error) {
-    console.error('Error reading fallback shopping list:', error);
+    console.error('Error reading local JSON shopping list:', error);
   }
   return { recipes: [], items: [] };
 }
 
 // Helper to save fallback shopping list
-function saveFallbackShoppingList(list: any) {
+function saveLocalJSONShoppingList(list: any) {
   try {
     fs.writeFileSync(SHOPPING_LIST_FILE, JSON.stringify(list, null, 2), 'utf8');
   } catch (error) {
-    console.error('Error saving fallback shopping list:', error);
+    console.error('Error saving local JSON shopping list:', error);
   }
 }
 
 // Helper to get fallback recipes
-function getFallbackRecipes(): any[] {
+function getLocalJSONRecipes(): any[] {
   try {
     if (fs.existsSync(RECIPES_FILE)) {
       const data = fs.readFileSync(RECIPES_FILE, 'utf8');
       return JSON.parse(data);
     }
   } catch (error) {
-    console.error('Error reading fallback recipes:', error);
+    console.error('Error reading local JSON recipes:', error);
   }
   return [];
 }
 
 // Helper to get fallback plans
-function getFallbackPlans(): any[] {
+function getLocalJSONPlans(): any[] {
   try {
     if (fs.existsSync(PLANS_FILE)) {
       const data = fs.readFileSync(PLANS_FILE, 'utf8');
@@ -120,21 +131,222 @@ function getFallbackPlans(): any[] {
 }
 
 // Helper to save fallback plans
-function saveFallbackPlans(plans: any[]) {
+function saveLocalJSONPlans(plans: any[]) {
   try {
     fs.writeFileSync(PLANS_FILE, JSON.stringify(plans, null, 2), 'utf8');
   } catch (error) {
-    console.error('Error saving fallback plans:', error);
+    console.error('Error saving local JSON plans:', error);
   }
 }
 
 // Helper to save fallback recipes
-function saveFallbackRecipes(recipes: any[]) {
+function saveLocalJSONRecipes(recipes: any[]) {
   try {
     fs.writeFileSync(RECIPES_FILE, JSON.stringify(recipes, null, 2), 'utf8');
   } catch (error) {
-    console.error('Error saving fallback recipes:', error);
+    console.error('Error saving local JSON recipes:', error);
   }
+}
+
+// --- Firebase Firestore Helpers (Internal) ---
+async function getFirebaseRecipes(): Promise<any[]> {
+  if (!isFirebaseConfigured() || !firestoreDb) return [];
+  try {
+    const qSnapshot = await getDocs(collection(firestoreDb, 'recipes'));
+    const list: any[] = [];
+    qSnapshot.forEach((doc) => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    
+    // Seed Firestore if empty
+    if (list.length === 0) {
+      console.log('Firestore recipes collection is empty. Seeding from recipes.json...');
+      const local = getLocalJSONRecipes();
+      if (local.length > 0) {
+        for (const recipe of local) {
+          await setDoc(doc(firestoreDb, 'recipes', recipe.id), {
+            name: recipe.name || '',
+            url: recipe.url || null,
+            description: recipe.description || null,
+            image: recipe.image || null,
+            preparationTime: Number(recipe.preparationTime) || 15,
+            cookingTime: Number(recipe.cookingTime) || 20,
+            totalTime: Number(recipe.totalTime) || 35,
+            servings: Number(recipe.servings) || 4,
+            difficulty: recipe.difficulty || 'Medium',
+            cuisine: recipe.cuisine || 'International',
+            mealTypes: recipe.mealTypes || [],
+            occasions: recipe.occasions || [],
+            flavorProfile: recipe.flavorProfile || [],
+            moodTags: recipe.moodTags || [],
+            ingredients: recipe.ingredients || [],
+            instructions: recipe.instructions || [],
+            nutrition: recipe.nutrition || {},
+            createdAt: recipe.createdAt || new Date().toISOString(),
+            updatedAt: recipe.updatedAt || new Date().toISOString()
+          });
+        }
+        return local;
+      }
+    }
+    return list;
+  } catch (err) {
+    console.error('Error fetching recipes from Firestore:', err);
+    return [];
+  }
+}
+
+async function saveFirebaseRecipes(recipes: any[]) {
+  if (!isFirebaseConfigured() || !firestoreDb) return;
+  try {
+    for (const r of recipes) {
+      await setDoc(doc(firestoreDb, 'recipes', r.id), {
+        name: r.name || '',
+        url: r.url || null,
+        description: r.description || null,
+        image: r.image || null,
+        preparationTime: Number(r.preparationTime) || 15,
+        cookingTime: Number(r.cookingTime) || 20,
+        totalTime: Number(r.totalTime) || 35,
+        servings: Number(r.servings) || 4,
+        difficulty: r.difficulty || 'Medium',
+        cuisine: r.cuisine || 'International',
+        mealTypes: r.mealTypes || [],
+        occasions: r.occasions || [],
+        flavorProfile: r.flavorProfile || [],
+        moodTags: r.moodTags || [],
+        ingredients: r.ingredients || [],
+        instructions: r.instructions || [],
+        nutrition: r.nutrition || {},
+        createdAt: r.createdAt || new Date().toISOString(),
+        updatedAt: r.updatedAt || new Date().toISOString()
+      }, { merge: true });
+    }
+  } catch (err) {
+    console.error('Error writing recipes to Firestore:', err);
+  }
+}
+
+async function getFirebasePlans(): Promise<any[]> {
+  if (!isFirebaseConfigured() || !firestoreDb) return [];
+  try {
+    const qSnapshot = await getDocs(collection(firestoreDb, 'plans'));
+    const list: any[] = [];
+    qSnapshot.forEach((doc) => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    return list;
+  } catch (err) {
+    console.error('Error fetching plans from Firestore:', err);
+    return [];
+  }
+}
+
+async function saveFirebasePlan(plan: any) {
+  if (!isFirebaseConfigured() || !firestoreDb) return;
+  try {
+    const docId = `${plan.weekOffset}_${plan.dayOfWeek}_${plan.mealSlot}`;
+    await setDoc(doc(firestoreDb, 'plans', docId), {
+      weekOffset: plan.weekOffset,
+      dayOfWeek: plan.dayOfWeek,
+      mealSlot: plan.mealSlot,
+      recipeId: plan.recipeId,
+      createdAt: plan.createdAt || new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('Error saving individual plan to Firestore:', err);
+  }
+}
+
+async function deleteFirebasePlanForWeek(weekOffset: number) {
+  if (!isFirebaseConfigured() || !firestoreDb) return;
+  try {
+    const plansRef = collection(firestoreDb, 'plans');
+    const q = query(plansRef, where('weekOffset', '==', weekOffset));
+    const qSnapshot = await getDocs(q);
+    for (const d of qSnapshot.docs) {
+      await deleteDoc(doc(firestoreDb, 'plans', d.id));
+    }
+  } catch (err) {
+    console.error('Error deleting plans for week offset in Firestore:', err);
+  }
+}
+
+async function getFirebaseShoppingList(): Promise<any> {
+  if (!isFirebaseConfigured() || !firestoreDb) return null;
+  try {
+    const dSnapshot = await getDoc(doc(firestoreDb, 'shopping_lists', 'current'));
+    if (dSnapshot.exists()) {
+      return dSnapshot.data();
+    }
+  } catch (err) {
+    console.error('Error fetching shopping list from Firestore:', err);
+  }
+  return null;
+}
+
+async function saveFirebaseShoppingList(list: any) {
+  if (!isFirebaseConfigured() || !firestoreDb) return;
+  try {
+    await setDoc(doc(firestoreDb, 'shopping_lists', 'current'), {
+      recipes: list.recipes || [],
+      items: list.items || [],
+      updatedAt: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('Error saving shopping list to Firestore:', err);
+  }
+}
+
+// --- Public Combined Fallback Wrappers (Async) ---
+async function getFallbackShoppingList(): Promise<any> {
+  if (isFirebaseConfigured()) {
+    const fbList = await getFirebaseShoppingList();
+    if (fbList) return fbList;
+  }
+  return getLocalJSONShoppingList();
+}
+
+async function saveFallbackShoppingList(list: any) {
+  if (isFirebaseConfigured()) {
+    await saveFirebaseShoppingList(list);
+  }
+  saveLocalJSONShoppingList(list);
+}
+
+async function getFallbackRecipes(): Promise<any[]> {
+  if (isFirebaseConfigured()) {
+    const fbRecipes = await getFirebaseRecipes();
+    if (fbRecipes && fbRecipes.length > 0) return fbRecipes;
+  }
+  return getLocalJSONRecipes();
+}
+
+async function getFallbackPlans(): Promise<any[]> {
+  if (isFirebaseConfigured()) {
+    return await getFirebasePlans();
+  }
+  return getLocalJSONPlans();
+}
+
+async function saveFallbackPlans(plans: any[]) {
+  if (isFirebaseConfigured()) {
+    if (plans.length > 0) {
+      const weekOffset = plans[0].weekOffset;
+      await deleteFirebasePlanForWeek(weekOffset);
+      for (const p of plans) {
+        await saveFirebasePlan(p);
+      }
+    }
+  }
+  saveLocalJSONPlans(plans);
+}
+
+async function saveFallbackRecipes(recipes: any[]) {
+  if (isFirebaseConfigured()) {
+    await saveFirebaseRecipes(recipes);
+  }
+  saveLocalJSONRecipes(recipes);
 }
 
 // Try-catch wrappers for db queries
@@ -475,8 +687,8 @@ export async function getRecipeById(id: string) {
       });
       return result ? JSON.parse(JSON.stringify(result)) : null;
     },
-    () => {
-      const recipes = getFallbackRecipes();
+    async () => {
+      const recipes = await getFallbackRecipes();
       return recipes.find((r) => r.id === id) || null;
     }
   );
@@ -513,8 +725,8 @@ export async function createRecipe(data: any) {
       });
       return JSON.parse(JSON.stringify(recipe));
     },
-    () => {
-      const recipes = getFallbackRecipes();
+    async () => {
+      const recipes = await getFallbackRecipes();
       const newRecipe = {
         id: `recipe_${Date.now()}`,
         name: data.name,
@@ -538,7 +750,7 @@ export async function createRecipe(data: any) {
         updatedAt: new Date().toISOString()
       };
       recipes.push(newRecipe);
-      saveFallbackRecipes(recipes);
+      await saveFallbackRecipes(recipes);
       return newRecipe;
     },
     true
@@ -574,8 +786,8 @@ export async function updateRecipe(id: string, data: any) {
       });
       return JSON.parse(JSON.stringify(recipe));
     },
-    () => {
-      const recipes = getFallbackRecipes();
+    async () => {
+      const recipes = await getFallbackRecipes();
       const index = recipes.findIndex((r) => r.id === id);
       if (index === -1) throw new Error('Recipe not found');
       
@@ -601,7 +813,7 @@ export async function updateRecipe(id: string, data: any) {
         updatedAt: new Date().toISOString()
       };
       recipes[index] = updatedRecipe;
-      saveFallbackRecipes(recipes);
+      await saveFallbackRecipes(recipes);
       return updatedRecipe;
     },
     true
@@ -618,10 +830,10 @@ export async function deleteRecipe(id: string) {
       });
       return { success: true };
     },
-    () => {
-      let recipes = getFallbackRecipes();
+    async () => {
+      let recipes = await getFallbackRecipes();
       recipes = recipes.filter((r) => r.id !== id);
-      saveFallbackRecipes(recipes);
+      await saveFallbackRecipes(recipes);
       return { success: true };
     },
     true
@@ -643,9 +855,9 @@ export async function getWeeklyPlan(weekOffset: number = 0) {
       });
       return JSON.parse(JSON.stringify(plans));
     },
-    () => {
-      const plans = getFallbackPlans();
-      const recipes = getFallbackRecipes();
+    async () => {
+      const plans = await getFallbackPlans();
+      const recipes = await getFallbackRecipes();
       
       // Filter plans by weekOffset and join with recipes
       return plans
@@ -697,9 +909,9 @@ export async function saveWeeklyPlan(plans: Array<{
       
       return { success: true };
     },
-    () => {
+    async () => {
       const weekOffset = plans.length > 0 ? plans[0].weekOffset : 0;
-      let allPlans = getFallbackPlans();
+      let allPlans = await getFallbackPlans();
       
       // Remove previous plans for this weekOffset
       allPlans = allPlans.filter((p) => p.weekOffset !== weekOffset);
@@ -716,7 +928,7 @@ export async function saveWeeklyPlan(plans: Array<{
         });
       });
       
-      saveFallbackPlans(allPlans);
+      await saveFallbackPlans(allPlans);
       return { success: true };
     },
     true
@@ -1301,7 +1513,7 @@ export async function getShoppingList() {
         items: typeof row.items === 'string' ? JSON.parse(row.items) : (row.items || [])
       };
     },
-    () => getFallbackShoppingList()
+    async () => await getFallbackShoppingList()
   );
   return result;
 }
@@ -1324,8 +1536,8 @@ export async function saveShoppingList(recipes: any[], items: any[]) {
       });
       return { success: true };
     },
-    () => {
-      saveFallbackShoppingList({ recipes, items });
+    async () => {
+      await saveFallbackShoppingList({ recipes, items });
       return { success: true };
     },
     true

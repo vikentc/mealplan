@@ -32,37 +32,97 @@ Setting up PostgreSQL can be a hassle during initial local development. To ensur
 
 ---
 
-## Getting Started
+## Getting Started & Manual Run Guide
 
-### 1. Install Dependencies
-Run the following in the project root:
+This project is a unified Next.js App Router application. The **frontend** (React UI) and the **backend** (Server Actions & API routes) run together on the same port. 
+
+Below are the steps to set up and run both the database backend and the application servers manually.
+
+---
+
+### Step 1: Install Dependencies
+Download packages and install platform-specific native binaries (e.g. Turbopack and LightningCSS modules):
 ```bash
 npm install
 ```
 
-### 2. Generate Prisma Client
-```bash
-npm run prisma:generate
-```
+### Step 2: Database Setup (Backend Database)
+By default, the application runs in a **JSON File Fallback Mode** if no database is connected. To run manually with PostgreSQL:
 
-### 3. Start PostgreSQL and Migrate (Optional)
-If you have PostgreSQL running:
-1. Update `DATABASE_URL` in your `.env` file.
-2. Run database migration and schema setup:
+1. **Start PostgreSQL**: Start your local PostgreSQL server.
+   * On macOS (via Homebrew):
+     ```bash
+     brew services start postgresql
+     ```
+   * Or run it via Docker:
+     ```bash
+     docker run --name mealplanner-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=meal_planner -p 5432:5432 -d postgres
+     ```
+2. **Configure Connection**: Verify `DATABASE_URL` in your `.env` file matches your PostgreSQL credentials:
+   ```env
+   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public"
+   ```
+3. **Generate Prisma Client**: Compile type-safe Prisma bindings:
+   ```bash
+   npm run prisma:generate
+   ```
+4. **Push DB Schema**: Push the Prisma database schema and create tables:
    ```bash
    npm run prisma:push
    ```
-3. Seed the database with the 57 unique recipes parsed from `meals.docx`:
+5. **Seed Example Recipes**: Seed the database with 57 unique recipes parsed from `meals.docx`:
    ```bash
    npm run seed
    ```
 
-### 4. Start Development Server
+---
+
+### Step 3: Run the Frontend & Backend Application
+
+You can start the combined application in either **Development Mode** or **Production Mode**.
+
+#### Option A: Running Development Mode (Hot-Reloading)
+Start the unified frontend/backend development server:
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
+#### Option B: Running Production Mode (Optimized)
+Build the optimized bundle and start the production server manually:
+1. **Compile Build**:
+   ```bash
+   npm run build
+   ```
+2. **Start Server**:
+   ```bash
+   npm run start
+   ```
+    Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+---
+
+### Step 4: Connecting Firebase (Cloud Fallback for Vercel)
+
+Vercel functions are serverless and the local filesystem is non-persistent. To write and save data dynamically on your Vercel deployment without PostgreSQL, the app uses **Firebase Firestore** as a cloud database.
+
+To configure Firebase for Vercel:
+
+1. **Create Firebase Project & Firestore**:
+   * Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
+   * Navigate to **Firestore Database** and click **Create database** (Native mode, production rules or test mode).
+2. **Register Web App**:
+   * In your project dashboard, click **Add app** and select **Web** (`</>`).
+   * Give your app a name and register it to generate the config object containing key parameters (`apiKey`, `projectId`, etc.).
+3. **Configure Environment Variables**:
+   * Add the following variables to your Vercel project's **Environment Variables** (and to your local `.env` for testing):
+     * `NEXT_PUBLIC_FIREBASE_API_KEY`
+     * `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+     * `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+     * `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+     * `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+     * `NEXT_PUBLIC_FIREBASE_APP_ID`
+
+Once these keys are provided, the application will automatically detect them and save recipes, plans, and shopping list data to **Cloud Firestore** whenever PostgreSQL is unavailable. Recipes are seeded to Firestore automatically on first load!
 ---
 
 ## Core MVP Features Implemented

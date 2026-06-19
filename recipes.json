@@ -7617,5 +7617,192 @@
       "dinner",
       "snack"
     ]
+  },
+  {
+    "id": "recipe_1781699833480",
+    "name": "Vardagsbibimbap",
+    "url": "https://drive.google.com/file/d/1s_DyBDSfgW_UKpoVzR-CuBn8OPJd-PJV/view?usp=sharing",
+    "description": "Bibimbap är en kioskvältare både i Korea och på min restaurang Namu. Det betyder ungefär \"rört ris\" och man ska röra ihop hela rätten med sked innan man äter härligheten. Det finns eğentligen inga reğler för vilka grönsaker man lägger på, det viktiga är att det blir riktigt gott. Här är min variant som fungerar",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/4/44/Dolsot-bibimbap.jpg",
+    "preparationTime": 15,
+    "cookingTime": 20,
+    "totalTime": 35,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "International",
+    "mealTypes": [
+      "dinner"
+    ],
+    "occasions": [],
+    "flavorProfile": [],
+    "moodTags": [],
+    "ingredients": [
+      {
+        "name": "vitlöksklyftor",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "japansk soja",
+        "quantity": 1.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "salt och svartpeppar",
+        "quantity": null,
+        "unit": null,
+        "optional": false
+      },
+      {
+        "name": "vegofärs (eller kyckling-, nöt- eller fläskfärs)",
+        "quantity": 300,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "neutral olja att steka i",
+        "quantity": null,
+        "unit": null,
+        "optional": false
+      },
+      {
+        "name": "gurka",
+        "quantity": 0.5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "risvinäger",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "gochugaru",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "morötter",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 2,
+        "unit": "liter",
+        "optional": false
+      },
+      {
+        "name": "färska böngroddar",
+        "quantity": 200,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "rostade sesamfrön",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "ägg",
+        "quantity": 4,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "mâchesallat eller spenat",
+        "quantity": 70,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "nykokt koreanskt eller japanskt ris",
+        "quantity": 4,
+        "unit": "portioner",
+        "optional": false
+      },
+      {
+        "name": "kimchi",
+        "quantity": null,
+        "unit": null,
+        "optional": true
+      },
+      {
+        "name": "gochujang",
+        "quantity": 3,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sirap",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 2,
+        "unit": "tsk",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Riv vitlöken. Blanda ihop soja, socker, 1 matsked sesamolja, riven vitlök och en rejäl nypa svartpeppar i en stor skål. Lägg i vegofärsen som får dra till sig smakerna medan du förbereder grönsakerna.",
+      "Skär gurkan i tunna skivor. Salta lätt och lägg i en skål. Häll på risvinäger och låt stå i 10 minuter. Häll sedan av all vätska och blanda med gochugaru. Ställ åt sidan.",
+      "Skala morötterna med potatisskalare. Släng skalet, skala sedan vidare runtom tills moroten är slut. Strö på lite salt och ställ åt sidan.",
+      "Koka upp 2 liter vatten. Lägg böngroddarna i ett durkslag eller sil. Häll det kokande vattnet över, spola sedan av groddarna med iskallt vatten. Låt droppa av väl. Blanda sedan med ½ matsked sesamolja, sesamfrön och smaka av med salt.",
+      "Stek färsen på hög värme tills den har fått fin färg. Stek äggen på ena sidan.",
+      "Blanda ihop allt till bibimbapsåsen.",
+      "Bottna 4 skålar med ris. Toppa med den koreanska färsen, gurkan, moroten, böngroddar, mâchesallat och ägg. Om du har kimchi hemma, lägg på lite av det med. Servera med den heta bibimbapsåsen."
+    ],
+    "nutrition": {
+      "calories": 620,
+      "protein": 29.4,
+      "carbohydrates": 76.2,
+      "fat": 21.1,
+      "fiber": 9.1,
+      "sugar": 13.2,
+      "sodium": 1753,
+      "iron": 4.8,
+      "calcium": 175,
+      "potassium": 686,
+      "magnesium": 85,
+      "vitaminA": 461,
+      "vitaminC": 21.8,
+      "vitaminD": 2,
+      "vitaminB12": 0.5
+    },
+    "createdAt": "2026-06-17T12:37:13.480Z",
+    "updatedAt": "2026-06-17T12:37:13.480Z"
   }
 ]

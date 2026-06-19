@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
-    "build": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate && (prisma db push || echo 'Warning: Could not push schema updates to DB') && next build",
+    "build": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate && ([ -n \"$VERCEL\" ] && echo 'Skipping DB push on Vercel' || prisma db push || echo 'Warning: Could not push schema updates to DB') && next build",
     "start": "next start",
     "postinstall": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate",
     "prisma:generate": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate",

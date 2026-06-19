@@ -143,7 +143,6 @@
 .transition-scale {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 /* Accessible keyboard focus outlines (WCAG 2.4.7) */
 input:focus-visible, 
 textarea:focus-visible, 
@@ -158,4 +157,11 @@ a:focus-visible {
 .border-3 {
   transform: translate3d(0, 0, 0);
   isolation: isolate;
+}
+
+/* Prevent auto-zooming on focus in iOS Safari on mobile devices */
+@media (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }

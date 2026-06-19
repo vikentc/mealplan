@@ -40,7 +40,7 @@ const CRAVINGS = [
   { id: 'high-protein', bg: 'bg-emerald-100', text: 'text-emerald-950' },
 ];
 
-const CUISINES = ['Vietnamese', 'Thai', 'Japanese', 'Swedish', 'Italian', 'Mexican'];
+const CUISINES = ['Vietnamese', 'Thai', 'Korean', 'Japanese', 'Swedish', 'Italian', 'Mexican'];
 const FLAVORS = ['spicy', 'sweet', 'savory', 'sour', 'umami', 'creamy', 'tangy', 'rich', 'light', 'fresh'];
 
 export default function RecommendationSelector() {

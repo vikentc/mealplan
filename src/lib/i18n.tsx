@@ -150,6 +150,7 @@ const translations: Record<Language, Record<string, string>> = {
     // cuisines
     'cuisine.Vietnamese': 'Vietnamesiskt',
     'cuisine.Thai': 'Thailändskt',
+    'cuisine.Korean': 'Koreanskt',
     'cuisine.Japanese': 'Japanskt',
     'cuisine.Swedish': 'Svenskt',
     'cuisine.Italian': 'Italienskt',
@@ -430,6 +431,7 @@ const translations: Record<Language, Record<string, string>> = {
     // cuisines
     'cuisine.Vietnamese': 'Vietnamese',
     'cuisine.Thai': 'Thai',
+    'cuisine.Korean': 'Korean',
     'cuisine.Japanese': 'Japanese',
     'cuisine.Swedish': 'Swedish',
     'cuisine.Italian': 'Italian',

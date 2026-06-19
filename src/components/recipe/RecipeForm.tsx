@@ -64,13 +64,14 @@ interface RecipeFormProps {
   fallbackId?: string;
 }
 
-const CUISINES = ['Vietnamese', 'Thai', 'Japanese', 'Swedish', 'Italian', 'Mexican', 'American', 'French', 'Indian', 'Greek', 'Spanish', 'Chinese', 'International'];
+const CUISINES = ['Vietnamese', 'Thai', 'Korean', 'Japanese', 'Swedish', 'Italian', 'Mexican', 'American', 'French', 'Indian', 'Greek', 'Spanish', 'Chinese', 'International'];
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'];
 
 const cuisineLabels: Record<string, string> = {
   'Vietnamese': 'Vietnamesiskt',
   'Thai': 'Thailändskt',
+  'Korean': 'Koreanskt',
   'Japanese': 'Japanskt',
   'Swedish': 'Svenskt',
   'Italian': 'Italienskt',

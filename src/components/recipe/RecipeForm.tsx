@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Save, ChevronLeft, AlertCircle, ChefHat, GripVertical, Sparkles, Link2, Image as ImageIcon, Loader2, Check, FileText, Camera } from 'lucide-react';
+import { Plus, Trash2, Save, ChevronLeft, AlertCircle, ChefHat, GripVertical, Sparkles, Link2, Image as ImageIcon, Loader2, Check, FileText, Camera, X } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { createRecipe, updateRecipe, autofillFromUrl, parseRecipeImageAction, estimateNutritionAction } from '@/app/actions/recipes';
@@ -134,6 +134,42 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
   const [autofillStatus, setAutofillStatus] = useState('');
   const [autofillError, setAutofillError] = useState<string | null>(null);
 
+  interface AutofillImage {
+    file: File;
+    previewUrl: string;
+  }
+  const [autofillImages, setAutofillImages] = useState<AutofillImage[]>([]);
+
+  const addAutofillFiles = (files: File[]) => {
+    const newImages = files.map(file => ({
+      file,
+      previewUrl: URL.createObjectURL(file)
+    }));
+    setAutofillImages(prev => [...prev, ...newImages]);
+  };
+
+  const removeAutofillImage = (index: number) => {
+    setAutofillImages(prev => {
+      const updated = [...prev];
+      const removed = updated.splice(index, 1)[0];
+      if (removed) {
+        URL.revokeObjectURL(removed.previewUrl);
+      }
+      return updated;
+    });
+  };
+
+  const autofillImagesRef = useRef<AutofillImage[]>([]);
+  useEffect(() => {
+    autofillImagesRef.current = autofillImages;
+  }, [autofillImages]);
+
+  useEffect(() => {
+    return () => {
+      autofillImagesRef.current.forEach(img => URL.revokeObjectURL(img.previewUrl));
+    };
+  }, []);
+
   // Scraped/Parsed Preview state
   const [previewData, setPreviewData] = useState<{
     name?: string;
@@ -154,13 +190,13 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
   const texts = {
     sv: {
       autofillTitle: 'Autofyll Recept (Smart)',
-      autofillDesc: 'Hämta information automatiskt från en receptlänk eller läs av ingredienser och instruktioner direkt från en bild.',
+      autofillDesc: 'Hämta information automatiskt från en receptlänk eller läs av ingredienser och instruktioner direkt från bilder.',
       tabLink: 'Klistra in länk',
-      tabImage: 'Läs från bild',
+      tabImage: 'Läs från bilder',
       urlPlaceholder: 'Klistra in länk till receptet (t.ex. köket.se, etc.)',
       btnFetch: 'Hämta',
-      imageZone: 'Dra och släpp en receptbild här, eller klicka för att bläddra',
-      imageZoneSub: 'Stöder JPG, PNG. Använder AI-avläsning (kräver GEMINI_API_KEY i .env) med lokal fallback.',
+      imageZone: 'Dra och släpp en eller flera receptbilder här, eller välj nedan',
+      imageZoneSub: 'Stöder flera JPG/PNG-bilder samtidigt. Tolkas med AI (eller lokal fallback).',
       applying: 'Applicerar...',
       appliedSuccess: 'Receptdata har hämtats! Kontrollera och redigera informationen nedan.',
       previewTitle: 'Identifierad receptinformation',
@@ -169,19 +205,24 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       ingredients: 'Ingredienser',
       instructions: 'Instruktioner',
       generalInfo: 'Allmän info',
-      noTextFound: 'Kunde inte hitta eller tolka text i bilden. Kontrollera bildens kvalitet.',
-      scannedImage: 'Skannar bild...',
-      optional: 'valfri'
+      noTextFound: 'Kunde inte hitta eller tolka text i bilderna. Kontrollera bildernas kvalitet.',
+      scannedImage: 'Skannar bilder...',
+      optional: 'valfri',
+      btnAnalyze: 'Analysera receptbilder',
+      btnSelectImages: 'Välj bilder',
+      btnTakePhotos: 'Ta ett foto',
+      uploadedImages: 'Valda bilder',
+      removeImage: 'Ta bort bild'
     },
     en: {
       autofillTitle: 'Autofill Recipe (Smart)',
-      autofillDesc: 'Automatically fetch information from a recipe link, or extract ingredients and instructions directly from an image.',
+      autofillDesc: 'Automatically fetch information from a recipe link, or extract ingredients and instructions directly from images.',
       tabLink: 'Paste link',
-      tabImage: 'Read from image',
+      tabImage: 'Read from images',
       urlPlaceholder: 'Paste recipe link (e.g. foodnetwork.com, etc.)',
       btnFetch: 'Fetch',
-      imageZone: 'Drag and drop a recipe image here, or click to browse',
-      imageZoneSub: 'Supports JPG, PNG. Uses AI scanning (requires GEMINI_API_KEY in .env) with local fallback.',
+      imageZone: 'Drag and drop one or more recipe images here, or choose below',
+      imageZoneSub: 'Supports multiple JPG/PNG images. Parsed with AI (or local fallback).',
       applying: 'Applying...',
       appliedSuccess: 'Recipe data extracted! Review and edit the details below.',
       previewTitle: 'Identified Recipe Information',
@@ -190,9 +231,14 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       ingredients: 'Ingredients',
       instructions: 'Instructions',
       generalInfo: 'General info',
-      noTextFound: 'Could not find or parse text in the image. Please check image quality.',
-      scannedImage: 'Scanning image...',
-      optional: 'optional'
+      noTextFound: 'Could not find or parse text in the images. Please check image quality.',
+      scannedImage: 'Scanning images...',
+      optional: 'optional',
+      btnAnalyze: 'Analyze Recipe Images',
+      btnSelectImages: 'Choose Images',
+      btnTakePhotos: 'Take a Photo',
+      uploadedImages: 'Selected Images',
+      removeImage: 'Remove Image'
     }
   };
 
@@ -235,23 +281,25 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
     }
   };
 
-  const handleImageAutofill = async (file: File) => {
-    if (!file) return;
+  const handleImageAutofill = async () => {
+    if (autofillImages.length === 0) return;
     setAutofillLoading(true);
     setAutofillError(null);
     setPreviewData(null);
     setAutofillProgress(0);
-    setAutofillStatus(lang === 'sv' ? 'Läser av bild med AI...' : 'Analyzing image with AI...');
+    setAutofillStatus(lang === 'sv' ? 'Läser av bilder med AI...' : 'Analyzing images with AI...');
 
     try {
       const formData = new FormData();
-      formData.append('image', file);
+      autofillImages.forEach((img) => {
+        formData.append('images', img.file);
+      });
 
       const res = await parseRecipeImageAction(formData);
 
       if (res.success && res.recipe) {
         setPreviewData(res.recipe);
-        setAutofillStatus(lang === 'sv' ? 'Bilden har lästs med AI!' : 'Image read successfully with AI!');
+        setAutofillStatus(lang === 'sv' ? 'Bilderna har lästs med AI!' : 'Images read successfully with AI!');
         return;
       }
 
@@ -264,35 +312,43 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
 
       // Fallback to local Tesseract OCR
       setAutofillStatus(lang === 'sv' ? 'Laddar lokal OCR-motor...' : 'Loading local OCR engine...');
-      const imageUrl = URL.createObjectURL(file);
-
       const Tesseract = (await import('tesseract.js')).default;
-      const { data: { text } } = await Tesseract.recognize(
-        imageUrl,
-        'swe+eng',
-        {
-          logger: (m) => {
-            if (m.status === 'recognizing text') {
-              setAutofillStatus(lang === 'sv' ? `Läser av text lokalt... (${Math.round(m.progress * 100)}%)` : `Recognizing text locally... (${Math.round(m.progress * 100)}%)`);
-              setAutofillProgress(m.progress);
-            } else if (m.status === 'loading tesseract core') {
-              setAutofillStatus(lang === 'sv' ? 'Laddar lokal core...' : 'Loading local core...');
-            } else if (m.status === 'initializing api') {
-              setAutofillStatus(lang === 'sv' ? 'Initierar lokal api...' : 'Initializing local api...');
+      
+      let combinedText = '';
+      for (let i = 0; i < autofillImages.length; i++) {
+        const img = autofillImages[i];
+        setAutofillStatus(
+          lang === 'sv' 
+            ? `Läser av bild ${i + 1} av ${autofillImages.length} lokalt...` 
+            : `Reading image ${i + 1} of ${autofillImages.length} locally...`
+        );
+        const { data: { text } } = await Tesseract.recognize(
+          img.previewUrl,
+          'swe+eng',
+          {
+            logger: (m) => {
+              if (m.status === 'recognizing text') {
+                setAutofillStatus(
+                  lang === 'sv' 
+                    ? `Läser av bild ${i + 1} av ${autofillImages.length} lokalt... (${Math.round(m.progress * 100)}%)` 
+                    : `Reading image ${i + 1} of ${autofillImages.length} locally... (${Math.round(m.progress * 100)}%)`
+                );
+                const overallProgress = (i + m.progress) / autofillImages.length;
+                setAutofillProgress(overallProgress);
+              }
             }
           }
-        }
-      );
+        );
+        combinedText += '\n' + text;
+      }
 
-      URL.revokeObjectURL(imageUrl);
-
-      if (!text || !text.trim()) {
-        throw new Error(lang === 'sv' ? 'Ingen text hittades i bilden.' : 'No text found in the image.');
+      if (!combinedText || !combinedText.trim()) {
+        throw new Error(lang === 'sv' ? 'Ingen text hittades i bilderna.' : 'No text found in the images.');
       }
 
       setAutofillStatus(lang === 'sv' ? 'Klassificerar text...' : 'Classifying text...');
 
-      const classified = classifyOcrText(text);
+      const classified = classifyOcrText(combinedText);
 
       if (classified.ingredients.length === 0 && classified.instructions.length === 0) {
         throw new Error(
@@ -313,7 +369,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       );
     } catch (err: any) {
       console.error(err);
-      setAutofillError(err.message || (lang === 'sv' ? 'Misslyckades med att läsa bilden.' : 'Failed to read the image.'));
+      setAutofillError(err.message || (lang === 'sv' ? 'Misslyckades med att läsa bilderna.' : 'Failed to read the images.'));
     } finally {
       setAutofillLoading(false);
       setAutofillProgress(0);
@@ -366,6 +422,8 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
     }
 
     setPreviewData(null);
+    autofillImages.forEach(img => URL.revokeObjectURL(img.previewUrl));
+    setAutofillImages([]);
 
     const targetElement = document.getElementById('recipe-form-title');
     if (targetElement) {
@@ -406,9 +464,9 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
     e.preventDefault();
     setIsDraggingAutofill(false);
     if (autofillLoading) return;
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      handleImageAutofill(file);
+    const droppedFiles = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+    if (droppedFiles.length > 0) {
+      addAutofillFiles(droppedFiles);
     }
   };
 
@@ -1059,12 +1117,10 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                 </div>
                 <div>
                   <h4 className="font-black text-xs uppercase tracking-wider text-foreground">
-                    {lang === 'sv' ? 'Läs in receptet från en bild' : 'Read recipe from image'}
+                    {texts[lang].imageZone}
                   </h4>
                   <p className="text-[10px] text-foreground/65 max-w-xs mx-auto mt-1 leading-normal font-semibold">
-                    {lang === 'sv' 
-                      ? 'Ladda upp en skärmavbild eller fota din kokbok för att läsa av texten med AI.' 
-                      : 'Upload a screenshot or take a photo of your cookbook to parse it with AI.'}
+                    {texts[lang].imageZoneSub}
                   </p>
                 </div>
 
@@ -1074,15 +1130,20 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                     <input
                       type="file"
                       accept="image/*"
+                      multiple
                       onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleImageAutofill(file);
+                        if (e.target.files) {
+                          const selectedFiles = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
+                          if (selectedFiles.length > 0) {
+                            addAutofillFiles(selectedFiles);
+                          }
+                        }
                       }}
                       className="hidden"
                       disabled={autofillLoading}
                     />
                     <ImageIcon className="h-4.5 w-4.5" />
-                    <span>{lang === 'sv' ? 'Välj bildfil' : 'Choose Image File'}</span>
+                    <span>{texts[lang].btnSelectImages}</span>
                   </label>
 
                   {/* Camera Capture Button */}
@@ -1093,13 +1154,15 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                       capture="environment"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) handleImageAutofill(file);
+                        if (file) {
+                          addAutofillFiles([file]);
+                        }
                       }}
                       className="hidden"
                       disabled={autofillLoading}
                     />
                     <Camera className="h-4.5 w-4.5" />
-                    <span>{lang === 'sv' ? 'Ta ett foto' : 'Take a Photo'}</span>
+                    <span>{texts[lang].btnTakePhotos}</span>
                   </label>
                 </div>
                 
@@ -1107,6 +1170,66 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                   {lang === 'sv' ? 'Stöder JPG, PNG • Lokalt OCR fallbacks' : 'Supports JPG, PNG • Local OCR fallback'}
                 </p>
               </div>
+
+              {/* Selected Images Thumbnails Grid */}
+              {autofillImages.length > 0 && (
+                <div className="space-y-3 bg-white border-3 border-foreground p-4 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex items-center justify-between">
+                    <h5 className="font-black text-xs uppercase tracking-wider text-foreground">
+                      {texts[lang].uploadedImages} ({autofillImages.length})
+                    </h5>
+                    {autofillImages.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          autofillImages.forEach(img => URL.revokeObjectURL(img.previewUrl));
+                          setAutofillImages([]);
+                        }}
+                        disabled={autofillLoading}
+                        className="text-[10px] font-black uppercase text-red-600 hover:text-red-700 disabled:opacity-50"
+                      >
+                        {lang === 'sv' ? 'Rensa alla' : 'Clear all'}
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                    {autofillImages.map((img, idx) => (
+                      <div key={idx} className="relative aspect-square rounded-lg border-2 border-foreground overflow-hidden bg-gray-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <img 
+                          src={img.previewUrl} 
+                          alt={`Selected page ${idx + 1}`} 
+                          className="w-full h-full object-cover" 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeAutofillImage(idx)}
+                          disabled={autofillLoading}
+                          className="absolute top-1 right-1 p-1 bg-red-400 hover:bg-red-500 border-2 border-foreground rounded-md text-foreground cursor-pointer transition-all shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none"
+                          title={texts[lang].removeImage}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-2 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={handleImageAutofill}
+                      disabled={autofillLoading}
+                      className="flex items-center gap-2 px-6 py-3.5 bg-yellow-300 hover:bg-yellow-400 disabled:opacity-50 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none"
+                    >
+                      {autofillLoading ? (
+                        <Loader2 className="h-4.5 w-4.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4.5 w-4.5" />
+                      )}
+                      <span>{texts[lang].btnAnalyze}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1152,7 +1275,11 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setPreviewData(null)}
+                    onClick={() => {
+                      setPreviewData(null);
+                      autofillImages.forEach(img => URL.revokeObjectURL(img.previewUrl));
+                      setAutofillImages([]);
+                    }}
                     className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground font-black text-[10px] uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
                   >
                     {texts[lang].btnDiscard}

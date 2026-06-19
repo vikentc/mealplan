@@ -1344,8 +1344,15 @@ function parseJsonLdRecipe(data: any, originalUrl: string) {
 
 export async function parseRecipeImageAction(formData: FormData) {
   try {
-    const file = formData.get('image') as File | null;
-    if (!file) {
+    let files = formData.getAll('images') as File[];
+    if (files.length === 0) {
+      const singleFile = formData.get('image') as File | null;
+      if (singleFile) {
+        files = [singleFile];
+      }
+    }
+
+    if (files.length === 0) {
       return { error: 'NO_FILE', message: 'Ingen bild skickades.' };
     }
 
@@ -1357,12 +1364,27 @@ export async function parseRecipeImageAction(formData: FormData) {
       };
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const base64Image = buffer.toString('base64');
-    const mimeType = file.type || 'image/jpeg';
+    const imageParts: any[] = [];
+    for (const file of files) {
+      if (file && file.size > 0) {
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const base64Image = buffer.toString('base64');
+        const mimeType = file.type || 'image/jpeg';
+        imageParts.push({
+          inlineData: {
+            mimeType: mimeType,
+            data: base64Image,
+          },
+        });
+      }
+    }
 
-    const prompt = `Du är en expert på matlagning och recepttolkning. Läs den här bilden och extrahera receptet.
+    if (imageParts.length === 0) {
+      return { error: 'NO_FILE', message: 'Ingen bild skickades.' };
+    }
+
+    const prompt = `Du är en expert på matlagning och recepttolkning. Läs den här bilden eller bilderna och extrahera receptet.
 Extrahera namnet på receptet, ingredienserna (med namn, mängd, enhet, samt om de är valfria) och tillagningsstegen.
 Receptets text ska extraheras på originalspråket (svenska om texten är på svenska).
 Säkerställ att mängder är siffror där det är möjligt (t.ex. 0.5 eller 1.5 istället för bråk som 1/2), och enheter är korrekta förkortningar (t.ex. "dl", "g", "st", "msk", "tsk").
@@ -1393,12 +1415,7 @@ Returnera resultatet som en JSON-struktur med exakt detta format:
             {
               parts: [
                 { text: prompt },
-                {
-                  inlineData: {
-                    mimeType: mimeType,
-                    data: base64Image,
-                  },
-                },
+                ...imageParts,
               ],
             },
           ],

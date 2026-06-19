@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { createRecipe, updateRecipe, autofillFromUrl, parseRecipeImageAction, estimateNutritionAction } from '@/app/actions/recipes';
 import { useLanguage } from '@/lib/i18n';
-import Tesseract from 'tesseract.js';
 import { classifyOcrText } from '@/lib/recipeParser';
 
 interface Ingredient {
@@ -113,11 +112,15 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
     if (typeof window !== 'undefined') {
       const referrer = document.referrer;
       if (referrer && referrer.includes(window.location.host)) {
-        const urlObj = new URL(referrer);
-        if (!urlObj.pathname.includes('/login') && 
-            !urlObj.pathname.includes('/recipes/add') && 
-            !urlObj.pathname.endsWith('/edit')) {
-          setBackUrl(urlObj.pathname + urlObj.search);
+        try {
+          const urlObj = new URL(referrer);
+          if (!urlObj.pathname.includes('/login') && 
+              !urlObj.pathname.includes('/recipes/add') && 
+              !urlObj.pathname.endsWith('/edit')) {
+            setBackUrl(urlObj.pathname + urlObj.search);
+          }
+        } catch (e) {
+          console.error('Failed to parse referrer URL:', e);
         }
       }
     }
@@ -263,6 +266,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       setAutofillStatus(lang === 'sv' ? 'Laddar lokal OCR-motor...' : 'Loading local OCR engine...');
       const imageUrl = URL.createObjectURL(file);
 
+      const Tesseract = (await import('tesseract.js')).default;
       const { data: { text } } = await Tesseract.recognize(
         imageUrl,
         'swe+eng',

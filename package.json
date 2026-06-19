@@ -38,5 +38,8 @@
     "prisma": "^6.19.3",
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3"
+  },
+  "optionalDependencies": {
+    "lightningcss-darwin-arm64": "^1.32.0"
   }
 }

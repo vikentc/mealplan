@@ -351,16 +351,47 @@ async function saveFallbackRecipes(recipes: any[]) {
   saveLocalJSONRecipes(recipes);
 }
 
+let isDbOffline = false;
+let lastDbCheckTime = 0;
+const DB_RETRY_INTERVAL_MS = 30000; // Retry DB connection after 30 seconds
+
 // Try-catch wrappers for db queries
 async function runWithFallback<T>(
   dbQuery: () => Promise<T>, 
   fallbackQuery: () => T | Promise<T>,
   isWrite: boolean = false
 ): Promise<T> {
+  const now = Date.now();
+  if (isDbOffline && (now - lastDbCheckTime < DB_RETRY_INTERVAL_MS)) {
+    return await fallbackQuery();
+  }
+
   try {
     // Attempt database call
-    return await dbQuery();
+    const result = await dbQuery();
+    if (isDbOffline) {
+      console.log('Database connection restored.');
+      isDbOffline = false;
+    }
+    return result;
   } catch (error: any) {
+    const isConnectionError = 
+      error.code === 'P1001' || 
+      error.name === 'PrismaClientInitializationError' || 
+      (error.message && (
+        error.message.includes('Can\'t reach database') ||
+        error.message.includes('localhost:5432') ||
+        error.message.includes('PrismaClientInitializationError')
+      ));
+
+    if (isConnectionError) {
+      if (!isDbOffline) {
+        console.warn('Database is offline, switching to fallback mode (JSON/Firestore).');
+        isDbOffline = true;
+      }
+      lastDbCheckTime = Date.now();
+    }
+
     if (isWrite && process.env.NODE_ENV === 'production') {
       console.error('Database mutation failed in production, attempting fallback:', error.message || error);
       try {
@@ -1487,7 +1518,7 @@ Viktigt:
 let isTableChecked = false;
 
 async function ensureShoppingListTableExists() {
-  if (isTableChecked) return;
+  if (isDbOffline || isTableChecked) return;
   try {
     await db.$executeRawUnsafe(`
       CREATE TABLE IF NOT EXISTS "ShoppingList" (
@@ -1499,8 +1530,20 @@ async function ensureShoppingListTableExists() {
       );
     `);
     isTableChecked = true;
-  } catch (error) {
-    console.error('Failed to auto-create ShoppingList table:', error);
+  } catch (error: any) {
+    const isConnectionError = 
+      error.code === 'P1001' || 
+      error.name === 'PrismaClientInitializationError' || 
+      (error.message && (
+        error.message.includes('Can\'t reach database') ||
+        error.message.includes('localhost:5432') ||
+        error.message.includes('PrismaClientInitializationError')
+      ));
+    if (isConnectionError) {
+      isDbOffline = true;
+      lastDbCheckTime = Date.now();
+    }
+    console.error('Failed to auto-create ShoppingList table:', error.message || error);
   }
 }
 

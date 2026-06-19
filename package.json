@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
-    "build": "DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public} prisma generate && (DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public} prisma db push || echo 'Warning: Could not push schema updates to DB') && next build",
+    "build": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate && (prisma db push || echo 'Warning: Could not push schema updates to DB') && next build",
     "start": "next start",
-    "postinstall": "DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public} prisma generate",
-    "prisma:generate": "DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public} prisma generate",
-    "prisma:push": "DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public} prisma db push",
+    "postinstall": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate",
+    "prisma:generate": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate",
+    "prisma:push": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma db push",
     "seed": "node scripts/seed.js"
   },
   "keywords": [],

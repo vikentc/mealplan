@@ -29,19 +29,21 @@ export interface Recipe {
   url: string | null;
   description: string | null;
   image: string | null;
+  images?: string[];
   preparationTime: number;
   cookingTime: number;
   totalTime: number;
   servings: number;
   difficulty: string;
   cuisine: string;
-  countryOfOrigin: string | null;
-  region: string | null;
-  mealType: string;
+  countryOfOrigin?: string | null;
+  region?: string | null;
+  mealType?: string;
+  mealTypes?: string[];
   occasions: string[];
   flavorProfile: string[];
   moodTags: string[];
-  spiceLevel: number;
+  spiceLevel?: number;
   ingredients: Ingredient[];
   instructions: string[];
   nutrition: Nutrition;
@@ -7391,5 +7393,2495 @@ export const recipes: Recipe[] = [
       "vitaminB12": 0
     },
     "id": "recipe_57"
+  },
+  {
+    "id": "recipe_1781593225799",
+    "name": "Kvarg",
+    "url": "https://www.gymgrossisten.com/barskvarg-frukost.html?srsltid=AfmBOoo_XtpvaqkK14nO2N5ygwO8ZtM5UbZ7rPyVG2y4xhUlCudfj_Ga",
+    "description": "Perfekt som bas i frukosten – den håller dig mätt länge tack vare sitt höga proteininnehåll och kan ätas naturell eller smaksatt, toppad med bär, nötter och frön.",
+    "image": "https://www.gymgrossisten.com/on/demandware.static/-/Sites-Gymgrossisten-Library/default/dwf85f8fc5/Editorial/shutterstock_1342453403.jpg",
+    "preparationTime": 15,
+    "cookingTime": 5,
+    "totalTime": 20,
+    "servings": 1,
+    "difficulty": "Medium",
+    "cuisine": "International",
+    "countryOfOrigin": "Unknown",
+    "region": "Unknown",
+    "mealType": "breakfast",
+    "occasions": [],
+    "flavorProfile": [],
+    "moodTags": [],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "Kvarg",
+        "quantity": 250,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "Protein pulver",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Blandade bär",
+        "quantity": 150,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "Pumpakärnor",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": true
+      },
+      {
+        "name": "Honung",
+        "quantity": 2.5,
+        "unit": "cl",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Häll upp hälften av kvargen i ett stort glas",
+      "Tillsätt protein pulver och blanda tills den är slät",
+      "Tillsätt pumpakärnorna och hälften av bären",
+      "Tillsätt resten av kvargen över bären och pumpakärnorna",
+      "Häll upp resterande bär",
+      "Ringla honungen över bären"
+    ],
+    "nutrition": {
+      "calories": 320,
+      "protein": 50,
+      "carbohydrates": 26,
+      "fat": 8.5,
+      "fiber": 0,
+      "sugar": 0,
+      "sodium": 0,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "createdAt": "2026-06-16T07:00:25.799Z",
+    "updatedAt": "2026-06-16T07:12:10.794Z"
+  },
+  {
+    "id": "recipe_1781600927447",
+    "name": "Plättar",
+    "url": "https://www.arla.se/recept/plattar-med-sommarbar/",
+    "description": "Plättar är en klassisk och älskad rätt som passar perfekt till helgfrukost, brunch eller som ett lyxigt mellanmål. Stek plättarna frasiga och servera gärna med färska bär som smultron, blåbär, hallon eller jordgubbar. Toppad med vispad grädde blir detta en både enkel och lyxig dessert som sprider värme och glädje vid varje tugga.",
+    "image": "https://images.arla.com/recordid/5462ABB2-5DD1-4E3C-859E215C6693DFE7/picture.jpg?width=1300&height=525&mode=crop&crop=(0,247,0,-284)&format=webp",
+    "preparationTime": 20,
+    "cookingTime": 20,
+    "totalTime": 40,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "International",
+    "countryOfOrigin": "Unknown",
+    "region": "Unknown",
+    "mealType": "dinner",
+    "occasions": [],
+    "flavorProfile": [],
+    "moodTags": [],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "vetemjöl",
+        "quantity": 3,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Arla Ko® Standardmjölk",
+        "quantity": 6,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "ägg",
+        "quantity": 3,
+        "unit": null,
+        "optional": false
+      },
+      {
+        "name": "salt",
+        "quantity": 0.5,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "Arla Köket® Smör- & rapsolja, till stekning",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "Arla Ko® Vispgrädde",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "blandade färska bär, t ex smultron, hallon, jordgubbar eller blåbär",
+        "quantity": 250,
+        "unit": "g",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Mät upp mjölet i en bunke. Vispa ner hälften av mjölken till en slät smet. Tillsätt ägg, salt och resten av mjölken.",
+      "Hetta upp smör- & rapsolja i en plättlagg. Stek plättar i omgångar på medelvärme.",
+      "Vänd plättarna när smeten stannat på ovansidan.",
+      "Vispa grädden fluffig tills det bildas toppar, helst för hand.",
+      "Servera plättarna med färska bär och grädde."
+    ],
+    "nutrition": {
+      "calories": 562,
+      "protein": 15,
+      "carbohydrates": 45,
+      "fat": 35,
+      "fiber": 3,
+      "sugar": 0,
+      "sodium": 0,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "createdAt": "2026-06-16T09:08:47.447Z",
+    "updatedAt": "2026-06-16T09:08:47.447Z"
+  },
+  {
+    "id": "recipe_1781603763529",
+    "name": "Klassisk pizzadeg",
+    "url": "https://photos.app.goo.gl/2RnEhr5yhqZTxXSS8",
+    "description": null,
+    "image": "https://images.arla.com/recordid/7CEBD784-61E8-4D71-AF6988DC4A66439B/pizzadeg.jpg?width=1269&height=715&mode=crop&format=webp",
+    "preparationTime": 15,
+    "cookingTime": 20,
+    "totalTime": 35,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Italian",
+    "countryOfOrigin": "Unknown",
+    "region": "Unknown",
+    "mealType": "dinner",
+    "occasions": [],
+    "flavorProfile": [],
+    "moodTags": [],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "Färsk jäst",
+        "quantity": 5,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "Kallt vatten",
+        "quantity": 3,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Strösocker",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "Salt",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "Olivolja",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "Vetemjöl",
+        "quantity": 6,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Vetemjöl (till utbakning)",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "Bakplåtspapper",
+        "quantity": null,
+        "unit": null,
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Använd gärna köksmaskin monterad med degkrok.",
+      "Rör ihop jäst och vatten tills jästen löser sig.",
+      "Blanda i socker, salt och olja.",
+      "Arbeta in mjölet i 2-3 omgångar och blanda till en smidig deg, ca 10 minuter.",
+      "Täck bunken med plastfilm och låt pizzadegen jäsa 1.5 timme.",
+      "Ta upp degen på mjölat bakbord och dela den i 3 lika stora bitar.",
+      "Degbitarna kan frysas in och håller ca 1 månad.",
+      "Utbakning för 1 portionsstor rund pizza (25-30 cm i diameter) eller 1 rektangulär pizza (23 x 32 cm): Ta upp 1 bit deg på mjölat bakbord. Forma den till en bulle och låt jäsa under bakduk ca 20 minuter. Kavla eller dra ut degen till 1 rund pizza eller 1 rektangulär. Lägg pizzan på bakplåtspapper.",
+      "Utbakning för 2 runda mellanstora pizzor (17-20 cm i diameter) eller 2 avlånga pizzor (15 x 30 cm): Ta upp 1 bit deg på mjölat bakbord. Dela den i 2 delar och forma dem till bullar. Låt bullarna jäsa under bakduk ca 20 minuter. Kavla eller dra ut till 2 runda pizzor eller 2 avlånga pizzor. Lägg pizzorna på bakplåtspapper.",
+      "Utbakning för 4 små avlånga pizzor (ca 6 x 15 cm): Ta upp 1 bit deg på mjölat bakbord. Dela den i 4 delar och forma dem till bullar. Låt bullarna jäsa under bakduk ca 20 minuter. Kavla ut till 4 avlånga pizzor. Lägg pizzorna på bakplåtspapper.",
+      "Utbakning för 10 minipizzor (ca 9 cm i diameter): Ta upp 1 bit deg på mjölat bakbord. Forma den till en bulle och låt den jäsa ca 20 minuter. Kavla ut degen till 1 rektangulär botten, 23 x 32 cm. Ta ut 10 rundlar med kakmått, ca 9 cm i diameter. Lägg pizzorna på bakplåtspapper.",
+      "Utbakning för 1 familjepizza (ca 35 x 42 cm): Använd 2 bitar deg. Ta upp degen på mjölat bakbord och låt den jäsa ca 20 minuter. Kavla ut degen till 1 rektangulär pizza och lägg den på en ugnsplåt med bakplåtspapper."
+    ],
+    "nutrition": {
+      "calories": 424,
+      "protein": 12.2,
+      "carbohydrates": 78.7,
+      "fat": 4.6,
+      "fiber": 3.2,
+      "sugar": 2.2,
+      "sodium": 490,
+      "iron": 1.5,
+      "calcium": 16.8,
+      "potassium": 110,
+      "magnesium": 28,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "createdAt": "2026-06-16T09:56:03.529Z",
+    "updatedAt": "2026-06-16T10:19:48.877Z",
+    "mealTypes": [
+      "lunch",
+      "dinner",
+      "snack"
+    ]
+  },
+  {
+    "id": "recipe_1781699833480",
+    "name": "Vardagsbibimbap",
+    "url": "https://drive.google.com/file/d/1s_DyBDSfgW_UKpoVzR-CuBn8OPJd-PJV/view?usp=sharing",
+    "description": "Bibimbap är en kioskvältare både i Korea och på min restaurang Namu. Det betyder ungefär \"rört ris\" och man ska röra ihop hela rätten med sked innan man äter härligheten. Det finns eğentligen inga reğler för vilka grönsaker man lägger på, det viktiga är att det blir riktigt gott. Här är min variant som fungerar",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/4/44/Dolsot-bibimbap.jpg",
+    "preparationTime": 15,
+    "cookingTime": 20,
+    "totalTime": 35,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "International",
+    "mealTypes": [
+      "dinner"
+    ],
+    "occasions": [],
+    "flavorProfile": [],
+    "moodTags": [],
+    "ingredients": [
+      {
+        "name": "vitlöksklyftor",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "japansk soja",
+        "quantity": 1.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "salt och svartpeppar",
+        "quantity": null,
+        "unit": null,
+        "optional": false
+      },
+      {
+        "name": "vegofärs (eller kyckling-, nöt- eller fläskfärs)",
+        "quantity": 300,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "neutral olja att steka i",
+        "quantity": null,
+        "unit": null,
+        "optional": false
+      },
+      {
+        "name": "gurka",
+        "quantity": 0.5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "risvinäger",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "gochugaru",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "morötter",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 2,
+        "unit": "liter",
+        "optional": false
+      },
+      {
+        "name": "färska böngroddar",
+        "quantity": 200,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "rostade sesamfrön",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "ägg",
+        "quantity": 4,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "mâchesallat eller spenat",
+        "quantity": 70,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "nykokt koreanskt eller japanskt ris",
+        "quantity": 4,
+        "unit": "portioner",
+        "optional": false
+      },
+      {
+        "name": "kimchi",
+        "quantity": null,
+        "unit": null,
+        "optional": true
+      },
+      {
+        "name": "gochujang",
+        "quantity": 3,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sirap",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 2,
+        "unit": "tsk",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Riv vitlöken. Blanda ihop soja, socker, 1 matsked sesamolja, riven vitlök och en rejäl nypa svartpeppar i en stor skål. Lägg i vegofärsen som får dra till sig smakerna medan du förbereder grönsakerna.",
+      "Skär gurkan i tunna skivor. Salta lätt och lägg i en skål. Häll på risvinäger och låt stå i 10 minuter. Häll sedan av all vätska och blanda med gochugaru. Ställ åt sidan.",
+      "Skala morötterna med potatisskalare. Släng skalet, skala sedan vidare runtom tills moroten är slut. Strö på lite salt och ställ åt sidan.",
+      "Koka upp 2 liter vatten. Lägg böngroddarna i ett durkslag eller sil. Häll det kokande vattnet över, spola sedan av groddarna med iskallt vatten. Låt droppa av väl. Blanda sedan med ½ matsked sesamolja, sesamfrön och smaka av med salt.",
+      "Stek färsen på hög värme tills den har fått fin färg. Stek äggen på ena sidan.",
+      "Blanda ihop allt till bibimbapsåsen.",
+      "Bottna 4 skålar med ris. Toppa med den koreanska färsen, gurkan, moroten, böngroddar, mâchesallat och ägg. Om du har kimchi hemma, lägg på lite av det med. Servera med den heta bibimbapsåsen."
+    ],
+    "nutrition": {
+      "calories": 620,
+      "protein": 29.4,
+      "carbohydrates": 76.2,
+      "fat": 21.1,
+      "fiber": 9.1,
+      "sugar": 13.2,
+      "sodium": 1753,
+      "iron": 4.8,
+      "calcium": 175,
+      "potassium": 686,
+      "magnesium": 85,
+      "vitaminA": 461,
+      "vitaminC": 21.8,
+      "vitaminD": 2,
+      "vitaminB12": 0.5
+    },
+    "createdAt": "2026-06-17T12:37:13.480Z",
+    "updatedAt": "2026-06-17T12:37:13.480Z"
+  },
+  {
+    "name": "Vardagsbibimbap",
+    "url": null,
+    "description": "En enklare vardagsvariant av den koreanska rätten bibimbap, även känd som 'rört ris'. Denna rätt är flexibel med grönsaker och passar bra för både barn och vuxna.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 20,
+    "cookingTime": 20,
+    "totalTime": 40,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Korean",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "weekday",
+      "family dinner"
+    ],
+    "flavorProfile": [
+      "savory",
+      "umami",
+      "fresh",
+      "tangy",
+      "spicy"
+    ],
+    "moodTags": [
+      "healthy",
+      "comfort food"
+    ],
+    "spiceLevel": 2,
+    "ingredients": [
+      {
+        "name": "vitlöksklyftor",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "japansk soja",
+        "quantity": 1.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "salt och svartpeppar",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      },
+      {
+        "name": "vegofärs (eller kyckling-, nöt- eller fläskfärs)",
+        "quantity": 300,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "neutral olja",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      },
+      {
+        "name": "gurka",
+        "quantity": 0.5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "risvinäger",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "gochugaru",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "morötter",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 2,
+        "unit": "liter",
+        "optional": false
+      },
+      {
+        "name": "färska böngroddar",
+        "quantity": 200,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "rostade sesamfrön",
+        "quantity": 0.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "ägg",
+        "quantity": 4,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "mâchesallat eller spenat",
+        "quantity": 70,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "nykokt koreanskt eller japanskt ris",
+        "quantity": 4,
+        "unit": "portioner",
+        "optional": false
+      },
+      {
+        "name": "kimchi",
+        "quantity": null,
+        "unit": "",
+        "optional": true
+      },
+      {
+        "name": "gochujang",
+        "quantity": 3,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sirap",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 2,
+        "unit": "tsk",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Riv vitlöken. Blanda ihop soja, socker, 1 matsked sesamolja, riven vitlök och en rejäl nypa svartpeppar i en stor skål. Lägg i vegofärsen som får dra till sig smakerna medan du förbereder grönsakerna.",
+      "Skär gurkan i tunna skivor. Salta lätt och lägg i en skål. Häll på risvinäger och låt stå i 10 minuter. Häll sedan av all vätska och blanda med gochugaru. Ställ åt sidan.",
+      "Skala morötterna med potatisskalare. Släng skalet, skala sedan vidare runtom tills moroten är slut. Strö på lite salt och ställ åt sidan.",
+      "Koka upp 2 liter vatten. Lägg böngroddarna i ett durkslag eller sil. Häll det kokande vattnet över, spola sedan av groddarna med iskallt vatten. Låt droppa av väl. Blanda sedan med ½ matsked sesamolja, sesamfrön och smaka av med salt.",
+      "Stek färsen på hög värme tills den har fått fin färg. Stek äggen på ena sidan.",
+      "Blanda ihop allt till bibimbapsåsen.",
+      "Bottna 4 skålar med ris. Toppa med den koreanska färsen, gurkan, moroten, böngroddar, mâchesallat och ägg. Om du har kimchi hemma, lägg på lite av det med. Servera med den heta bibimbapsåsen."
+    ],
+    "nutrition": {
+      "calories": 500,
+      "protein": 30,
+      "carbohydrates": 60,
+      "fat": 20,
+      "fiber": 8,
+      "sugar": 10,
+      "sodium": 800,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833481"
+  },
+  {
+    "name": "Heta thaikycklingbiffar med limesås",
+    "url": null,
+    "description": "Spännande smaker från Thailand kombineras i små kycklingbiffar med en krispig sallad och en len, svalkande limesås.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 20,
+    "cookingTime": 15,
+    "totalTime": 35,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Thai",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "weekday",
+      "family dinner",
+      "weekend"
+    ],
+    "flavorProfile": [
+      "spicy",
+      "savory",
+      "tangy",
+      "fresh",
+      "umami"
+    ],
+    "moodTags": [
+      "healthy",
+      "quick and easy"
+    ],
+    "spiceLevel": 3,
+    "ingredients": [
+      {
+        "name": "kycklingfärs",
+        "quantity": 500,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "röd currypasta",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "ägg",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "Maizena majsstärkelse",
+        "quantity": 3,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "citrongräs",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "salladslök, tunt skivade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "röd chilifrukt, tunna skivor",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "fisksås",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "haricots verts, tunt skivade",
+        "quantity": 8,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "rapsolja",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      },
+      {
+        "name": "matlagningsyoghurt",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "riven ingefära",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "lime, rivet skal",
+        "quantity": 0.5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "vitlöksklyfta, skalad och riven",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "salt",
+        "quantity": 0.5,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "fisksås",
+        "quantity": 1.5,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "lime, pressad saft",
+        "quantity": 0.5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "gurka, urkärnad och tärnad",
+        "quantity": 0.5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "rostade och saltade jordnötter, grovhackade",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "rädisor, i kvartar",
+        "quantity": 100,
+        "unit": "g",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Blanda yoghurt, ingefära, limeskal, vitlök och salt väl. Täck över och låt stå i kylen till servering.",
+      "Blanda dressingen till salladen genom att röra ihop fisksås, socker och pressad lime. Häll över gurka, jordnötter och rädisor och blanda väl. Ställ i kylen.",
+      "Ta bort det yttersta skalet från citrongräset och hacka resten riktigt fint. Blanda alla ingredienser till biffarna väl. Forma till små biffar och stek i en stekpanna täckt med rapsolja. Stek tills biffarna är gyllene och frasiga. Låt rinna av på hushållspapper.",
+      "Servera de heta kycklingbiffarna med den svalkande såsen och den krispiga salladen. Ett ångande jasminris är gott till."
+    ],
+    "nutrition": {
+      "calories": 550,
+      "protein": 40,
+      "carbohydrates": 35,
+      "fat": 30,
+      "fiber": 5,
+      "sugar": 10,
+      "sodium": 700,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833482"
+  },
+  {
+    "name": "Pad Thai med kyckling",
+    "url": null,
+    "description": "En av Sveriges mest populära hämtmaträtter, Pad Thai med kyckling. Nudlarna får en milt söt smak och serveras med färska grönsaker och nötter.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 25,
+    "cookingTime": 15,
+    "totalTime": 40,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Thai",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "weekday",
+      "weekend"
+    ],
+    "flavorProfile": [
+      "savory",
+      "sweet",
+      "umami",
+      "tangy",
+      "fresh"
+    ],
+    "moodTags": [
+      "quick and easy",
+      "comfort food"
+    ],
+    "spiceLevel": 1,
+    "ingredients": [
+      {
+        "name": "kycklinglårfilé, i stora tärningar",
+        "quantity": 400,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "platta risnudlar",
+        "quantity": 300,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "tamarindkoncentrat (eller pressad lime)",
+        "quantity": 4,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "fisksås",
+        "quantity": 4,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "japansk soja",
+        "quantity": 3,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "rödlök, i tunna båtar",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "vitlöksklyfta",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "morot, tunna skivor",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "salladslökar, 2-3 cm bitar",
+        "quantity": 4,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "vitlöksklyftor, skalade och finhackade",
+        "quantity": 3,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "koriander, finhackade blad och stjälkar",
+        "quantity": 1,
+        "unit": "kruka",
+        "optional": false
+      },
+      {
+        "name": "hackad ingefära",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "ägg, uppvispade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "böngroddar",
+        "quantity": 150,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "lime, klyftade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "rostade jordnötter, grovhackade",
+        "quantity": 100,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "rapsolja",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      },
+      {
+        "name": "salt",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Blötlägg nudlarna enligt instruktioner på förpackningen, men dra av lite från blötläggningstiden så att nudlarna är något al dente. Häll av vattnet.",
+      "Blanda tamarindkoncentrat, fisksås och japansk soja.",
+      "Salta kycklingen något och bryn den i en rykande het wok eller stor stekpanna tills den har fått fin färg. Lägg på en tallrik och ställ åt sidan.",
+      "I samma wok eller stora stekpanna som kycklingen stektes i, häll på ny olja och vänta tills den börjar ryka. Fräs rödlök, morot, salladslök, vitlök, koriander-stjälkar och ingefära på hög värme i 2–3 minuter. Häll över på en tallrik och ställ åt sidan.",
+      "Stek nudlarna på medelvärme i woken (håll i mer olja om pannan är torr). Häll över tamarindsåsen och eventuellt lite vatten och rör om väl tills alla nudlar har mjuknat något och är täckta av såsen.",
+      "Fös nudlarna till sidan av woken och häll ner de uppvispade äggen i hålet. Låt steka i 2 minuter och rör om ordentligt så att nudlarna täcks av ägg. Lägg ner den stekta kycklingen och grönsakerna och låt allt fräsa upp tillsammans i någon minut. Lägg ner böngroddar-na. Smaka av med fisksås och salt och servera genast, toppat med korianderblad och hackade jordnötter."
+    ],
+    "nutrition": {
+      "calories": 700,
+      "protein": 45,
+      "carbohydrates": 70,
+      "fat": 30,
+      "fiber": 6,
+      "sugar": 15,
+      "sodium": 900,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833483"
+  },
+  {
+    "name": "Dak bokkeum tang / Kycklinggryta med sötpotatisnudlar",
+    "url": null,
+    "description": "En mustig och smakrik koreansk kycklinggryta med sötpotatisnudlar, där nudlarna får sjuda i den fylliga såsen. Passar bra att dela vid bordet.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 20,
+    "cookingTime": 45,
+    "totalTime": 65,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Korean",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "family dinner",
+      "weekend",
+      "cozy"
+    ],
+    "flavorProfile": [
+      "savory",
+      "umami",
+      "spicy",
+      "rich",
+      "sweet"
+    ],
+    "moodTags": [
+      "comfort food",
+      "cozy"
+    ],
+    "spiceLevel": 3,
+    "ingredients": [
+      {
+        "name": "kycklinglårfilé med skinn",
+        "quantity": 8,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "sötpotatisnudlar, dangmyun",
+        "quantity": 300,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "fastpotatisar, i tärningar",
+        "quantity": 4,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "morötter, skivade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "kycklingbuljong",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "salladslökar, finhackade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "sesamfrön",
+        "quantity": 5,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "gochujang",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "ljus soja",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "vitlöksklyftor, finrivna",
+        "quantity": 7,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "mirin",
+        "quantity": 5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "koreansk chilipulver",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Blanda alla ingredienser till såsen. Ta 1 dl av såsen och blanda väl med kycklinglårfiléerna. Låt stå och dra åt sig smak i minst 1 timme.",
+      "Sätt ugnen på 150 grader, varmt. Bryn kycklingen i en gryta tills den fått fin färg med skinnet uppåt.",
+      "Tillsätt potatisar, morötter och övrig sås. Koka upp och låt sjuda i ca 15 minuter.",
+      "Lägg i sötpotatisnudlarna och koka ca 15 minuter.",
+      "Toppa med salladslök och eventuellt sesamfrön."
+    ],
+    "nutrition": {
+      "calories": 600,
+      "protein": 50,
+      "carbohydrates": 60,
+      "fat": 20,
+      "fiber": 7,
+      "sugar": 20,
+      "sodium": 1000,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833484"
+  },
+  {
+    "name": "Gyudon – japansk rice bowl med biff och lök",
+    "url": null,
+    "description": "En japansk rice bowl med biff och lök som puttrar i en umamismakande, söt sås. Serveras traditionellt med ris och är en populär snabbmatsrätt.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 15,
+    "cookingTime": 30,
+    "totalTime": 45,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Japanese",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "weekday",
+      "family dinner"
+    ],
+    "flavorProfile": [
+      "savory",
+      "umami",
+      "sweet",
+      "rich"
+    ],
+    "moodTags": [
+      "comfort food",
+      "quick and easy"
+    ],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "entrecôte eller lövbiff",
+        "quantity": 600,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "japanskt ris",
+        "quantity": 4,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "neutral matolja",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "köttbuljong",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "mirin",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "japansk soja",
+        "quantity": 3,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "salladslök, finhackad",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "gul lök",
+        "quantity": 3,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "rostade sesamfrön",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "shichimi togarashi",
+        "quantity": 0.5,
+        "unit": "tsk",
+        "optional": true
+      },
+      {
+        "name": "chiliflakes",
+        "quantity": null,
+        "unit": "",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Dela löken längst fibrerna i 3 delar. Lägg i frysen i 30 minuter så blir den lättare att skära tunt. Skär tunt och ställ åt sidan.",
+      "Koka ris enligt anvisningen på förpackningen.",
+      "Skiva löken tunt. Fräs löken i lite olja tills den är brun. Strö över sockret och låt det karamelliseras ihop med löken.",
+      "Tillsätt buljong, japansk soja och mirin till löken och låt småkoka i några minuter.",
+      "Lägg i de tunna entrecôte- eller lövbiffsskivorna och låt sjuda i någon minut tills köttet är genomkokt.",
+      "Fördela riset i djupa skålar och lägg kött och lök ovanpå. Strö över med finhackad salladslök, tunt skivad äggula, rostade sesamfrön och eventuellt shichimi togarashi eller chiliflakes."
+    ],
+    "nutrition": {
+      "calories": 650,
+      "protein": 40,
+      "carbohydrates": 70,
+      "fat": 25,
+      "fiber": 4,
+      "sugar": 15,
+      "sodium": 900,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833485"
+  },
+  {
+    "name": "Asiatisk fisk taco",
+    "url": null,
+    "description": "En spännande fusionrätt med mexikanska och koreanska smaker, perfekt för en annorlunda tacokväll. Frasig panerad torsk serveras i tortillabröd med fräscha tillbehör.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 15,
+    "cookingTime": 15,
+    "totalTime": 30,
+    "servings": 4,
+    "difficulty": "Easy",
+    "cuisine": "International",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "weekday",
+      "weekend",
+      "family dinner"
+    ],
+    "flavorProfile": [
+      "savory",
+      "fresh",
+      "tangy",
+      "umami"
+    ],
+    "moodTags": [
+      "quick and easy",
+      "healthy"
+    ],
+    "spiceLevel": 1,
+    "ingredients": [
+      {
+        "name": "torskfilé",
+        "quantity": 400,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "salt",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      },
+      {
+        "name": "vetemjöl",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "ägg, uppvispade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "pankoströbröd",
+        "quantity": 3,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "rapsolja",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      },
+      {
+        "name": "tortillabröd",
+        "quantity": 8,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "coleslaw kimchi style",
+        "quantity": null,
+        "unit": "portioner",
+        "optional": false
+      },
+      {
+        "name": "sesamaioli",
+        "quantity": null,
+        "unit": "portioner",
+        "optional": false
+      },
+      {
+        "name": "avokado, skalade och tärnade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "färsk spenat",
+        "quantity": 70,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "koriander, plockade blad",
+        "quantity": 1,
+        "unit": "kruka",
+        "optional": false
+      },
+      {
+        "name": "lime, klyftor",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Skär torskfiléerna i avlånga bitar, cirka 3 x 5 centimeter. Salta försiktigt och vänd först i mjöl, sedan i ägg och till sist i panko. Stek fisken på medelvärme i olja tills den är gyllene och frasig på bägge sidor. Lägg att rinna av på tjockt hushållspapper.",
+      "Servera den varma fisken i tortillabröd med coleslaw, sesamaioli, avokado, spenat, koriander och en klyfta lime att pressa över."
+    ],
+    "nutrition": {
+      "calories": 600,
+      "protein": 35,
+      "carbohydrates": 60,
+      "fat": 25,
+      "fiber": 8,
+      "sugar": 5,
+      "sodium": 600,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833486"
+  },
+  {
+    "name": "Entrecôte Gangnam Style",
+    "url": null,
+    "description": "En rätt inspirerad av Koreas nationalrätt bulgogi, med skivor av hängmörad entrecôte marinerad och stekt. Serveras med ris och salladsblad.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 15,
+    "cookingTime": 10,
+    "totalTime": 55,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Korean",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "weekend",
+      "celebration",
+      "family dinner"
+    ],
+    "flavorProfile": [
+      "savory",
+      "umami",
+      "sweet",
+      "rich",
+      "tangy"
+    ],
+    "moodTags": [
+      "high protein",
+      "comfort food"
+    ],
+    "spiceLevel": 1,
+    "ingredients": [
+      {
+        "name": "hängmörad entrecôte",
+        "quantity": 800,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "ljus soja",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 3,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "paron, skalat och finrivet",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "riven vitlök",
+        "quantity": 3,
+        "unit": "klyftor",
+        "optional": false
+      },
+      {
+        "name": "gul lök, skalad och tunt skivad",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "riven ingefära",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamfrön",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "gochujang",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "salladslök, fint skivad",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "rostade vita sesamfrön",
+        "quantity": 2,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "koreanskt/japanskt ris",
+        "quantity": 3,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "krispsallad",
+        "quantity": 2,
+        "unit": "krukor",
+        "optional": false
+      },
+      {
+        "name": "sesamböngroddar",
+        "quantity": null,
+        "unit": "portioner",
+        "optional": false
+      },
+      {
+        "name": "marinerad spenat",
+        "quantity": null,
+        "unit": "portioner",
+        "optional": false
+      },
+      {
+        "name": "kimchi",
+        "quantity": null,
+        "unit": "portioner",
+        "optional": false
+      },
+      {
+        "name": "grön chilifrukt, skivad",
+        "quantity": null,
+        "unit": "",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Blanda alla ingredienser till marinaden. Lägg ner köttet och låt stå i minst 30 minuter i kylskåp, gärna över natten.",
+      "Rör samman alla ingredienser till såsen och lägg i en liten skål.",
+      "Stek köttet i en riktigt het panna med rapsolja. Några minuter på varje sida räcker för medium rare.",
+      "Skiva upp köttet och servera med sås och ris i salladsblad, marinerad kimchi och namul (sidorätter). Ät gärna salladspaketen med händerna."
+    ],
+    "nutrition": {
+      "calories": 750,
+      "protein": 60,
+      "carbohydrates": 40,
+      "fat": 40,
+      "fiber": 4,
+      "sugar": 20,
+      "sodium": 1200,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833487"
+  },
+  {
+    "name": "Pad Kee Mao – Thai Drunken Noodles",
+    "url": null,
+    "description": "Hetta och supergoda nudlar, även kända som 'drunken noodles', perfekta för en snabb och smakrik måltid med mycket chili och basilika.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 15,
+    "cookingTime": 15,
+    "totalTime": 30,
+    "servings": 4,
+    "difficulty": "Medium",
+    "cuisine": "Thai",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "weekday",
+      "quick and easy"
+    ],
+    "flavorProfile": [
+      "spicy",
+      "savory",
+      "umami",
+      "fresh"
+    ],
+    "moodTags": [
+      "quick and easy",
+      "comfort food"
+    ],
+    "spiceLevel": 4,
+    "ingredients": [
+      {
+        "name": "breda risnudlar",
+        "quantity": 300,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "vitlöksklyftor",
+        "quantity": 8,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "röda chilifrukter",
+        "quantity": 3,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "kycklinglårfilé",
+        "quantity": 300,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "neutral matolja",
+        "quantity": null,
+        "unit": "",
+        "optional": false
+      },
+      {
+        "name": "salladslökar",
+        "quantity": 4,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "fisksås",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "ostronsås",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "ljus soja, thailändsk eller kinesisk",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "basilika",
+        "quantity": 2,
+        "unit": "knippen",
+        "optional": false
+      },
+      {
+        "name": "broccolini",
+        "quantity": 8,
+        "unit": "st",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Koka nudlarna enligt anvisningen på förpackningen. Häll av vattnet och ställ åt sidan.",
+      "Mortla vitlök och chili till en grov pasta, eller kör i en mixer.",
+      "Dela kycklingen i munsbitar. Hetta upp en wok tills den ryker. Häll generöst med olja. Fräs den mortlade vitlöks- och chilipastan i någon minut tills den är gyllene.",
+      "Skär salladslök i 3 centimeter stora bitar. Bryn broccolin i buketter och skär stammen i tandstickstjocka stavar. Fös kycklingen åt sidan i woken och lägg i salladslöken och broccolin som får fräsa i 1–2 minuter. Tillsätt sedan fisksås, ostronsås, soja och socker och woka ihop tills nudlarna blivit genomvarma och allt blivit väl blandat. (Rör försiktigt så nudlarna inte går sönder).",
+      "Ta av från värmen och vänd ner basilikan."
+    ],
+    "nutrition": {
+      "calories": 600,
+      "protein": 40,
+      "carbohydrates": 60,
+      "fat": 20,
+      "fiber": 5,
+      "sugar": 10,
+      "sodium": 1100,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833488"
+  },
+  {
+    "name": "Crème brûlée",
+    "url": null,
+    "description": "En klassisk, krämig fransk dessert med ett knaprigt, karamelliserat sockertäcke. Denna version kan varieras med apelsin och kardemumma.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 20,
+    "cookingTime": 60,
+    "totalTime": 80,
+    "servings": 6,
+    "difficulty": "Medium",
+    "cuisine": "French",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dessert",
+    "occasions": [
+      "celebration",
+      "weekend"
+    ],
+    "flavorProfile": [
+      "sweet",
+      "creamy",
+      "rich"
+    ],
+    "moodTags": [
+      "cozy",
+      "comfort food"
+    ],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "vispgrädde",
+        "quantity": 400,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "vaniljstång",
+        "quantity": 1,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "mjölk",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "äggulor",
+        "quantity": 7,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 1.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 1.5,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "apelsinskal, finrivet",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": true
+      },
+      {
+        "name": "malen kardemumma",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Värm vaniljstång, grädde och mjölk i en kastrull till kokpunkten. Låt svalna och sedan skrapa ur vaniljen.",
+      "Vispa äggulor och strösocker fluffigt.",
+      "Häll den varma gräddblandningen över äggsmeten under vispning.",
+      "Sätt ugnen på 150 grader, över- och undervärme. Fördela smeten i 6 ugnssäkra portionsformar.",
+      "Ställ formarna i en djup ugnsplåt med vattenbad.",
+      "Grädda i ugnen i 50-60 minuter, tills de har stelnat.",
+      "Låt kallna helt. Låt stå i kylen minst 4 timmar, gärna över natten.",
+      "Strax innan servering: strö florsocker på toppen och bränn med en gasbrännare tills det bildas ett karamelliserat täcke."
+    ],
+    "nutrition": {
+      "calories": 450,
+      "protein": 8,
+      "carbohydrates": 30,
+      "fat": 35,
+      "fiber": 0,
+      "sugar": 25,
+      "sodium": 50,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833489"
+  },
+  {
+    "name": "Dakgae jang / Stark kycklinggryta med böngroddar",
+    "url": null,
+    "description": "En härlig och ganska stark koreansk kycklinggryta, perfekt att äta på vintern. Hela kycklingen används och köttet plockas ner i en smakrik buljong.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 25,
+    "cookingTime": 90,
+    "totalTime": 115,
+    "servings": 5,
+    "difficulty": "Medium",
+    "cuisine": "Korean",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dinner",
+    "occasions": [
+      "family dinner",
+      "weekend",
+      "cozy"
+    ],
+    "flavorProfile": [
+      "spicy",
+      "savory",
+      "umami",
+      "rich"
+    ],
+    "moodTags": [
+      "comfort food",
+      "cozy"
+    ],
+    "spiceLevel": 4,
+    "ingredients": [
+      {
+        "name": "hel kyckling",
+        "quantity": 1.5,
+        "unit": "kg",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 3,
+        "unit": "liter",
+        "optional": false
+      },
+      {
+        "name": "gula lökar, halverade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "vitlöksklyftor, skalade",
+        "quantity": 4,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "salladslökar, skalade",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "sojaböns- alt. mungböngroddar",
+        "quantity": 250,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "sesamfrön",
+        "quantity": null,
+        "unit": "",
+        "optional": true
+      },
+      {
+        "name": "matolja",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "sesamolja",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "gochugaru",
+        "quantity": 1.5,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "koreanskt chilipulver",
+        "quantity": 0.5,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "ljus soja",
+        "quantity": 1.5,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "vitlöksklyftor, finrivna",
+        "quantity": 6,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "doenjang (koreansk bömpasta)",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "svartpeppar",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "salt",
+        "quantity": 1,
+        "unit": "tsk",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Lägg kycklingen i en kastrull med 3 liter vatten, lök, vitlök och 2 salladslökar i stora bitar. Koka upp och låt koka 1–1 ½ timme, tills köttet är mjukt. Skumma av regelbundet.",
+      "Lyft ur kycklingen, sila buljongen och koka ner den till cirka 1 liter. Plocka allt kött från kycklingen och dra isär det i mindre bitar.",
+      "Gör en grytbas. Värm matolja och sesamolja i en stekpanna, tillsätt gochugaru och fräs på låg värme tills oljan blir riktigt röd. Tillsätt resten av ingredienserna till grytbasen och koka ihop.",
+      "Blanda kyckling, finhackade salladslökar och böngroddar med grytbasen. Lägg i en gryta, slå på buljongen och låt koka ihop cirka 5 minuter. Toppa eventuellt med lite sparad salladslök och sesamfrön.",
+      "Servera med nykokt rundkornigt ris och gärna banchan (sidorätter)."
+    ],
+    "nutrition": {
+      "calories": 700,
+      "protein": 60,
+      "carbohydrates": 30,
+      "fat": 40,
+      "fiber": 6,
+      "sugar": 10,
+      "sodium": 1000,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833490"
+  },
+  {
+    "name": "Key lime pie",
+    "url": null,
+    "description": "En typisk amerikansk dessert från Florida Keys, en underbar harmoni mellan syra och sötma. Denna paj är enkel att göra och sprider glädje över hela världen.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 20,
+    "cookingTime": 15,
+    "totalTime": 35,
+    "servings": 7,
+    "difficulty": "Medium",
+    "cuisine": "American",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dessert",
+    "occasions": [
+      "celebration",
+      "weekend"
+    ],
+    "flavorProfile": [
+      "sweet",
+      "sour",
+      "tangy",
+      "creamy",
+      "rich"
+    ],
+    "moodTags": [
+      "cozy",
+      "comfort food"
+    ],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "digestivekex",
+        "quantity": 100,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "smält smör",
+        "quantity": 75,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "kondenserad mjölk",
+        "quantity": 800,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "limesaft, färskpressad",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "limeskal, finrivet",
+        "quantity": null,
+        "unit": "från 5-6 limefrukter",
+        "optional": false
+      },
+      {
+        "name": "äggulor",
+        "quantity": 4,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "vispad grädde",
+        "quantity": 300,
+        "unit": "g",
+        "optional": true
+      },
+      {
+        "name": "limeskivor",
+        "quantity": null,
+        "unit": "",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Sätt ugnen på 175 grader, över- och undervärme. Mixa kexen till ett fint smul i matberedare eller lägg dem i en plastpåse och banka på dem med en kavel.",
+      "Smält smör och blanda med kexsmulorna. Tryck ut kexmassan i botten på en pajform (cirka 24 cm i diameter), tryck även upp på kanterna.",
+      "Grädda pajskalet i mitten av ugnen i 12–15 minuter.",
+      "Vispa för hand och rör varsamt ihop äggulor, kondenserad mjölk, limesaft och -skal. Häll försiktigt fyllningen i pajskalet och grädda pajen i mitten av ugnen i 10 minuter.",
+      "Låt pajen kallna och sedan stå i kylen minst 4 timmar innan servering.",
+      "Garnera pajen med vispad grädde och limeskivor vid servering."
+    ],
+    "nutrition": {
+      "calories": 500,
+      "protein": 10,
+      "carbohydrates": 60,
+      "fat": 25,
+      "fiber": 1,
+      "sugar": 40,
+      "sodium": 150,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833491"
+  },
+  {
+    "name": "Tiramisu",
+    "url": null,
+    "description": "En mäktig italiensk klassiker med kaffedoppade kex, fluffig mascarponekräm och kakao. Denna version är en lättare och piggare variant med citron.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 30,
+    "cookingTime": 20,
+    "totalTime": 30,
+    "servings": 8,
+    "difficulty": "Medium",
+    "cuisine": "Italian",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dessert",
+    "occasions": [
+      "celebration",
+      "weekend"
+    ],
+    "flavorProfile": [
+      "sweet",
+      "creamy",
+      "rich",
+      "tangy",
+      "coffee"
+    ],
+    "moodTags": [
+      "cozy",
+      "comfort food"
+    ],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "savoiardikex",
+        "quantity": 180,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "espresso/starkt kaffe",
+        "quantity": 4,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "kakao",
+        "quantity": 8,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "citron, färskpressad saft från",
+        "quantity": 5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "äggulor",
+        "quantity": 5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "hela stora ägg",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "citronskal, rivet från",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "smör, rumstempererat",
+        "quantity": 120,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "mascarpone",
+        "quantity": 500,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "florsocker",
+        "quantity": 4,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "vaniljsocker",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "vispgrädde",
+        "quantity": 200,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "gelatinblad",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Börja med curden. Vispa ihop alla ingredienser, utom smöret, i en värmetålig bunke, ställ över ett vattenbad, och vispa kraftigt tills krämen tjocknat. Ta av från värmen, rör ner smöret och låt svalna.",
+      "Vispa upp mascarpone, äggulor och vaniljsocker till vitt, fast skum. Vispa grädden för sig.",
+      "Blanda mascarponekrämen med den vispade grädden.",
+      "Doppa savoiardikexen snabbt i kaffet (eller citronvatten för den lättare varianten), lägg dem i en form.",
+      "Varva kex med mascarponekrämen och lemon curd.",
+      "Avsluta med ett lager mascarponekräm och sikta över kakao.",
+      "Låt stå i kylen minst 1 timme, gärna över natten, innan servering."
+    ],
+    "nutrition": {
+      "calories": 600,
+      "protein": 15,
+      "carbohydrates": 50,
+      "fat": 40,
+      "fiber": 2,
+      "sugar": 30,
+      "sodium": 100,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833492"
+  },
+  {
+    "name": "Pannacotta",
+    "url": null,
+    "description": "En klassisk italiensk dessert känd för sin krämiga och silkeslena konsistens. Här serveras den med en äppelkompott och krispiga pajsmulor.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 20,
+    "cookingTime": 20,
+    "totalTime": 40,
+    "servings": 6,
+    "difficulty": "Easy",
+    "cuisine": "Italian",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "dessert",
+    "occasions": [
+      "celebration",
+      "weekend",
+      "family dinner"
+    ],
+    "flavorProfile": [
+      "sweet",
+      "creamy",
+      "fresh"
+    ],
+    "moodTags": [
+      "cozy",
+      "comfort food"
+    ],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "vispgrädde",
+        "quantity": 600,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 6,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "vaniljsocker",
+        "quantity": 1.5,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "gelatinblad",
+        "quantity": 1.5,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "mjölk",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "granna syrliga äpplen",
+        "quantity": 8,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "brun farin",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "vaniljsocker",
+        "quantity": 1,
+        "unit": "msk",
+        "optional": false
+      },
+      {
+        "name": "malen kardemumma",
+        "quantity": 0.5,
+        "unit": "tsk",
+        "optional": false
+      },
+      {
+        "name": "vatten",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "smör, rumstempererat",
+        "quantity": 100,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "vetemjöl",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "havregryn",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 1,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "sirap",
+        "quantity": 2,
+        "unit": "msk",
+        "optional": false
+      }
+    ],
+    "instructions": [
+      "Pajsmul: Blanda alla ingredienser till pajsmul. Smula ihop till en jämn massa. Sprid ut på bakplåtspapper. Sätt ugnen på 175 grader, över- och undervärme. Grädda pajsmulet i 15-20 minuter eller tills smulet fått en fin gyllenbrun färg. Låt svalna helt.",
+      "Äppelkompott: Skala, kärna ur och tärna äpplena till kompott. Koka upp och låt puttra till en tjockare konsistens, ca 10 minuter. Låt kompotten svalna helt.",
+      "Pannacotta: Blanda alla ingredienser till pannacottan i en kastrull och sjud i 10 minuter. Häll i portionsglas och låt stelna i kylen.",
+      "Fördela den kalla äppelkompotten över pannacottan. Strö över pajsmul och servera."
+    ],
+    "nutrition": {
+      "calories": 700,
+      "protein": 10,
+      "carbohydrates": 90,
+      "fat": 35,
+      "fiber": 5,
+      "sugar": 60,
+      "sodium": 50,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833493"
+  },
+  {
+    "name": "Krofne",
+    "url": null,
+    "description": "Härligt frasfluffiga munkar från Balkan. De är goda som de är, eller fyllda med sylt eller vaniljkräm för en mer dekadent upplevelse.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+    "preparationTime": 30,
+    "cookingTime": 10,
+    "totalTime": 40,
+    "servings": 24,
+    "difficulty": "Medium",
+    "cuisine": "International",
+    "countryOfOrigin": null,
+    "region": null,
+    "mealType": "snack",
+    "occasions": [
+      "weekend",
+      "celebration"
+    ],
+    "flavorProfile": [
+      "sweet",
+      "rich"
+    ],
+    "moodTags": [
+      "comfort food",
+      "cozy"
+    ],
+    "spiceLevel": 0,
+    "ingredients": [
+      {
+        "name": "färsk jäst",
+        "quantity": 25,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "strösocker",
+        "quantity": 2,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "mjölk",
+        "quantity": 4,
+        "unit": "dl",
+        "optional": false
+      },
+      {
+        "name": "vetemjöl special",
+        "quantity": 1,
+        "unit": "kg",
+        "optional": false
+      },
+      {
+        "name": "ägg",
+        "quantity": 2,
+        "unit": "st",
+        "optional": false
+      },
+      {
+        "name": "rumsvarmt smör",
+        "quantity": 50,
+        "unit": "g",
+        "optional": false
+      },
+      {
+        "name": "neutral matolja",
+        "quantity": 1,
+        "unit": "liter",
+        "optional": false
+      },
+      {
+        "name": "florsocker",
+        "quantity": null,
+        "unit": "",
+        "optional": true
+      }
+    ],
+    "instructions": [
+      "Smula ner jästen i en bunke, gärna till en hushållsassistent. Tillsätt mjölken och rör om tills den har lösts upp.",
+      "Tillsätt sockret, ägg, hälften av mjölet och arbeta degen tills den är slät och elastisk. Tillsätt smöret och arbeta in det.",
+      "Täck bunken med plastfolie och låt degen vila i cirka 10 minuter.",
+      "Dela degen i 24 lika stora bitar och forma dem till runda bollar.",
+      "Täck över degen igen med plastfolie och låt jäsa på rumstemperatur i 1-2 timmar.",
+      "Hetta upp oljan till 180 grader i en rymlig kastrull. Använd en hushållstermometer.",
+      "Platta till bollarna lite lätt och fritera dem några i någon minut per sida.",
+      "Lägg upp munkarna på hushållspapper för att rinna av. Pudra över florsocker och servera munkarna medan de fortfarande är varma."
+    ],
+    "nutrition": {
+      "calories": 300,
+      "protein": 5,
+      "carbohydrates": 35,
+      "fat": 15,
+      "fiber": 1,
+      "sugar": 10,
+      "sodium": 10,
+      "iron": 0,
+      "calcium": 0,
+      "potassium": 0,
+      "magnesium": 0,
+      "vitaminA": 0,
+      "vitaminC": 0,
+      "vitaminD": 0,
+      "vitaminB12": 0
+    },
+    "id": "recipe_1781699833494"
   }
 ];

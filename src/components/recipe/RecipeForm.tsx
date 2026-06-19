@@ -41,6 +41,7 @@ interface Recipe {
   url: string | null;
   description: string | null;
   image: string | null;
+  images?: string[];
   preparationTime: number;
   cookingTime: number;
   servings: number;
@@ -375,6 +376,9 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
   const [name, setName] = useState(initialRecipe?.name || '');
   const [description, setDescription] = useState(initialRecipe?.description || '');
   const [image, setImage] = useState(initialRecipe?.image || '');
+  const [images, setImages] = useState<string[]>(
+    initialRecipe?.images || (initialRecipe?.image ? [initialRecipe.image] : [])
+  );
   const [url, setUrl] = useState(initialRecipe?.url || '');
 
   // Drag and Drop States & Ref
@@ -414,30 +418,41 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
     setIsDraggingImage(false);
   };
 
-  const processImageFile = (file: File) => {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setImage(event.target.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
+  const processImageFiles = (files: FileList | File[]) => {
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          const base64 = event.target.result as string;
+          setImages((prev) => {
+            if (prev.includes(base64)) return prev;
+            const updated = [...prev, base64];
+            // If no primary image is set, use the first uploaded image
+            if (!image) {
+              setImage(base64);
+            }
+            return updated;
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleDropImage = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDraggingImage(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      processImageFile(file);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      processImageFiles(files);
     }
   };
 
   const handleImageUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      processImageFile(file);
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      processImageFiles(files);
     }
   };
   const [preparationTime, setPreparationTime] = useState(initialRecipe?.preparationTime || 15);
@@ -486,6 +501,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       setName(initialRecipe.name || '');
       setDescription(initialRecipe.description || '');
       setImage(initialRecipe.image || '');
+      setImages(initialRecipe.images || (initialRecipe.image ? [initialRecipe.image] : []));
       setUrl(initialRecipe.url || '');
       setPreparationTime(initialRecipe.preparationTime || 15);
       setCookingTime(initialRecipe.cookingTime || 20);
@@ -514,6 +530,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                 setName(found.name || '');
                 setDescription(found.description || '');
                 setImage(found.image || '');
+                setImages(found.images || (found.image ? [found.image] : []));
                 setUrl(found.url || '');
                 setPreparationTime(found.preparationTime || 15);
                 setCookingTime(found.cookingTime || 20);
@@ -698,6 +715,8 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
     if (description !== (recipe?.description || '')) return true;
     if (image !== (recipe?.image || '')) return true;
     if (url !== (recipe?.url || '')) return true;
+    const initialImages = recipe?.images || (recipe?.image ? [recipe.image] : []);
+    if (images.length !== initialImages.length || !images.every((img, idx) => img === initialImages[idx])) return true;
     if (preparationTime !== (recipe?.preparationTime || 15)) return true;
     if (cookingTime !== (recipe?.cookingTime || 20)) return true;
     if (servings !== (recipe?.servings || 4)) return true;
@@ -792,6 +811,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       name: name.trim(),
       description: description.trim() || null,
       image: image.trim() || null,
+      images: images,
       url: url.trim() || null,
       preparationTime,
       cookingTime,
@@ -1240,13 +1260,15 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-3 col-span-2 md:col-span-1">
               <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">
-                {lang === 'sv' ? 'Receptbild' : 'Recipe Image'}
+                {lang === 'sv' ? 'Receptbilder' : 'Recipe Images'}
               </label>
+              
+              {/* Drag and Drop Zone */}
               <div 
                 className={cn(
-                  "border-3 border-dashed rounded-xl p-4 bg-white transition-all text-center flex flex-col items-center justify-center min-h-[140px] cursor-pointer shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
+                  "border-3 border-dashed rounded-xl p-4 bg-white transition-all text-center flex flex-col items-center justify-center min-h-[120px] cursor-pointer shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
                   isDraggingImage 
                     ? "border-primary bg-primary/5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" 
                     : "border-foreground/30 hover:border-foreground/80"
@@ -1260,41 +1282,90 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                   type="file"
                   ref={imageFileInputRef}
                   accept="image/*"
+                  multiple
                   onChange={handleImageUploadChange}
                   className="hidden"
                 />
                 
-                {image ? (
-                  <div className="relative w-full max-w-xs h-[100px] flex items-center justify-center">
-                    <img 
-                      src={image} 
-                      alt="Recipe Preview" 
-                      className="max-h-[100px] rounded-lg border-2 border-foreground object-cover" 
-                    />
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setImage('');
-                      }}
-                      className="absolute -top-2 -right-2 p-1 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-foreground rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                <div className="space-y-2">
+                  <div className="mx-auto w-8 h-8 rounded-full bg-cyan-50 border-2 border-foreground flex items-center justify-center text-foreground">
+                    <ImageIcon className="h-4 w-4" />
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="mx-auto w-8 h-8 rounded-full bg-cyan-50 border-2 border-foreground flex items-center justify-center text-foreground">
-                      <ImageIcon className="h-4 w-4" />
-                    </div>
-                    <div className="text-[10px] font-bold text-foreground/75 leading-normal max-w-[200px] mx-auto">
-                      {lang === 'sv' 
-                        ? 'Släpp bildfil här, klicka för att välja fil eller klistra in en länk till höger' 
-                        : 'Drop image here, click to browse, or paste URL to the right'}
-                    </div>
+                  <div className="text-[10px] font-bold text-foreground/75 leading-normal max-w-[240px] mx-auto">
+                    {lang === 'sv' 
+                      ? 'Släpp bildfiler här (flera går bra), eller klicka för att bläddra' 
+                      : 'Drop image files here (multiple allowed), or click to browse'}
                   </div>
-                )}
+                </div>
               </div>
+
+              {/* Thumbnails Gallery */}
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 pt-1.5">
+                  {images.map((imgSrc, idx) => {
+                    const isCover = imgSrc === image;
+                    return (
+                      <div 
+                        key={idx} 
+                        className={cn(
+                          "relative group aspect-square rounded-lg border-2 overflow-hidden bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-1px] transition-all",
+                          isCover ? "border-primary ring-2 ring-primary/20" : "border-foreground"
+                        )}
+                      >
+                        <img 
+                          src={imgSrc} 
+                          alt={`Thumbnail ${idx + 1}`} 
+                          className="w-full h-full object-cover" 
+                        />
+                        
+                        {/* Overlay Controls */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-1.5">
+                          {/* Delete Button */}
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newImages = images.filter((_, i) => i !== idx);
+                                setImages(newImages);
+                                // If we deleted the cover image, pick another one or set to empty
+                                if (isCover) {
+                                  setImage(newImages.length > 0 ? newImages[0] : '');
+                                }
+                              }}
+                              className="p-1 bg-red-100 hover:bg-red-200 text-red-700 border border-foreground rounded shadow transition-all"
+                              title={lang === 'sv' ? 'Ta bort bild' : 'Delete image'}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+
+                          {/* Set Cover Button */}
+                          {!isCover && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setImage(imgSrc);
+                              }}
+                              className="w-full py-0.5 text-[8px] font-black uppercase text-foreground bg-cyan-100 hover:bg-cyan-200 border border-foreground rounded text-center transition-all"
+                            >
+                              {lang === 'sv' ? 'Sätt som omslag' : 'Set as cover'}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Cover Badge */}
+                        {isCover && (
+                          <div className="absolute top-1 left-1 bg-primary text-[7px] text-white font-black uppercase tracking-wider px-1.5 py-0.5 rounded border border-white leading-none shadow-[1px_1px_0px_0px_rgba(0,0,0,0.15)]">
+                            {lang === 'sv' ? 'Omslag' : 'Cover'}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">

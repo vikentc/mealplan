@@ -9,6 +9,7 @@ import {
   Trash2, 
   Edit3, 
   ChevronLeft, 
+  ChevronRight,
   ChefHat, 
   Globe, 
   Sparkles,
@@ -40,6 +41,7 @@ interface Recipe {
   url: string | null;
   description: string | null;
   image: string | null;
+  images?: string[];
   preparationTime: number;
   cookingTime: number;
   totalTime: number;
@@ -77,8 +79,10 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe, fallbac
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAddingToShoppingList, setIsAddingToShoppingList] = useState(false);
   const [shoppingListFeedback, setShoppingListFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
+    setActiveImageIndex(0);
     if (originalRecipe) {
       setRecipe(getTranslatedRecipe(originalRecipe, language));
       setServings(originalRecipe.servings || 4);
@@ -406,21 +410,78 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe, fallbac
       {/* 1. Main Recipe Info Hero Card (spans full width) */}
       <div className="bg-card border-3 border-foreground rounded-[2rem] overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
         {/* Image banner */}
-        <div className="relative h-64 md:h-96 w-full bg-secondary border-b-3 border-foreground">
-          {recipe.image ? (
-            <Image
-              src={recipe.image}
-              alt={recipe.name}
-              fill
-              className="object-cover"
-              priority
-              sizes="100vw"
-            />
-          ) : (
-            <div className="h-full w-full flex items-center justify-center bg-secondary/50 text-foreground font-black uppercase text-xs tracking-wider">
-              {t('details.no_image')}
-            </div>
-          )}
+        <div className="relative h-64 md:h-96 w-full bg-secondary border-b-3 border-foreground group/carousel">
+          {(() => {
+            const recipeImages = (recipe && recipe.images && recipe.images.length > 0) 
+              ? recipe.images 
+              : (recipe?.image ? [recipe.image] : []);
+            
+            if (recipeImages.length === 0) {
+              return (
+                <div className="h-full w-full flex items-center justify-center bg-secondary/50 text-foreground font-black uppercase text-xs tracking-wider">
+                  {t('details.no_image')}
+                </div>
+              );
+            }
+
+            const currentImg = recipeImages[activeImageIndex] || recipeImages[0];
+
+            return (
+              <>
+                <Image
+                  src={currentImg}
+                  alt={recipe.name}
+                  fill
+                  className="object-cover transition-all duration-300"
+                  priority
+                  sizes="100vw"
+                />
+
+                {/* Left/Right Arrows if multiple images */}
+                {recipeImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveImageIndex((prev) => (prev === 0 ? recipeImages.length - 1 : prev - 1));
+                      }}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white hover:bg-cyan-100 text-foreground border-2 border-foreground rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[-48%] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer opacity-90 hover:opacity-100 z-10"
+                      title={language === 'sv' ? 'Föregående bild' : 'Previous image'}
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveImageIndex((prev) => (prev === recipeImages.length - 1 ? 0 : prev + 1));
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white hover:bg-cyan-100 text-foreground border-2 border-foreground rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[-48%] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer opacity-90 hover:opacity-100 z-10"
+                      title={language === 'sv' ? 'Nästa bild' : 'Next image'}
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+
+                    {/* Pagination indicators */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/40 px-2.5 py-1.5 rounded-full border border-white/20 backdrop-blur-xs z-10">
+                      {recipeImages.map((_: string, i: number) => (
+                        <button
+                          key={i}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImageIndex(i);
+                          }}
+                          className={cn(
+                            "w-2 h-2 rounded-full border border-white transition-all cursor-pointer",
+                            i === activeImageIndex ? "bg-white scale-110" : "bg-white/40 hover:bg-white/70"
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            );
+          })()}
         </div>
 
         {/* Title & Stats */}

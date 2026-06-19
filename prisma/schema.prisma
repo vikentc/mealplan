@@ -13,6 +13,7 @@ model Recipe {
   url             String?
   description     String?      @db.Text
   image           String?      @db.Text
+  images          String[]
   preparationTime Int          @default(15)
   cookingTime     Int          @default(20)
   totalTime       Int          @default(35)

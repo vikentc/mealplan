@@ -1008,6 +1008,11 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
       
       {/* Header bar */}
       <div className="flex items-center justify-between gap-4">
+        <h2 id="recipe-form-title" className="text-xl md:text-2xl font-black text-foreground uppercase tracking-tight flex items-center gap-2">
+          <ChefHat className="h-6 w-6 text-foreground animate-pulse" />
+          <span>{isEdit ? t('form.edit_title', { name: recipe?.name || '' }) : t('form.create_title')}</span>
+        </h2>
+
         <Link
           href={backUrl || (isEdit ? `/recipes/${recipe?.id}` : '/')}
           className="px-5 py-3 bg-amber-100 hover:bg-amber-200 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2 cursor-pointer shrink-0"
@@ -1015,11 +1020,6 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
           <ChevronLeft className="h-4.5 w-4.5 text-foreground" />
           <span>{t('form.cancel')}</span>
         </Link>
-
-        <h2 id="recipe-form-title" className="text-xl md:text-2xl font-black text-foreground uppercase tracking-tight flex items-center gap-2">
-          <ChefHat className="h-6 w-6 text-foreground animate-pulse" />
-          <span>{isEdit ? t('form.edit_title', { name: recipe?.name || '' }) : t('form.create_title')}</span>
-        </h2>
       </div>
 
       {error && (
@@ -1103,7 +1103,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
             <div className="space-y-4">
               <div 
                 className={cn(
-                  "border-3 border-dashed rounded-2xl p-5 md:p-8 transition-all text-center space-y-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
+                  "border-3 border-dashed rounded-2xl p-5 md:p-6 transition-all text-center space-y-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
                   isDraggingAutofill 
                     ? "border-primary bg-primary/5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" 
                     : "border-foreground/30 hover:border-foreground/80 bg-white"
@@ -1112,73 +1112,72 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                 onDragLeave={handleDragLeaveAutofill}
                 onDrop={handleDropAutofill}
               >
-                <div className="mx-auto w-12 h-12 rounded-full bg-yellow-100 border-2 border-foreground flex items-center justify-center text-foreground mb-1">
-                  <ImageIcon className="h-6 w-6" />
-                </div>
-                <div>
-                  <h4 className="font-black text-xs uppercase tracking-wider text-foreground">
-                    {texts[lang].imageZone}
-                  </h4>
-                  <p className="text-[10px] text-foreground/65 max-w-xs mx-auto mt-1 leading-normal font-semibold">
-                    {texts[lang].imageZoneSub}
-                  </p>
-                </div>
+                {autofillImages.length === 0 ? (
+                  <div className="space-y-4">
+                    <div className="mx-auto w-12 h-12 rounded-full bg-yellow-100 border-2 border-foreground flex items-center justify-center text-foreground mb-1">
+                      <ImageIcon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-xs uppercase tracking-wider text-foreground">
+                        {texts[lang].imageZone}
+                      </h4>
+                      <p className="text-[10px] text-foreground/65 max-w-xs mx-auto mt-1 leading-normal font-semibold">
+                        {texts[lang].imageZoneSub}
+                      </p>
+                    </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-                  {/* Gallery Select Button */}
-                  <label className="flex items-center justify-center gap-2 px-5 py-3 bg-cyan-100 hover:bg-cyan-200 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => {
-                        if (e.target.files) {
-                          const selectedFiles = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
-                          if (selectedFiles.length > 0) {
-                            addAutofillFiles(selectedFiles);
-                          }
-                        }
-                      }}
-                      className="hidden"
-                      disabled={autofillLoading}
-                    />
-                    <ImageIcon className="h-4.5 w-4.5" />
-                    <span>{texts[lang].btnSelectImages}</span>
-                  </label>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                      {/* Gallery Select Button */}
+                      <label className="flex items-center justify-center gap-2 px-5 py-3 bg-cyan-100 hover:bg-cyan-200 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              const selectedFiles = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
+                              if (selectedFiles.length > 0) {
+                                addAutofillFiles(selectedFiles);
+                              }
+                            }
+                          }}
+                          className="hidden"
+                          disabled={autofillLoading}
+                        />
+                        <ImageIcon className="h-4.5 w-4.5" />
+                        <span>{texts[lang].btnSelectImages}</span>
+                      </label>
 
-                  {/* Camera Capture Button */}
-                  <label className="flex items-center justify-center gap-2 px-5 py-3 bg-yellow-300 hover:bg-yellow-400 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          addAutofillFiles([file]);
-                        }
-                      }}
-                      className="hidden"
-                      disabled={autofillLoading}
-                    />
-                    <Camera className="h-4.5 w-4.5" />
-                    <span>{texts[lang].btnTakePhotos}</span>
-                  </label>
-                </div>
-                
-                <p className="text-[9px] text-foreground/45 font-semibold pt-1 uppercase tracking-wider">
-                  {lang === 'sv' ? 'Stöder JPG, PNG • Lokalt OCR fallbacks' : 'Supports JPG, PNG • Local OCR fallback'}
-                </p>
-              </div>
-
-              {/* Selected Images Thumbnails Grid */}
-              {autofillImages.length > 0 && (
-                <div className="space-y-3 bg-white border-3 border-foreground p-4 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center justify-between">
-                    <h5 className="font-black text-xs uppercase tracking-wider text-foreground">
-                      {texts[lang].uploadedImages} ({autofillImages.length})
-                    </h5>
-                    {autofillImages.length > 1 && (
+                      {/* Camera Capture Button */}
+                      <label className="flex items-center justify-center gap-2 px-5 py-3 bg-yellow-300 hover:bg-yellow-400 text-foreground border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              addAutofillFiles([file]);
+                            }
+                          }}
+                          className="hidden"
+                          disabled={autofillLoading}
+                        />
+                        <Camera className="h-4.5 w-4.5" />
+                        <span>{texts[lang].btnTakePhotos}</span>
+                      </label>
+                    </div>
+                    
+                    <p className="text-[9px] text-foreground/45 font-semibold pt-1 uppercase tracking-wider">
+                      {lang === 'sv' ? 'Stöder JPG, PNG • Lokalt OCR fallbacks' : 'Supports JPG, PNG • Local OCR fallback'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 text-left">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-foreground">
+                        {texts[lang].uploadedImages} ({autofillImages.length})
+                      </span>
                       <button
                         type="button"
                         onClick={() => {
@@ -1186,50 +1185,83 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
                           setAutofillImages([]);
                         }}
                         disabled={autofillLoading}
-                        className="text-[10px] font-black uppercase text-red-600 hover:text-red-700 disabled:opacity-50"
+                        className="text-[9px] font-black uppercase text-red-600 hover:text-red-700 disabled:opacity-50"
                       >
                         {lang === 'sv' ? 'Rensa alla' : 'Clear all'}
                       </button>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                    {autofillImages.map((img, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-lg border-2 border-foreground overflow-hidden bg-gray-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                        <img 
-                          src={img.previewUrl} 
-                          alt={`Selected page ${idx + 1}`} 
-                          className="w-full h-full object-cover" 
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeAutofillImage(idx)}
-                          disabled={autofillLoading}
-                          className="absolute top-1 right-1 p-1 bg-red-400 hover:bg-red-500 border-2 border-foreground rounded-md text-foreground cursor-pointer transition-all shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none"
-                          title={texts[lang].removeImage}
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                    </div>
 
-                  <div className="pt-2 flex justify-center">
-                    <button
-                      type="button"
-                      onClick={handleImageAutofill}
-                      disabled={autofillLoading}
-                      className="flex items-center gap-2 px-6 py-3.5 bg-yellow-300 hover:bg-yellow-400 disabled:opacity-50 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none"
-                    >
-                      {autofillLoading ? (
-                        <Loader2 className="h-4.5 w-4.5 animate-spin" />
-                      ) : (
-                        <Sparkles className="h-4.5 w-4.5" />
-                      )}
-                      <span>{texts[lang].btnAnalyze}</span>
-                    </button>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                      {autofillImages.map((img, idx) => (
+                        <div key={idx} className="relative aspect-square rounded-lg border-2 border-foreground overflow-hidden bg-gray-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                          <img 
+                            src={img.previewUrl} 
+                            alt={`Selected page ${idx + 1}`} 
+                            className="w-full h-full object-cover" 
+                          />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeAutofillImage(idx);
+                            }}
+                            disabled={autofillLoading}
+                            className="absolute top-1 right-1 p-1 bg-red-400 hover:bg-red-500 border-2 border-foreground rounded-md text-foreground cursor-pointer transition-all shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-none"
+                            title={texts[lang].removeImage}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+
+                      {/* "+" Add slot/placeholder inside the grid */}
+                      <label className="flex flex-col items-center justify-center border-2 border-dashed border-foreground/30 hover:border-foreground/80 aspect-square rounded-lg bg-gray-50/50 hover:bg-white transition-all cursor-pointer group">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              const selectedFiles = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
+                              if (selectedFiles.length > 0) {
+                                addAutofillFiles(selectedFiles);
+                              }
+                            }
+                          }}
+                          className="hidden"
+                          disabled={autofillLoading}
+                        />
+                        <Plus className="h-5 w-5 text-foreground/45 group-hover:text-foreground transition-colors" />
+                        <span className="text-[8px] font-black uppercase text-foreground/45 group-hover:text-foreground mt-1 transition-colors">
+                          {lang === 'sv' ? 'Lägg till' : 'Add file'}
+                        </span>
+                      </label>
+                    </div>
+
+                    <p className="text-[9px] text-foreground/50 font-semibold italic text-center">
+                      {lang === 'sv' 
+                        ? 'Dra fler bilder hit eller klicka på Lägg till för att lägga till fler sidor' 
+                        : 'Drag more images here or click Add file to add more pages'}
+                    </p>
+
+                    <div className="pt-2 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={handleImageAutofill}
+                        disabled={autofillLoading}
+                        className="flex items-center gap-2 px-6 py-3.5 bg-yellow-300 hover:bg-yellow-400 disabled:opacity-50 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer select-none"
+                      >
+                        {autofillLoading ? (
+                          <Loader2 className="h-4.5 w-4.5 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4.5 w-4.5" />
+                        )}
+                        <span>{texts[lang].btnAnalyze}</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
 

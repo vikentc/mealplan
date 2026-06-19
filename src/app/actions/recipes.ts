@@ -155,7 +155,11 @@ async function getFirebaseRecipes(): Promise<any[]> {
     const qSnapshot = await getDocs(collection(firestoreDb, 'recipes'));
     const list: any[] = [];
     qSnapshot.forEach((doc) => {
-      list.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      const mealTypes = Array.isArray(data.mealTypes) && data.mealTypes.length > 0
+        ? data.mealTypes
+        : (typeof data.mealType === 'string' && data.mealType ? [data.mealType] : []);
+      list.push({ id: doc.id, ...data, mealTypes });
     });
     
     // Seed Firestore if empty
@@ -176,7 +180,7 @@ async function getFirebaseRecipes(): Promise<any[]> {
             servings: Number(recipe.servings) || 4,
             difficulty: recipe.difficulty || 'Medium',
             cuisine: recipe.cuisine || 'International',
-            mealTypes: recipe.mealTypes || [],
+            mealTypes: recipe.mealTypes || (recipe.mealType ? [recipe.mealType] : []),
             occasions: recipe.occasions || [],
             flavorProfile: recipe.flavorProfile || [],
             moodTags: recipe.moodTags || [],
@@ -213,7 +217,7 @@ async function saveFirebaseRecipes(recipes: any[]) {
         servings: Number(r.servings) || 4,
         difficulty: r.difficulty || 'Medium',
         cuisine: r.cuisine || 'International',
-        mealTypes: r.mealTypes || [],
+        mealTypes: r.mealTypes || (r.mealType ? [r.mealType] : []),
         occasions: r.occasions || [],
         flavorProfile: r.flavorProfile || [],
         moodTags: r.moodTags || [],

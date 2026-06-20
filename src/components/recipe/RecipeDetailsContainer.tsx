@@ -313,7 +313,11 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe, fallbac
       if (recipe?.id) {
         const result = (await deleteRecipe(recipe.id)) as any;
         if (result && result.error) {
-          console.warn('Server delete failed, but recipe was removed locally if local:', result.error);
+          console.error('Server delete failed:', result.error);
+          setDeleteStatus('error');
+          setDeleteStatusMsg(result.message || (language === 'sv' ? 'Kunde inte ta bort receptet från servern.' : 'Could not delete recipe from server.'));
+          setIsDeleting(false);
+          return;
         }
       }
       setDeleteStatus('success');
@@ -324,13 +328,10 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe, fallbac
         router.refresh();
       }, 1000);
     } catch (error: any) {
-      console.warn('Server delete threw an error, assuming local delete was sufficient:', error);
-      setDeleteStatus('success');
-      setDeleteStatusMsg(language === 'sv' ? 'Receptet har tagits bort! Omdirigerar...' : 'Recipe has been deleted! Redirecting...');
-      setTimeout(() => {
-        router.push('/');
-        router.refresh();
-      }, 1000);
+      console.error('Server delete threw an error:', error);
+      setDeleteStatus('error');
+      setDeleteStatusMsg(error.message || (language === 'sv' ? 'Ett oväntat fel uppstod vid borttagning.' : 'An unexpected error occurred during deletion.'));
+      setIsDeleting(false);
     }
   };
 

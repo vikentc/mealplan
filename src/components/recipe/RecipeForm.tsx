@@ -66,7 +66,7 @@ interface RecipeFormProps {
 
 const CUISINES = ['Vietnamese', 'Thai', 'Korean', 'Japanese', 'Swedish', 'Italian', 'Mexican', 'American', 'French', 'Indian', 'Greek', 'Spanish', 'Chinese', 'International'];
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
-const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'];
+const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert'];
 
 const cuisineLabels: Record<string, string> = {
   'Vietnamese': 'Vietnamesiskt',
@@ -98,6 +98,7 @@ const mealTypeLabels: Record<string, string> = {
   'breakfast': 'Frukost',
   'lunch': 'Lunch',
   'dinner': 'Middag',
+  'dessert': 'Efterrätt',
   'snack': 'Mellanmål'
 };
 

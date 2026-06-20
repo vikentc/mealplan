@@ -359,60 +359,15 @@ let isDbOffline = false;
 let lastDbCheckTime = 0;
 const DB_RETRY_INTERVAL_MS = 30000; // Retry DB connection after 30 seconds
 
-// Try-catch wrappers for db queries
+// Try-catch wrappers for db queries (redefined to make the PostgreSQL database the sole source of truth)
 async function runWithFallback<T>(
   dbQuery: () => Promise<T>, 
   fallbackQuery: () => T | Promise<T>,
   isWrite: boolean = false
 ): Promise<T> {
-  const now = Date.now();
-  if (isDbOffline && (now - lastDbCheckTime < DB_RETRY_INTERVAL_MS)) {
-    return await fallbackQuery();
-  }
-
-  try {
-    // Attempt database call
-    const result = await dbQuery();
-    if (isDbOffline) {
-      console.log('Database connection restored.');
-      isDbOffline = false;
-    }
-    return result;
-  } catch (error: any) {
-    const isConnectionError = 
-      error.code === 'P1001' || 
-      error.name === 'PrismaClientInitializationError' || 
-      (error.message && (
-        error.message.includes('Can\'t reach database') ||
-        error.message.includes('localhost:5432') ||
-        error.message.includes('PrismaClientInitializationError')
-      ));
-
-    if (isConnectionError) {
-      if (!isDbOffline) {
-        console.warn('Database is offline, switching to fallback mode (JSON/Firestore).');
-        isDbOffline = true;
-      }
-      lastDbCheckTime = Date.now();
-    }
-
-    if (isWrite && process.env.NODE_ENV === 'production') {
-      console.error('Database mutation failed in production, attempting fallback:', error.message || error);
-      try {
-        return await fallbackQuery();
-      } catch (fallbackError: any) {
-        console.error('Fallback write operation also failed in production:', fallbackError.message || fallbackError);
-        return {
-          error: 'DATABASE_MUTATION_FAILED',
-          message: error.message || String(error)
-        } as any;
-      }
-    }
-    // Fall back to local file state if DB fails
-    console.warn('Database access failed, falling back to local file state:', error.message || error);
-    return await fallbackQuery();
-  }
+  return await dbQuery();
 }
+
 
 // Helper to extract clean word tokens from text
 function tokenizeText(text: string): string[] {
@@ -864,22 +819,59 @@ export async function updateRecipe(id: string, data: any) {
 export async function deleteRecipe(id: string) {
   await checkAuth();
   invalidateRecipesCache();
-  return runWithFallback(
-    async () => {
-      await db.recipe.delete({
-        where: { id }
-      });
-      return { success: true };
-    },
-    async () => {
-      let recipes = await getFallbackRecipes();
-      recipes = recipes.filter((r) => r.id !== id);
-      await saveFallbackRecipes(recipes);
-      return { success: true };
-    },
-    true
-  );
+  
+  let deletedFromDb = false;
+  let deletedFromFb = false;
+  let deletedFromLocal = false;
+
+  // 1. Delete from PostgreSQL database
+  try {
+    await db.recipe.delete({
+      where: { id }
+    });
+    deletedFromDb = true;
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      console.warn(`Recipe with id ${id} not found in database, might be a fallback/local recipe.`);
+    } else {
+      console.error(`Database deletion error for recipe ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // 2. Delete from Firebase Firestore if configured
+  if (isFirebaseConfigured() && firestoreDb) {
+    try {
+      await deleteDoc(doc(firestoreDb, 'recipes', id));
+      deletedFromFb = true;
+    } catch (fbError) {
+      console.error(`Failed to delete recipe ${id} from Firestore:`, fbError);
+    }
+  }
+
+  // 3. Delete from local recipes.json file
+  try {
+    const RECIPES_FILE = path.join(process.cwd(), 'recipes.json');
+    if (fs.existsSync(RECIPES_FILE)) {
+      const data = fs.readFileSync(RECIPES_FILE, 'utf8');
+      let recipes = JSON.parse(data);
+      if (Array.isArray(recipes)) {
+        const initialLen = recipes.length;
+        recipes = recipes.filter((r: any) => r.id !== id);
+        if (recipes.length < initialLen) {
+          fs.writeFileSync(RECIPES_FILE, JSON.stringify(recipes, null, 2), 'utf8');
+          deletedFromLocal = true;
+        }
+      }
+    }
+  } catch (fsError) {
+    console.error(`Failed to delete recipe ${id} from recipes.json:`, fsError);
+  }
+
+  console.log(`Recipe deletion results for id ${id} -> DB: ${deletedFromDb}, FB: ${deletedFromFb}, Local: ${deletedFromLocal}`);
+  return { success: true };
 }
+
 
 export async function getWeeklyPlan(weekOffset: number = 0) {
   const now = Date.now();

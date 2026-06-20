@@ -10,7 +10,8 @@
     "postinstall": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate",
     "prisma:generate": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma generate",
     "prisma:push": "export DATABASE_URL=\"${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/meal_planner?schema=public}\" && prisma db push",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "db:cleanup": "node scripts/cleanup-db-duplicates.js"
   },
   "keywords": [],
   "author": "",

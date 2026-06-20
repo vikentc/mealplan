@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import fs from 'fs';
 import path from 'path';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { getTranslatedRecipe } from '@/lib/recipeTranslations';
 import { 
   Ingredient,
@@ -33,8 +34,8 @@ async function checkAuth() {
   return sessionUser;
 }
 
-// Caching layer variables & helper functions
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache TTL in production
+// Caching layer variables & helper functions (disabled in production serverless to prevent stale distributed state)
+const CACHE_TTL_MS = 0; 
 
 let allRecipesCache: any[] | null = null;
 let allRecipesCacheTime = 0;
@@ -46,6 +47,13 @@ function invalidateRecipesCache() {
   allRecipesCache = null;
   allRecipesCacheTime = 0;
   recipeCache = {};
+  try {
+    revalidatePath('/');
+    revalidatePath('/recipes');
+    revalidatePath('/recipes/[id]', 'page');
+  } catch (e) {
+    console.error('revalidatePath error in invalidateRecipesCache:', e);
+  }
 }
 
 function invalidateWeeklyPlanCache(weekOffset?: number) {
@@ -53,6 +61,12 @@ function invalidateWeeklyPlanCache(weekOffset?: number) {
     delete weeklyPlanCache[weekOffset];
   } else {
     weeklyPlanCache = {};
+  }
+  try {
+    revalidatePath('/');
+    revalidatePath('/planner');
+  } catch (e) {
+    console.error('revalidatePath error in invalidateWeeklyPlanCache:', e);
   }
 }
 

@@ -80,9 +80,6 @@ export default function RecommendationCard({
             </span>
 
             <div className="flex items-center gap-3 text-[10px] font-black uppercase text-foreground/80">
-              <span className="px-2 py-0.5 rounded-md border-2 border-foreground bg-blue-100 text-blue-900 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                {t(`details.${recipe.difficulty.toLowerCase()}`)}
-              </span>
               <div className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 text-foreground" />
                 <span>{formatTime(recipe.totalTime)}</span>

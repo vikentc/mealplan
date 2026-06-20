@@ -1609,16 +1609,7 @@ export default function RecipeForm({ recipe: initialRecipe, fallbackId }: Recipe
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.difficulty')}</label>
-              <select
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
-                className="w-full p-3 bg-white border-3 border-foreground rounded-xl text-xs font-black uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
-              >
-                {DIFFICULTIES.map(diff => <option key={diff} value={diff}>{t(`details.${diff.toLowerCase()}`)}</option>)}
-              </select>
-            </div>
+
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-foreground/80 uppercase tracking-widest leading-none block mb-1.5">{t('form.servings')}</label>

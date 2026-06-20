@@ -498,12 +498,7 @@ export default function RecipeDetailsContainer({ recipe: originalRecipe, fallbac
               </span>
             )}
 
-            <span className={cn(
-              "text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-blue-100 text-blue-900"
-            )}>
-              {t(`details.${recipe.difficulty?.toLowerCase()}`)}
-            </span>
-            
+
             {recipe.url && (
               <a
                 href={recipe.url}

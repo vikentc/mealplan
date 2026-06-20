@@ -359,13 +359,59 @@ let isDbOffline = false;
 let lastDbCheckTime = 0;
 const DB_RETRY_INTERVAL_MS = 30000; // Retry DB connection after 30 seconds
 
-// Try-catch wrappers for db queries (redefined to make the PostgreSQL database the sole source of truth)
+// Try-catch wrappers for db queries with fallback to local JSON/Firestore if database is offline
 async function runWithFallback<T>(
   dbQuery: () => Promise<T>, 
   fallbackQuery: () => T | Promise<T>,
   isWrite: boolean = false
 ): Promise<T> {
-  return await dbQuery();
+  const now = Date.now();
+  if (isDbOffline && (now - lastDbCheckTime < DB_RETRY_INTERVAL_MS)) {
+    return await fallbackQuery();
+  }
+
+  try {
+    // Attempt database call
+    const result = await dbQuery();
+    if (isDbOffline) {
+      console.log('Database connection restored.');
+      isDbOffline = false;
+    }
+    return result;
+  } catch (error: any) {
+    const isConnectionError = 
+      error.code === 'P1001' || 
+      error.name === 'PrismaClientInitializationError' || 
+      (error.message && (
+        error.message.includes('Can\'t reach database') ||
+        error.message.includes('localhost:5432') ||
+        error.message.includes('PrismaClientInitializationError')
+      ));
+
+    if (isConnectionError) {
+      if (!isDbOffline) {
+        console.warn('Database is offline, switching to fallback mode (JSON/Firestore).');
+        isDbOffline = true;
+      }
+      lastDbCheckTime = Date.now();
+    }
+
+    if (isWrite && process.env.NODE_ENV === 'production') {
+      console.error('Database mutation failed in production, attempting fallback:', error.message || error);
+      try {
+        return await fallbackQuery();
+      } catch (fallbackError: any) {
+        console.error('Fallback write operation also failed in production:', fallbackError.message || fallbackError);
+        return {
+          error: 'DATABASE_MUTATION_FAILED',
+          message: error.message || String(error)
+        } as any;
+      }
+    }
+    // Fall back to local file state if DB fails
+    console.warn('Database access failed, falling back to local file state:', error.message || error);
+    return await fallbackQuery();
+  }
 }
 
 

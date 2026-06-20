@@ -863,59 +863,75 @@ export async function updateRecipe(id: string, data: any) {
 }
 
 export async function deleteRecipe(id: string) {
-  await checkAuth();
-  invalidateRecipesCache();
-  
-  let deletedFromDb = false;
-  let deletedFromFb = false;
-  let deletedFromLocal = false;
-
-  // 1. Delete from PostgreSQL database
   try {
-    await db.recipe.delete({
-      where: { id }
-    });
-    deletedFromDb = true;
-  } catch (error: any) {
-    if (error.code === 'P2025') {
-      console.warn(`Recipe with id ${id} not found in database, might be a fallback/local recipe.`);
-    } else {
-      console.error(`Database deletion error for recipe ${id}:`, error);
-      throw error;
-    }
-  }
+    await checkAuth();
+    invalidateRecipesCache();
+    
+    let deletedFromDb = false;
+    let deletedFromFb = false;
+    let deletedFromLocal = false;
 
-  // 2. Delete from Firebase Firestore if configured
-  if (isFirebaseConfigured() && firestoreDb) {
+    // 1. Delete from PostgreSQL database
     try {
-      await deleteDoc(doc(firestoreDb, 'recipes', id));
-      deletedFromFb = true;
-    } catch (fbError) {
-      console.error(`Failed to delete recipe ${id} from Firestore:`, fbError);
-    }
-  }
+      await db.recipe.delete({
+        where: { id }
+      });
+      deletedFromDb = true;
+    } catch (error: any) {
+      const isConnectionError = 
+        error.code === 'P1001' || 
+        error.name === 'PrismaClientInitializationError' || 
+        (error.message && (
+          error.message.includes("Can't reach database") ||
+          error.message.includes('localhost:5432') ||
+          error.message.includes('PrismaClientInitializationError')
+        ));
 
-  // 3. Delete from local recipes.json file
-  try {
-    const RECIPES_FILE = path.join(process.cwd(), 'recipes.json');
-    if (fs.existsSync(RECIPES_FILE)) {
-      const data = fs.readFileSync(RECIPES_FILE, 'utf8');
-      let recipes = JSON.parse(data);
-      if (Array.isArray(recipes)) {
-        const initialLen = recipes.length;
-        recipes = recipes.filter((r: any) => r.id !== id);
-        if (recipes.length < initialLen) {
-          fs.writeFileSync(RECIPES_FILE, JSON.stringify(recipes, null, 2), 'utf8');
-          deletedFromLocal = true;
-        }
+      if (error.code === 'P2025') {
+        console.warn(`Recipe with id ${id} not found in database, might be a fallback/local recipe.`);
+      } else if (isConnectionError) {
+        console.warn(`Database is offline, skipping DB deletion for recipe ${id}.`);
+      } else {
+        console.error(`Database deletion error for recipe ${id}:`, error);
+        throw error;
       }
     }
-  } catch (fsError) {
-    console.error(`Failed to delete recipe ${id} from recipes.json:`, fsError);
-  }
 
-  console.log(`Recipe deletion results for id ${id} -> DB: ${deletedFromDb}, FB: ${deletedFromFb}, Local: ${deletedFromLocal}`);
-  return { success: true };
+    // 2. Delete from Firebase Firestore if configured
+    if (isFirebaseConfigured() && firestoreDb) {
+      try {
+        await deleteDoc(doc(firestoreDb, 'recipes', id));
+        deletedFromFb = true;
+      } catch (fbError) {
+        console.error(`Failed to delete recipe ${id} from Firestore:`, fbError);
+      }
+    }
+
+    // 3. Delete from local recipes.json file
+    try {
+      const RECIPES_FILE = path.join(process.cwd(), 'recipes.json');
+      if (fs.existsSync(RECIPES_FILE)) {
+        const data = fs.readFileSync(RECIPES_FILE, 'utf8');
+        let recipes = JSON.parse(data);
+        if (Array.isArray(recipes)) {
+          const initialLen = recipes.length;
+          recipes = recipes.filter((r: any) => r.id !== id);
+          if (recipes.length < initialLen) {
+            fs.writeFileSync(RECIPES_FILE, JSON.stringify(recipes, null, 2), 'utf8');
+            deletedFromLocal = true;
+          }
+        }
+      }
+    } catch (fsError) {
+      console.error(`Failed to delete recipe ${id} from recipes.json:`, fsError);
+    }
+
+    console.log(`Recipe deletion results for id ${id} -> DB: ${deletedFromDb}, FB: ${deletedFromFb}, Local: ${deletedFromLocal}`);
+    return { success: true };
+  } catch (err: any) {
+    console.error(`deleteRecipe action error for id ${id}:`, err);
+    return { error: 'DELETE_FAILED', message: err.message || 'Kunde inte ta bort receptet.' };
+  }
 }
 
 

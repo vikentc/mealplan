@@ -311,24 +311,53 @@ export default function HomeClient({
   return (
     <div ref={containerRef} className="relative overflow-hidden px-3 -mx-3 space-y-10 pb-12">
       
-      {/* Shopping List Quick Link Indicator */}
-      {itemCount > 0 && (
-        <div className="flex justify-center -mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
-          <Link
-            href="/shopping-list"
-            className="flex items-center gap-2.5 px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-950 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600"></span>
-            </span>
-            <span>
-              {language === 'sv' 
-                ? `Du har ${itemCount} ${itemCount === 1 ? 'vara' : 'varor'} att handla i inköpslistan!` 
-                : `You have ${itemCount} ${itemCount === 1 ? 'item' : 'items'} in your shopping list!`}
-            </span>
-            <ChevronRight className="h-4.5 w-4.5 text-foreground group-hover:translate-x-1 transition-transform duration-200" />
-          </Link>
+      {/* Top Quick-Link Notification Center */}
+      {(itemCount > 0 || upcomingMeals.length > 0) && (
+        <div className="flex flex-col items-center gap-3.5 -mb-6 animate-in fade-in slide-in-from-top-4 duration-300 w-full">
+          {/* Shopping List Quick Link Indicator */}
+          {itemCount > 0 && (
+            <Link
+              href="/shopping-list"
+              className="flex items-center gap-2.5 px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-950 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600"></span>
+              </span>
+              <span>
+                {language === 'sv' 
+                  ? `Du har ${itemCount} ${itemCount === 1 ? 'vara' : 'varor'} att handla i inköpslistan!` 
+                  : `You have ${itemCount} ${itemCount === 1 ? 'item' : 'items'} in your shopping list!`}
+              </span>
+              <ChevronRight className="h-4.5 w-4.5 text-foreground group-hover:translate-x-1 transition-transform duration-200" />
+            </Link>
+          )}
+
+          {/* Next Planned Meal Indicator */}
+          {upcomingMeals.length > 0 && (() => {
+            const nextPlan = upcomingMeals[0];
+            const recipe = nextPlan.recipe;
+            const dayStr = getRelativeDayName(nextPlan.dayOfWeek, nextPlan.relativeDayIndex);
+            const slotStr = language === 'sv' ? mealTypeLabels[nextPlan.mealSlot] || nextPlan.mealSlot : nextPlan.mealSlot;
+
+            return (
+              <Link
+                href={`/recipes/${recipe.id}`}
+                className="flex items-center gap-2.5 px-5 py-2.5 bg-cyan-100 hover:bg-cyan-200 text-cyan-950 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer group"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-600"></span>
+                </span>
+                <span>
+                  {language === 'sv' 
+                    ? `Nästa måltid: ${recipe.name} (${dayStr} ${slotStr.toLowerCase()})` 
+                    : `Next meal: ${recipe.name} (${dayStr} ${slotStr})`}
+                </span>
+                <ChevronRight className="h-4.5 w-4.5 text-foreground group-hover:translate-x-1 transition-transform duration-200" />
+              </Link>
+            );
+          })()}
         </div>
       )}
       
@@ -413,69 +442,7 @@ export default function HomeClient({
         </motion.div>
       </motion.section>
 
-      {/* Next Planned Meal Alert (Compact At-a-glance Reminder) */}
-      {upcomingMeals.length > 0 && (() => {
-        const nextPlan = upcomingMeals[0];
-        const recipe = nextPlan.recipe;
-        const dayStr = getRelativeDayName(nextPlan.dayOfWeek, nextPlan.relativeDayIndex);
-        const slotStr = language === 'sv' ? mealTypeLabels[nextPlan.mealSlot] || nextPlan.mealSlot : nextPlan.mealSlot;
 
-        return (
-          <div className="bg-amber-50 border-3 border-foreground rounded-2xl p-3.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
-            <div className="flex items-center gap-3.5 min-w-0">
-              {/* Recipe Image Thumbnail */}
-              <div className="relative h-14 w-14 rounded-xl overflow-hidden bg-secondary border-2 border-foreground shadow-sm shrink-0">
-                {recipe.image ? (
-                  <Image
-                    src={recipe.image}
-                    alt={recipe.name}
-                    fill
-                    className="object-cover"
-                    sizes="56px"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-secondary flex items-center justify-center text-[9px] text-muted-foreground font-black uppercase">
-                    {language === 'sv' ? 'Måltid' : 'Meal'}
-                  </div>
-                )}
-              </div>
-
-              {/* Text Information */}
-              <div className="min-w-0">
-                <span className="text-[9px] font-black uppercase tracking-wider text-rose-800 bg-rose-100 border border-foreground/35 px-2 py-0.5 rounded-md inline-block mb-1">
-                  🔔 {language === 'sv' ? 'Planerad måltid' : 'Planned Meal'}
-                </span>
-                
-                <h4 className="font-black text-xs text-foreground uppercase tracking-tight truncate max-w-[200px] sm:max-w-xs md:max-w-md">
-                  {recipe.name}
-                </h4>
-                
-                <p className="text-[10px] text-muted-foreground font-semibold mt-0.5 uppercase tracking-wide">
-                  {dayStr} · {slotStr} · {recipe.nutrition?.calories || 0} kcal
-                </p>
-              </div>
-            </div>
-
-            {/* Quick Action Buttons */}
-            <div className="flex items-center gap-2 shrink-0">
-              <Link
-                href={`/recipes/${recipe.id}`}
-                className="px-3.5 py-2 bg-foreground hover:bg-foreground/90 text-background text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px]"
-              >
-                {language === 'sv' ? 'Visa' : 'View'}
-              </Link>
-              
-              <Link
-                href="/planner"
-                className="hidden sm:flex px-3 py-2 bg-white border-2 border-foreground hover:bg-secondary text-[10px] font-black uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px]"
-                title={language === 'sv' ? 'Veckoplanering' : 'Weekly Planner'}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        );
-      })()}
 
       {/* Selector Grid (cravings + meal types selection) */}
       <RecommendationSelector />

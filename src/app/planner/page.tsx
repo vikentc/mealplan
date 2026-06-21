@@ -15,13 +15,11 @@ interface PlannerPageProps {
 
 export default async function PlannerPage({ searchParams }: PlannerPageProps) {
   const resolvedParams = await searchParams;
-  const weekOffset = resolvedParams.weekOffset !== undefined 
-    ? Number(resolvedParams.weekOffset) 
-    : 0;
+  const weekOffset = 0;
 
   // Fetch all recipes for picker, and current plans
   const { recipes } = await getRecipes();
-  const plans = await getWeeklyPlan(weekOffset);
+  const plans = await getWeeklyPlan(0);
 
   // Cast recipe objects to simplify typing
   const formattedRecipes = recipes.map((r: any) => ({

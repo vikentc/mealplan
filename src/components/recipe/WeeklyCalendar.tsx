@@ -386,25 +386,8 @@ export default function WeeklyCalendar({
             </div>
           </div>
 
-          {/* Week offset selectors & Action buttons */}
+          {/* Action buttons */}
           <div className="flex items-center gap-2.5 flex-wrap">
-            <button
-              onClick={() => onWeekOffsetChange(weekOffset - 1)}
-              className="h-10 w-10 bg-card border-2 border-foreground hover:bg-secondary flex items-center justify-center rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
-              title={language === 'sv' ? 'Föregående vecka' : 'Previous week'}
-            >
-              <ChevronLeft className="h-4.5 w-4.5" />
-            </button>
-            <span className="px-4 py-2 bg-amber-100 text-amber-950 border-2 border-foreground rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-[10px] font-black uppercase tracking-wider select-none">
-              {weekOffset === 0 ? t('planner.this_week') : weekOffset === 1 ? t('planner.next_week') : t('planner.week_offset', { offset: weekOffset.toString() })}
-            </span>
-            <button
-              onClick={() => onWeekOffsetChange(weekOffset + 1)}
-              className="h-10 w-10 bg-card border-2 border-foreground hover:bg-secondary flex items-center justify-center rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
-              title={language === 'sv' ? 'Nästa vecka' : 'Next week'}
-            >
-              <ChevronRight className="h-4.5 w-4.5" />
-            </button>
 
             {/* Autofill Button */}
             <button

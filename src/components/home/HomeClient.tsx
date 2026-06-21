@@ -123,21 +123,21 @@ export default function HomeClient({
       .map(p => {
         const dayIndex = DAYS.indexOf(p.dayOfWeek);
         const slotIndex = SLOT_ORDER.indexOf(p.mealSlot);
-        const rank = (p.weekOffset || 0) * 100 + (dayIndex >= 0 ? dayIndex : 0) * 10 + (slotIndex >= 0 ? slotIndex : 0);
-        return { ...p, rank };
+        // Calculate relative day index from today (0 = today, 1 = tomorrow, ..., 6 = yesterday/wrap-around)
+        const relativeDayIndex = (dayIndex - currentDayIndex + 7) % 7;
+        const rank = relativeDayIndex * 10 + (slotIndex >= 0 ? slotIndex : 0);
+        return { ...p, relativeDayIndex, rank };
       })
       .filter(p => {
-        const isFutureWeek = (p.weekOffset || 0) > 0;
-        const currentRank = currentDayIndex * 10 + currentSlotIndex;
-        const isFutureTodayOrLater = (p.weekOffset || 0) === 0 && p.rank >= currentRank;
-        return isFutureWeek || isFutureTodayOrLater;
+        // Keep planned meals for later today, or any upcoming day (wrapping around the week)
+        return p.relativeDayIndex > 0 || (p.relativeDayIndex === 0 && (p.rank % 10) >= currentSlotIndex);
       })
       .sort((a, b) => a.rank - b.rank);
 
     setUpcomingMeals(upcoming);
   }, [weeklyPlans]);
 
-  const getRelativeDayName = (dayOfWeek: string, weekOffset: number) => {
+  const getRelativeDayName = (dayOfWeek: string, relativeDayIndex: number) => {
     const dayNamesSv: Record<string, string> = {
       'Monday': 'Måndag',
       'Tuesday': 'Tisdag',
@@ -158,27 +158,12 @@ export default function HomeClient({
       'Sunday': 'Sunday'
     };
 
-    if (weekOffset === 0) {
-      const now = new Date();
-      const todayIndex = (now.getDay() + 6) % 7; // Monday = 0, Sunday = 6
-      const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-      const planDayIndex = DAYS.indexOf(dayOfWeek);
-
-      if (planDayIndex === todayIndex) {
-        return language === 'sv' ? 'Idag' : 'Today';
-      }
-      if (planDayIndex === (todayIndex + 1) % 7) {
-        return language === 'sv' ? 'Imorgon' : 'Tomorrow';
-      }
-      return language === 'sv' ? dayNamesSv[dayOfWeek] : dayNamesEn[dayOfWeek];
+    if (relativeDayIndex === 0) {
+      return language === 'sv' ? 'Idag' : 'Today';
     }
-
-    if (weekOffset === 1) {
-      return language === 'sv' 
-        ? `Nästa ${dayNamesSv[dayOfWeek].toLowerCase()}` 
-        : `Next ${dayNamesEn[dayOfWeek]}`;
+    if (relativeDayIndex === 1) {
+      return language === 'sv' ? 'Imorgon' : 'Tomorrow';
     }
-
     return language === 'sv' ? dayNamesSv[dayOfWeek] : dayNamesEn[dayOfWeek];
   };
 
@@ -462,7 +447,7 @@ export default function HomeClient({
               {(() => {
                 const nextPlan = upcomingMeals[0];
                 const recipe = nextPlan.recipe;
-                const dayStr = getRelativeDayName(nextPlan.dayOfWeek, nextPlan.weekOffset);
+                const dayStr = getRelativeDayName(nextPlan.dayOfWeek, nextPlan.relativeDayIndex);
                 const slotStr = language === 'sv' ? mealTypeLabels[nextPlan.mealSlot] || nextPlan.mealSlot : nextPlan.mealSlot;
 
                 return (
@@ -538,7 +523,7 @@ export default function HomeClient({
                 <div className="flex gap-4 overflow-x-auto pb-3 pt-1 px-1 scrollbar-none -mx-4 px-4 lg:mx-0 lg:px-0">
                   {upcomingMeals.slice(1, 6).map((plan, index) => {
                     const recipe = plan.recipe;
-                    const dayStr = getRelativeDayName(plan.dayOfWeek, plan.weekOffset);
+                    const dayStr = getRelativeDayName(plan.dayOfWeek, plan.relativeDayIndex);
                     const slotStr = language === 'sv' ? mealTypeLabels[plan.mealSlot] || plan.mealSlot : plan.mealSlot;
 
                     return (

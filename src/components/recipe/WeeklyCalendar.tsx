@@ -100,6 +100,7 @@ export default function WeeklyCalendar({
 }: WeeklyCalendarProps) {
   const [plans, setPlans] = useState<Record<string, Record<string, Recipe | null>>>({});
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMealTypeFilter, setSelectedMealTypeFilter] = useState<string>('all');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -162,6 +163,7 @@ export default function WeeklyCalendar({
   const handleCellClick = (day: string, slot: string) => {
     setActiveSelectCell({ day, slot });
     setSearchQuery(''); // Reset search input on open
+    setSelectedMealTypeFilter(slot); // Default filter to clicked cell's slot
   };
 
   const selectRecipeForCell = (recipe: Recipe) => {
@@ -346,10 +348,21 @@ export default function WeeklyCalendar({
   };
 
   // Filter recipes for dialog picker
-  const filteredRecipes = translatedRecipes.filter(r => 
-    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.cuisine.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredRecipes = translatedRecipes.filter(r => {
+    // 1. Search Query Filter
+    const matchesSearch = searchQuery === '' || 
+                          r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          r.cuisine.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // 2. Meal Type Filter
+    if (selectedMealTypeFilter !== 'all') {
+      const recipeMealTypes = r.mealTypes || (r.mealType ? [r.mealType] : []);
+      const matchesMealType = recipeMealTypes.some((m: string) => m.toLowerCase() === selectedMealTypeFilter.toLowerCase());
+      if (!matchesMealType) return false;
+    }
+
+    return matchesSearch;
+  });
 
   // Calculate daily totals
   const getDayNutrients = (day: string) => {
@@ -576,7 +589,7 @@ export default function WeeklyCalendar({
             </div>
 
             {/* Dialog Search */}
-            <div className="relative mb-5">
+            <div className="relative mb-4">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground z-10" />
               <input
                 type="text"
@@ -587,6 +600,32 @@ export default function WeeklyCalendar({
               />
             </div>
 
+            {/* Dialog Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-4 pt-1 mb-2.5 scrollbar-none shrink-0">
+              {['all', 'breakfast', 'lunch', 'dinner', 'dessert', 'snack'].map((type) => {
+                const isSelected = selectedMealTypeFilter === type;
+                const label = type === 'all' 
+                  ? (language === 'sv' ? 'Alla' : 'All') 
+                  : (t(`meal.${type}`) || type);
+                
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setSelectedMealTypeFilter(type)}
+                    className={cn(
+                      "px-3.5 py-1.5 border-2 border-foreground rounded-full text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-[0.5px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[0.5px] active:shadow-[0.5px_0.5px_0px_0px_rgba(0,0,0,1)]",
+                      isSelected
+                        ? "bg-amber-100 text-amber-950 font-black border-foreground"
+                        : "bg-white text-foreground hover:bg-amber-50/50"
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Dialog recipe list - 2 column grid */}
             <div className="flex-1 overflow-y-auto pr-1">
               {filteredRecipes.length > 0 ? (
@@ -595,31 +634,45 @@ export default function WeeklyCalendar({
                     <div
                       key={recipe.id}
                       onClick={() => selectRecipeForCell(recipe)}
-                      className="flex items-center gap-3 p-3 bg-white border-2 border-foreground rounded-2xl cursor-pointer hover:bg-amber-50 hover:translate-y-[-1px] transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group"
+                      className="flex items-center justify-between p-3 bg-white border-2 border-foreground rounded-2xl cursor-pointer hover:bg-amber-50 hover:translate-y-[-1px] transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group"
                     >
-                      <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-secondary shrink-0 border-2 border-foreground shadow-sm">
-                        {recipe.image ? (
-                          <Image
-                            src={recipe.image}
-                            alt={recipe.name}
-                            fill
-                            className="object-cover"
-                            sizes="40px"
-                          />
-                        ) : (
-                          <div className="h-full w-full bg-secondary flex items-center justify-center text-[9px] text-muted-foreground font-black uppercase">
-                            {t('planner.meal')}
+                      {/* Left: Info */}
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-secondary shrink-0 border-2 border-foreground shadow-sm">
+                          {recipe.image ? (
+                            <Image
+                              src={recipe.image}
+                              alt={recipe.name}
+                              fill
+                              className="object-cover"
+                              sizes="40px"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-secondary flex items-center justify-center text-[9px] text-muted-foreground font-black uppercase">
+                              {t('planner.meal')}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="min-w-0 flex-1">
+                          <h5 className="font-black text-xs text-foreground truncate group-hover:text-amber-850 uppercase tracking-tight">{recipe.name}</h5>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[10px] text-muted-foreground font-bold uppercase">{recipe.cuisine}</span>
+                            <span className="text-[10px] text-emerald-800 bg-emerald-100 border border-foreground/30 px-2 py-0.5 rounded-md font-black">{recipe.nutrition?.protein || 0}g P</span>
                           </div>
-                        )}
-                      </div>
-                      
-                      <div className="min-w-0 flex-1">
-                        <h5 className="font-black text-xs text-foreground truncate group-hover:text-amber-850 uppercase tracking-tight">{recipe.name}</h5>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] text-muted-foreground font-bold uppercase">{recipe.cuisine}</span>
-                          <span className="text-[10px] text-emerald-800 bg-emerald-100 border border-foreground/30 px-2 py-0.5 rounded-md font-black">{recipe.nutrition?.protein || 0}g P</span>
                         </div>
                       </div>
+
+                      {/* Right: View Action Button */}
+                      <a
+                        href={`/recipes/${recipe.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="ml-3 px-3 py-1.5 bg-foreground hover:bg-foreground/90 text-background text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2.5px_2.5px_0px_0px_rgba(0,0,0,1)] active:translate-y-[0.5px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] text-center cursor-pointer shrink-0"
+                      >
+                        {language === 'sv' ? 'Visa' : 'View'}
+                      </a>
                     </div>
                   ))}
                 </div>

@@ -369,7 +369,7 @@ export default function WeeklyCalendar({
   };
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative pb-24 md:pb-0">
       
       {/* Calendar Area */}
       <div className="flex flex-col gap-6 w-full">
@@ -410,7 +410,7 @@ export default function WeeklyCalendar({
             <button
               onClick={handleAutofill}
               type="button"
-              className="ml-2 px-5 py-2.5 bg-cyan-400 hover:bg-cyan-300 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2 cursor-pointer"
+              className="hidden md:flex ml-2 px-5 py-2.5 bg-cyan-400 hover:bg-cyan-300 text-foreground border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] items-center gap-2 cursor-pointer"
               title={t('planner.autofill_title')}
             >
               <Sparkles className="h-4 w-4" />
@@ -421,7 +421,7 @@ export default function WeeklyCalendar({
             <button
               onClick={handleClearAll}
               type="button"
-              className="ml-2 px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2 cursor-pointer"
+              className="hidden md:flex ml-2 px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-800 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] items-center gap-2 cursor-pointer"
               title={t('planner.clear_title')}
             >
               <Trash2 className="h-4 w-4" />
@@ -433,7 +433,7 @@ export default function WeeklyCalendar({
               onClick={handleSave}
               disabled={isSaving}
               className={cn(
-                "ml-2 px-5 py-2.5 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2 cursor-pointer",
+                "hidden md:flex ml-2 px-5 py-2.5 border-3 border-foreground font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] items-center gap-2 cursor-pointer",
                 saveSuccess
                   ? "bg-green-700 text-white"
                   : "bg-emerald-500 hover:bg-emerald-400 text-foreground"
@@ -720,6 +720,43 @@ export default function WeeklyCalendar({
           </div>
         </div>
       )}
+      {/* Floating Sticky Actions Dock for Mobile Portrait Layout */}
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-md bg-card/95 backdrop-blur-md border-3 border-foreground rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 flex items-center justify-between gap-3 animate-in slide-in-from-bottom-10 duration-300 md:hidden">
+        {/* Mobile Clear Button */}
+        <button
+          onClick={handleClearAll}
+          type="button"
+          className="h-12 w-12 bg-red-100 hover:bg-red-200 text-red-800 border-2 border-foreground flex items-center justify-center rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all"
+          title={t('planner.clear_title')}
+        >
+          <Trash2 className="h-5 w-5" />
+        </button>
+
+        {/* Mobile Autofill Button */}
+        <button
+          onClick={handleAutofill}
+          type="button"
+          className="h-12 w-12 bg-cyan-400 hover:bg-cyan-300 text-foreground border-2 border-foreground flex items-center justify-center rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all"
+          title={t('planner.autofill_title')}
+        >
+          <Sparkles className="h-5 w-5" />
+        </button>
+
+        {/* Mobile Save Button */}
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className={cn(
+            "flex-1 h-12 border-2 border-foreground font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-2 cursor-pointer",
+            saveSuccess
+              ? "bg-green-700 text-white"
+              : "bg-emerald-500 hover:bg-emerald-400 text-foreground"
+          )}
+        >
+          <Save className="h-4.5 w-4.5" />
+          <span>{isSaving ? t('planner.saving') : saveSuccess ? t('planner.saved') : t('planner.save')}</span>
+        </button>
+      </div>
 
     </div>
   );

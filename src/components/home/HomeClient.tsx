@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { 
@@ -30,6 +31,7 @@ interface HomeClientProps {
   isSearchActive: boolean;
   isRecommendationActive: boolean;
   shoppingItemCount?: number;
+  weeklyPlans?: any[];
 }
 
 const mealTypeLabels: Record<string, string> = {
@@ -75,7 +77,8 @@ export default function HomeClient({
   recipes,
   isSearchActive,
   isRecommendationActive,
-  shoppingItemCount = 0
+  shoppingItemCount = 0,
+  weeklyPlans = []
 }: HomeClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showRules, setShowRules] = useState(false);
@@ -89,6 +92,95 @@ export default function HomeClient({
   const [itemCount, setItemCount] = useState(shoppingItemCount);
   const [displayRecipes, setDisplayRecipes] = useState<any[]>(recipes);
   const { t, language } = useLanguage();
+
+  const [upcomingMeals, setUpcomingMeals] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!weeklyPlans || weeklyPlans.length === 0) {
+      setUpcomingMeals([]);
+      return;
+    }
+
+    const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const SLOT_ORDER = ['breakfast', 'lunch', 'snack', 'dinner'];
+
+    // Get current local date & time
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentDayIndex = (now.getDay() + 6) % 7; // Monday is 0, Sunday is 6
+
+    // Determine current slot index based on time
+    let currentSlotIndex = 0;
+    if (currentHour >= 10 && currentHour < 14) {
+      currentSlotIndex = 1; // lunch
+    } else if (currentHour >= 14 && currentHour < 17) {
+      currentSlotIndex = 2; // snack
+    } else if (currentHour >= 17) {
+      currentSlotIndex = 3; // dinner
+    }
+
+    const upcoming = weeklyPlans
+      .map(p => {
+        const dayIndex = DAYS.indexOf(p.dayOfWeek);
+        const slotIndex = SLOT_ORDER.indexOf(p.mealSlot);
+        const rank = (p.weekOffset || 0) * 100 + (dayIndex >= 0 ? dayIndex : 0) * 10 + (slotIndex >= 0 ? slotIndex : 0);
+        return { ...p, rank };
+      })
+      .filter(p => {
+        const isFutureWeek = (p.weekOffset || 0) > 0;
+        const currentRank = currentDayIndex * 10 + currentSlotIndex;
+        const isFutureTodayOrLater = (p.weekOffset || 0) === 0 && p.rank >= currentRank;
+        return isFutureWeek || isFutureTodayOrLater;
+      })
+      .sort((a, b) => a.rank - b.rank);
+
+    setUpcomingMeals(upcoming);
+  }, [weeklyPlans]);
+
+  const getRelativeDayName = (dayOfWeek: string, weekOffset: number) => {
+    const dayNamesSv: Record<string, string> = {
+      'Monday': 'Måndag',
+      'Tuesday': 'Tisdag',
+      'Wednesday': 'Onsdag',
+      'Thursday': 'Torsdag',
+      'Friday': 'Fredag',
+      'Saturday': 'Lördag',
+      'Sunday': 'Söndag'
+    };
+
+    const dayNamesEn: Record<string, string> = {
+      'Monday': 'Monday',
+      'Tuesday': 'Tuesday',
+      'Wednesday': 'Wednesday',
+      'Thursday': 'Thursday',
+      'Friday': 'Friday',
+      'Saturday': 'Saturday',
+      'Sunday': 'Sunday'
+    };
+
+    if (weekOffset === 0) {
+      const now = new Date();
+      const todayIndex = (now.getDay() + 6) % 7; // Monday = 0, Sunday = 6
+      const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const planDayIndex = DAYS.indexOf(dayOfWeek);
+
+      if (planDayIndex === todayIndex) {
+        return language === 'sv' ? 'Idag' : 'Today';
+      }
+      if (planDayIndex === (todayIndex + 1) % 7) {
+        return language === 'sv' ? 'Imorgon' : 'Tomorrow';
+      }
+      return language === 'sv' ? dayNamesSv[dayOfWeek] : dayNamesEn[dayOfWeek];
+    }
+
+    if (weekOffset === 1) {
+      return language === 'sv' 
+        ? `Nästa ${dayNamesSv[dayOfWeek].toLowerCase()}` 
+        : `Next ${dayNamesEn[dayOfWeek]}`;
+    }
+
+    return language === 'sv' ? dayNamesSv[dayOfWeek] : dayNamesEn[dayOfWeek];
+  };
 
   useEffect(() => {
     setQueryText(activeQuery);
@@ -335,6 +427,170 @@ export default function HomeClient({
           </button>
         </motion.div>
       </motion.section>
+
+      {/* Upcoming Meals Section (Clean Neo-brutalist Card Grid) */}
+      {upcomingMeals.length > 0 && (
+        <div className="bg-amber-50/50 border-3 border-foreground rounded-[2rem] p-5 md:p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-[radial-gradient(rgba(0,0,0,0.03)_1.5px,transparent_1.5px)] [background-size:16px_16px] space-y-5">
+          <div className="flex items-center justify-between border-b-2 border-dashed border-foreground/30 pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-amber-100 border-2 border-foreground text-foreground flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <Coffee className="h-4.5 w-4.5 animate-bounce-subtle" />
+              </div>
+              <div>
+                <h3 className="font-black text-sm md:text-base text-foreground uppercase tracking-tight">
+                  {t('home.upcoming_title')}
+                </h3>
+                <p className="text-[9px] text-muted-foreground font-semibold uppercase tracking-wider">
+                  {language === 'sv' ? 'Vad som serveras härnäst i köket' : 'What is serving next in the kitchen'}
+                </p>
+              </div>
+            </div>
+            
+            <Link
+              href="/planner"
+              className="px-3.5 py-1.5 bg-white border-2 border-foreground hover:bg-amber-100 text-[10px] font-black uppercase tracking-wider rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>{language === 'sv' ? 'Öppna kalender' : 'Open calendar'}</span>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          {/* Grid Layout: Next Meal Spotlight (Left) & Horizontal scroll of the rest (Right) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Left: Next Meal Spotlight */}
+            <div className="lg:col-span-5 bg-white border-2 border-foreground rounded-[1.5rem] p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-between">
+              {(() => {
+                const nextPlan = upcomingMeals[0];
+                const recipe = nextPlan.recipe;
+                const dayStr = getRelativeDayName(nextPlan.dayOfWeek, nextPlan.weekOffset);
+                const slotStr = language === 'sv' ? mealTypeLabels[nextPlan.mealSlot] || nextPlan.mealSlot : nextPlan.mealSlot;
+
+                return (
+                  <div className="space-y-4 h-full flex flex-col justify-between">
+                    <div>
+                      <span className="text-[9px] font-black uppercase tracking-wider text-rose-800 bg-rose-100 border border-foreground/35 px-2.5 py-1 rounded-md inline-block mb-3.5">
+                        🔥 {t('home.next_meal')}
+                      </span>
+                      
+                      {/* Flex layout for image and text details */}
+                      <div className="flex gap-4">
+                        <div className="relative h-20 w-20 rounded-xl overflow-hidden bg-secondary border-2 border-foreground shadow-sm shrink-0">
+                          {recipe.image ? (
+                            <Image
+                              src={recipe.image}
+                              alt={recipe.name}
+                              fill
+                              className="object-cover"
+                              sizes="80px"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-secondary flex items-center justify-center text-[10px] text-muted-foreground font-black uppercase">
+                              {language === 'sv' ? 'Måltid' : 'Meal'}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <span className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded-md font-bold inline-block uppercase tracking-wider">
+                            {dayStr} · {slotStr}
+                          </span>
+                          <h4 className="font-black text-sm text-foreground uppercase tracking-tight line-clamp-2 leading-tight">
+                            {recipe.name}
+                          </h4>
+                          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">
+                            {recipe.cuisine} · {recipe.nutrition?.calories || 0} kcal
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-3 border-t border-dashed border-foreground/20 mt-4">
+                      <div className="flex items-center gap-1.5 font-mono text-[9px] font-bold text-foreground/80">
+                        <span className="bg-emerald-100 text-emerald-950 border border-foreground/25 px-1.5 py-0.5 rounded">
+                          💪 {recipe.nutrition?.protein || 0}g P
+                        </span>
+                        <span className="bg-blue-100 text-blue-950 border border-foreground/25 px-1.5 py-0.5 rounded">
+                          🍞 {recipe.nutrition?.carbohydrates || 0}g C
+                        </span>
+                      </div>
+                      
+                      <Link
+                        href={`/recipes/${recipe.id}`}
+                        className="px-3.5 py-2 bg-foreground hover:bg-foreground/90 text-background text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px]"
+                      >
+                        {language === 'sv' ? 'Visa recept' : 'View recipe'}
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Right: The rest of the upcoming meals */}
+            <div className="lg:col-span-7 flex flex-col justify-center">
+              <h4 className="text-[10px] font-black uppercase tracking-wider text-foreground/70 mb-3 flex items-center gap-1.5 px-1">
+                <span>{t('home.upcoming_all')}</span>
+                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse inline-block"></span>
+              </h4>
+
+              {upcomingMeals.length > 1 ? (
+                /* Scrollable Row Container optimized for mobile swipe */
+                <div className="flex gap-4 overflow-x-auto pb-3 pt-1 px-1 scrollbar-none -mx-4 px-4 lg:mx-0 lg:px-0">
+                  {upcomingMeals.slice(1, 6).map((plan, index) => {
+                    const recipe = plan.recipe;
+                    const dayStr = getRelativeDayName(plan.dayOfWeek, plan.weekOffset);
+                    const slotStr = language === 'sv' ? mealTypeLabels[plan.mealSlot] || plan.mealSlot : plan.mealSlot;
+
+                    return (
+                      <Link
+                        key={plan.id || index}
+                        href={`/recipes/${recipe.id}`}
+                        className="bg-white border-2 border-foreground rounded-2xl p-3 w-48 shrink-0 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[1px] transition-all flex flex-col justify-between space-y-3 group cursor-pointer"
+                      >
+                        <div className="space-y-2">
+                          <div className="relative h-24 w-full rounded-xl overflow-hidden bg-secondary border border-foreground/35">
+                            {recipe.image ? (
+                              <Image
+                                src={recipe.image}
+                                alt={recipe.name}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                sizes="200px"
+                              />
+                            ) : (
+                              <div className="h-full w-full bg-secondary flex items-center justify-center text-[10px] text-muted-foreground font-black uppercase">
+                                {language === 'sv' ? 'Måltid' : 'Meal'}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-1 min-w-0">
+                            <span className="text-[8px] text-emerald-800 bg-emerald-50 border border-emerald-250 px-1.5 py-0.25 rounded font-black inline-block uppercase tracking-wider">
+                              {dayStr} · {slotStr}
+                            </span>
+                            <h5 className="font-black text-xs text-foreground uppercase tracking-tight truncate leading-tight group-hover:text-amber-800 transition-colors">
+                              {recipe.name}
+                            </h5>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground border-t border-dashed border-foreground/20 pt-1.5">
+                          <span>{recipe.nutrition?.calories || 0} kcal</span>
+                          <span className="text-emerald-800 font-extrabold">{recipe.nutrition?.protein || 0}g P</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="bg-white border-2 border-dashed border-foreground/20 p-8 rounded-2xl text-center text-xs font-semibold text-muted-foreground uppercase py-10 flex-1 flex items-center justify-center">
+                  {language === 'sv' ? 'Inga fler måltider inplanerade' : 'No other meals planned'}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Selector Grid (cravings + meal types selection) */}
       <RecommendationSelector />

@@ -35,6 +35,13 @@ const translations: Record<Language, Record<string, string>> = {
     'home.no_results_title': 'Inga träffar hittades',
     'home.no_results_desc': 'Vi hittade inga recept som matchar just den valda kombinationen av filter för tillfället. Skapa ett nytt recept eller rensa filtren!',
     'home.create_recipe_btn': 'Skapa ett recept',
+    'home.upcoming_title': 'Planerat i veckan',
+    'home.next_meal': 'Nästa måltid',
+    'home.upcoming_all': 'Kommande i kalendern',
+    'home.upcoming_empty': 'Inga måltider planerade för resten av veckan.',
+    'home.plan_now': 'Planera nu',
+    'home.today': 'Idag',
+    'home.tomorrow': 'Imorgon',
 
     // find me a meal modal
     'modal.tag': 'Måltidsväljare 🎲',
@@ -316,6 +323,13 @@ const translations: Record<Language, Record<string, string>> = {
     'home.no_results_title': 'No matches found',
     'home.no_results_desc': "We couldn't find any recipes matching the selected combination of filters. Create a new recipe or clear filters!",
     'home.create_recipe_btn': 'Create a recipe',
+    'home.upcoming_title': 'Planned this week',
+    'home.next_meal': 'Next meal',
+    'home.upcoming_all': 'Upcoming in calendar',
+    'home.upcoming_empty': 'No meals planned for the rest of the week.',
+    'home.plan_now': 'Plan now',
+    'home.today': 'Today',
+    'home.tomorrow': 'Tomorrow',
 
     // find me a meal modal
     'modal.tag': 'Meal Selector 🎲',

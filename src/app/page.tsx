@@ -33,9 +33,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const mealType = resolvedParams.mealType || '';
   const craving = resolvedParams.craving || '';
 
-  // Fetch plans for the current week to exclude already planned meals
+  // Fetch plans for the current and next week
   const currentWeekPlans = await getWeeklyPlan(0);
-  const currentWeekRecipeIds = currentWeekPlans.map((p: any) => p.recipeId);
+  const nextWeekPlans = await getWeeklyPlan(1);
+  const weeklyPlans = [...currentWeekPlans, ...nextWeekPlans];
 
   // Fetch filtered recipes with combined filters and cravings
   const searchResult = await getRecipes(filters);
@@ -65,6 +66,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       isSearchActive={isSearchActive}
       isRecommendationActive={isRecommendationActive}
       shoppingItemCount={shoppingItemCount}
+      weeklyPlans={weeklyPlans}
     />
   );
 }

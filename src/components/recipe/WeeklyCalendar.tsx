@@ -98,7 +98,19 @@ export default function WeeklyCalendar({
   weekOffset,
   onWeekOffsetChange
 }: WeeklyCalendarProps) {
-  const [plans, setPlans] = useState<Record<string, Record<string, Recipe | null>>>({});
+  const [plans, setPlans] = useState<Record<string, Record<string, Recipe | null>>>(() => {
+    if (typeof window !== 'undefined') {
+      const draftPlans = sessionStorage.getItem('weekly-planner-plans-draft');
+      if (draftPlans) {
+        try {
+          return JSON.parse(draftPlans);
+        } catch (e) {
+          console.error('Failed to parse plans draft:', e);
+        }
+      }
+    }
+    return {};
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMealTypeFilter, setSelectedMealTypeFilter] = useState<string>('all');
   const [isSaving, setIsSaving] = useState(false);
@@ -138,6 +150,11 @@ export default function WeeklyCalendar({
 
   // Initialize plans mapping dynamically per day's slots
   useEffect(() => {
+    // Only load initialPlans if we don't have a local draft!
+    if (typeof window !== 'undefined' && sessionStorage.getItem('weekly-planner-plans-draft')) {
+      return;
+    }
+
     const newPlans: Record<string, Record<string, Recipe | null>> = {};
     DAYS.forEach(day => {
       newPlans[day] = {};
@@ -158,6 +175,64 @@ export default function WeeklyCalendar({
 
     setPlans(newPlans);
   }, [initialPlans]);
+
+  // Load transient dialogue state on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const draftCell = sessionStorage.getItem('weekly-planner-active-cell');
+      const draftQuery = sessionStorage.getItem('weekly-planner-search-query');
+      const draftFilter = sessionStorage.getItem('weekly-planner-meal-filter');
+
+      if (draftCell) {
+        try {
+          setActiveSelectCell(JSON.parse(draftCell));
+        } catch (e) {}
+      }
+      if (draftQuery) {
+        setSearchQuery(draftQuery);
+      }
+      if (draftFilter) {
+        setSelectedMealTypeFilter(draftFilter);
+      }
+    }
+  }, []);
+
+  // Save changes to sessionStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && Object.keys(plans).length > 0) {
+      sessionStorage.setItem('weekly-planner-plans-draft', JSON.stringify(plans));
+    }
+  }, [plans]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (activeSelectCell) {
+        sessionStorage.setItem('weekly-planner-active-cell', JSON.stringify(activeSelectCell));
+      } else {
+        sessionStorage.removeItem('weekly-planner-active-cell');
+      }
+    }
+  }, [activeSelectCell]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (searchQuery) {
+        sessionStorage.setItem('weekly-planner-search-query', searchQuery);
+      } else {
+        sessionStorage.removeItem('weekly-planner-search-query');
+      }
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (selectedMealTypeFilter) {
+        sessionStorage.setItem('weekly-planner-meal-filter', selectedMealTypeFilter);
+      } else {
+        sessionStorage.removeItem('weekly-planner-meal-filter');
+      }
+    }
+  }, [selectedMealTypeFilter]);
 
   // Click-to-assign cell handler
   const handleCellClick = (day: string, slot: string) => {
@@ -221,6 +296,12 @@ export default function WeeklyCalendar({
         setSaveError((result as any).message || String((result as any).error));
       } else {
         setSaveSuccess(true);
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('weekly-planner-plans-draft');
+          sessionStorage.removeItem('weekly-planner-active-cell');
+          sessionStorage.removeItem('weekly-planner-search-query');
+          sessionStorage.removeItem('weekly-planner-meal-filter');
+        }
         setTimeout(() => setSaveSuccess(false), 3000);
       }
     } catch (error: any) {
@@ -345,6 +426,12 @@ export default function WeeklyCalendar({
       });
     });
     setPlans(clearedPlans);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('weekly-planner-plans-draft');
+      sessionStorage.removeItem('weekly-planner-active-cell');
+      sessionStorage.removeItem('weekly-planner-search-query');
+      sessionStorage.removeItem('weekly-planner-meal-filter');
+    }
   };
 
   // Filter recipes for dialog picker
